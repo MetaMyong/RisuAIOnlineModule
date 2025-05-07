@@ -62,32 +62,32 @@ local function showRerollForms(triggerId, generatedImagesInfo)
         local displayIdentifier = safeIdentifierHtml
         local displayLabel = "Identifier:"
         local actionName = ""
-        local buttonText = "리롤"
+        local buttonText = ""
 
         if rerollType == "PROFILE" then
             displayLabel = "ID:"
             actionName = "PROFILE_REROLL"
-            buttonText = "프로필 리롤"
+            buttonText = ""
         elseif rerollType == "SIMULATIONCARD" then
             displayLabel = "NAME:"
             actionName = "SIMCARD_REROLL"
-            buttonText = "시뮬봇 리롤"
+            buttonText = ""
         elseif rerollType == "DC" then
             displayLabel = "DC Index:"
             actionName = "DC_REROLL"
-            buttonText = "DC 리롤"
+            buttonText = ""
         elseif rerollType == "EROSTATUS" then
             displayLabel = "EroStatus ID:"
             actionName = "EROSTATUS_REROLL"
-            buttonText = "에로스테 리롤"
+            buttonText = ""
         elseif rerollType == "TWEET" then
             displayLabel = "Tweet ID:"
             actionName = "TWEET_REROLL"
-            buttonText = "트위터 리롤"
+            buttonText = ""
         elseif rerollType == "KAKAO" then
             displayLabel = "Kakao ID:"
             actionName = "KAKAO_REROLL"
-            buttonText = "카톡 리롤"
+            buttonText = ""
         else
             print("ONLINEMODULE: addRerollForm: Unknown reroll type '" .. tostring(rerollType) .. "'. Skipping snippet generation.")
             return ""
@@ -99,19 +99,18 @@ local function showRerollForms(triggerId, generatedImagesInfo)
         local safeRisuBtnAttr = string.gsub(risuBtnJson, "'", "'")
 
         rerollAreaHtml = string.format([[
-        <div class="profile-reroll-area">
-        <div class="profile-info">
-            <span class="profile-id-label">%s</span>
-            <span class="profile-id-value">%s</span>
-            <div class="profile-preview">%s</div>
-        </div>
-        <button class="reroll-button" risu-btn='%s'>%s</button>
-        </div>
+<div class="profile-reroll-area">
+<div class="profile-info">
+<span class="profile-id-label">%s</span>
+<span class="profile-id-value">%s</span>
+<div class="profile-preview">%s</div>
+</div>
+<button class="reroll-button" risu-btn='%s'>%s</button>
+</div>
         ]], displayLabel, displayIdentifier, inlay, safeRisuBtnAttr, buttonText)
 
         return rerollAreaHtml
     end
-
     print("ONLINEMODULE: showRerollForms: Assembling reroll forms for " .. #generatedImagesInfo .. " generated images.")
     local allRerollHtmlSnippets = {}
     for i, info in ipairs(generatedImagesInfo) do
@@ -128,22 +127,140 @@ local function showRerollForms(triggerId, generatedImagesInfo)
         ]]
         local combinedSnippets = table.concat(allRerollHtmlSnippets, "\n")
 
-        local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
-        local safeGlobalRisuBtnAttr = globalBtnJson
-        local globalButtonHtml = string.format([[
-        <div class="global-reroll-controls">
-          <button class="reroll-button" risu-btn='%s'>리롤 총괄 인터페이스</button>
-        </div>
-        ]], safeGlobalRisuBtnAttr)
-
-        local finalCombinedHtml = prefixHtml .. '<div class="simple-ui-bar">' .. combinedSnippets .. globalButtonHtml .. '</div>'
+        local finalCombinedHtml = prefixHtml .. '<div class="simple-ui-bar">' .. combinedSnippets .. '</div>'
 
         addChat(triggerId, "user", finalCombinedHtml)
-        print("ONLINEMODULE: showRerollForms: Finished adding combined reroll UI with single global button.")
+        print("ONLINEMODULE: showRerollForms: Finished adding combined reroll UI.")
     else
         print("ONLINEMODULE: showRerollForms: No valid snippets generated, skipping final addChat.")
     end
 end
+
+
+local function openRerollForm(triggerId)
+    local storedIdsVar = "STORED_SIMCARD_IDS"
+    local idListStr = getChatVar(triggerId, storedIdsVar) or "null"
+    if idListStr == "null" then idListStr = "" end
+    print("ONLINEMODULE: onButtonClick: Value retrieved for " .. storedIdsVar .. " with triggerId " .. triggerId .. ": [" .. tostring(idListStr) .. "]") 
+    local identifiers = {}
+
+    if idListStr and idListStr ~= "" and idListStr ~= "null" then
+         for id in string.gmatch(idListStr, "([^,]+)") do
+            local trimmedId = id:match("^%s*(.-)%s*$")
+            if trimmedId and trimmedId ~= "" then 
+                table.insert(identifiers, trimmedId)
+            else
+               print("ONLINEMODULE: Skipping invalid/empty ID found in list: [" .. tostring(id) .. "]")
+            end
+        end
+    else
+        print("ONLINEMODULE: No stored SIMCARD IDs string found or list is empty in variable: " .. storedIdsVar)
+    end
+
+
+    if #identifiers == 0 then
+        addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터가 없습니다.")
+        print("ONLINEMODULE: No valid identifiers found to display.")
+        return
+    end
+
+    local allRerollFormsCSS = [[
+<style>@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.profile-reroll-area-wrapper{border-bottom:1px solid #000000;padding-bottom:0px;margin-bottom:10px;}.profile-reroll-area-wrapper:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.simcard-name-clickable{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-decoration-color:#ff69b4;text-decoration-thickness:1px;text-underline-offset:2px;}.simcard-name-clickable:hover{color:#ff69b4;}.profile-preview{width:32px;height:32px;border-radius:16px;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}.simcard-fullscreen-toggle{display:none;}.simcard-fullscreen-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:9999;padding:20px;box-sizing:border-box;}.simcard-fullscreen-content{position:relative;display:flex;justify-content:center;align-items:center;max-width:90%;max-height:90%;}.simcard-fullscreen-content>img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid white;box-shadow:0 0 25px rgba(0,0,0,0.5);object-fit:contain;}.simcard-fullscreen-close-label{position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer;z-index:1;}.simcard-fullscreen-close-button{position:absolute;top:-15px;right:-15px;font-size:24px;color:white;background-color:rgba(0,0,0,0.6);border-radius:50%;width:35px;height:35px;line-height:35px;text-align:center;cursor:pointer;z-index:3;border:1px solid rgba(255,255,255,0.3);}.simcard-fullscreen-toggle:checked+.profile-reroll-area-wrapper>.simcard-fullscreen-overlay{display:flex;align-items:center;justify-content:center;}</style>
+]]
+
+    local allRerollFormsBodyHtml = '<div><h2 style="text-align:center; margin-bottom: 15px;">저장된 시뮬레이션 카드 리롤 인터페이스</h2>'
+    local count = 0
+
+    for i, simId in ipairs(identifiers) do
+        local inlay = getChatVar(triggerId, simId) or "null"
+        if inlay == "null" then inlay = "" end
+
+        if inlay and type(inlay) == "string" and inlay ~= "" and inlay ~= "null" and string.len(inlay) > 5 then
+            count = count + 1
+            local uniqueId = "simcard-fs-" .. count
+            local rerollType = "SIMULATIONCARD"
+            local displayLabel = "NAME:"
+            local actionName = "SIMCARD_REROLL"
+            local buttonText = ""
+            local safeIdentifierHtml = escapeHtml(tostring(simId))
+            local safeIdentifierJson = escapeJsonValue(tostring(simId))
+            local risuBtnJson = string.format('{"action":%s, "identifier":%s}', escapeJsonValue(actionName), safeIdentifierJson)
+            local safeRisuBtnAttr = risuBtnJson
+
+            local htmlFormatPattern = [[<input type="checkbox" id="%s" class="simcard-fullscreen-toggle"><div class="profile-reroll-area-wrapper"><div class="profile-reroll-area"><div class="profile-info"><span class="profile-id-label" style="font-weight: bold;">%s</span><label for="%s" class="simcard-name-clickable">%s</label><div class="profile-preview">%s</div></div><div style="text-align: right; margin-top: 5px;"><button class="reroll-button" risu-btn='%s' style="padding: 5px 10px;">%s</button></div></div><div class="simcard-fullscreen-overlay"><label for="%s" class="simcard-fullscreen-close-label"></label><div class="simcard-fullscreen-content">%s<label for="%s" class="simcard-fullscreen-close-button">✕</label></div></div></div>]]
+            
+            local singleFormHtml = string.format(htmlFormatPattern .. "\n",
+                uniqueId,
+                displayLabel,
+                uniqueId,
+                safeIdentifierHtml,
+                inlay, -- 작은 미리보기
+                safeRisuBtnAttr,
+                buttonText,
+                -- 오버레이 부분
+                uniqueId, -- 배경 닫기 라벨
+                inlay, -- <<< 크게 보여줄 내용 (inlay 값 자체) >>>
+                uniqueId -- 'X' 닫기 버튼 라벨
+            )
+
+            allRerollFormsBodyHtml = allRerollFormsBodyHtml .. singleFormHtml
+        else
+            print("ONLINEMODULE: WARN - Could not retrieve valid inlay for stored SIMCARD ID: [" .. simId .. "]. Skipping.")
+        end
+    end
+
+    local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
+    local safeGlobalRisuBtnAttr = globalBtnJson
+    local globalButtonHtml = string.format([[ ... ]])
+    local finalHtml = allRerollFormsCSS .. allRerollFormsBodyHtml .. globalButtonHtml .. "</div>"
+
+    if count > 0 then
+         print("ONLINEMODULE: Displaying reroll interface for " .. count .. " stored SIMULATIONCARDs via addChat.")
+         addChat(triggerId, "user", finalHtml)
+    else
+         addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터를 찾았으나, 유효한 이미지(inlay) 정보가 없습니다.")
+         print("ONLINEMODULE: Found identifiers but no valid inlays to display.")
+    end
+end
+
+local function addRerollFormButton(triggerId, data)
+    local html = {}
+    local rerollTemplate = [[
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}
+.separator{height:2px;background-color:#000000;width:100%;margin:5px 0;}
+.profile-reroll-area{display:flex;align-items:center;gap:10px;padding:10px 0;justify-content:space-between;flex-wrap:wrap;border-bottom:2px solid #000000;}
+.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}
+.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}
+.profile-id-value{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.profile-preview{width:32px;height:32px;border-radius:50%;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}
+.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}
+.reroll-button{padding:16px 36px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:18px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;min-width:80px;min-height:24px;position:relative;}
+.reroll-button::before{content:"REROLL";position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:#ffe6f2;pointer-events:none;}
+.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}
+.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}
+.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}
+</style>
+]]      
+    
+    local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
+    local safeGlobalRisuBtnAttr = globalBtnJson
+    local globalButtonHtml = string.format([[
+    <div class="global-reroll-controls">
+        <button class="reroll-button" risu-btn='%s'></button>
+    </div>
+    ]], safeGlobalRisuBtnAttr)
+
+    table.insert(html, rerollTemplate)
+    table.insert(html, data)
+    table.insert(html, globalButtonHtml)
+
+    return table.concat(html, "\n")
+
+end
+
 
 local function changeInlay(triggerId, index, oldInlay, newInlay)
     print("changeInlay is in PROCESS!")
@@ -220,7 +337,6 @@ local function changeInlay(triggerId, index, oldInlay, newInlay)
         print("ONLINEMODULE: No block matching oldInlay '" .. oldInlay .. "' found for replacement at index " .. index .. ".")
     end
 end
-
 
 local function inputEroStatus(triggerId, data)
     local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
@@ -1871,6 +1987,7 @@ local function inputImage(triggerId, data)
     return data
 end
 
+
 listenEdit("editInput", function(triggerId, data)
     if not data or data == "" then return "" end
 
@@ -1920,7 +2037,7 @@ end)
 
 listenEdit("editRequest", function(triggerId, data)
     print("---------------------------------editREQUEST---------------------------------------")
-    
+    print("ONLINEMODULE: editRequest: Triggered with ID:", triggerId)
     local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
     local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
     local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
@@ -2013,11 +2130,12 @@ listenEdit("editDisplay", function(triggerId, data)
         data = changeKAKAOTalk(triggerId, data)
     end
 
+    data = addRerollFormButton(triggerId, data)
+
     return data
 end)
 
-
-onInput = async(function (triggerId)
+function onInput(triggerId)
     print("----- ANALYZING VALUABLES -----")
     print("ONLINEMODULE: onInput: Triggered with ID:", triggerId)
 
@@ -2170,7 +2288,8 @@ onInput = async(function (triggerId)
         print("ONLINEMODULE: onInput: No modifications were made to the chat history.")
     end
 
-end)
+end
+
 
 onOutput = async(function (triggerId)
     print("onOutput: Triggered with ID:", triggerId)
@@ -2918,94 +3037,8 @@ onButtonClick = async(function(triggerId, data)
 
     if action == "RUNREROLLSETTING" then
         print("ONLINEMODULE: ACTION - RUNREROLLSETTING triggered.")
-
         removeChat(triggerId, (getChatLength(triggerId) - 1))
-        
-        local storedIdsVar = "STORED_SIMCARD_IDS"
-        local idListStr = getChatVar(triggerId, storedIdsVar) or "null"
-        if idListStr == "null" then idListStr = "" end
-        print("ONLINEMODULE: onButtonClick: Value retrieved for " .. storedIdsVar .. " with triggerId " .. triggerId .. ": [" .. tostring(idListStr) .. "]") 
-        local identifiers = {}
-
-        if idListStr and idListStr ~= "" and idListStr ~= "null" then
-             for id in string.gmatch(idListStr, "([^,]+)") do
-                local trimmedId = id:match("^%s*(.-)%s*$")
-                if trimmedId and trimmedId ~= "" then 
-                    table.insert(identifiers, trimmedId)
-                else
-                   print("ONLINEMODULE: Skipping invalid/empty ID found in list: [" .. tostring(id) .. "]")
-                end
-            end
-        else
-            print("ONLINEMODULE: No stored SIMCARD IDs string found or list is empty in variable: " .. storedIdsVar)
-        end
-
-
-        if #identifiers == 0 then
-            addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터가 없습니다.")
-            print("ONLINEMODULE: No valid identifiers found to display.")
-            
-            return
-        end
-
-        local allRerollFormsCSS = [[
-<style>@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.profile-reroll-area-wrapper{border-bottom:2px solid #000000;padding-bottom:10px;margin-bottom:10px;}.profile-reroll-area-wrapper:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.simcard-name-clickable{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-decoration-color:#ff69b4;text-decoration-thickness:1px;text-underline-offset:2px;}.simcard-name-clickable:hover{color:#ff69b4;}.profile-preview{width:32px;height:32px;border-radius:16px;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}.simcard-fullscreen-toggle{display:none;}.simcard-fullscreen-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:9999;padding:20px;box-sizing:border-box;}.simcard-fullscreen-content{position:relative;display:flex;justify-content:center;align-items:center;max-width:90%;max-height:90%;}.simcard-fullscreen-content>img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid white;box-shadow:0 0 25px rgba(0,0,0,0.5);object-fit:contain;}.simcard-fullscreen-close-label{position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer;z-index:1;}.simcard-fullscreen-close-button{position:absolute;top:-15px;right:-15px;font-size:24px;color:white;background-color:rgba(0,0,0,0.6);border-radius:50%;width:35px;height:35px;line-height:35px;text-align:center;cursor:pointer;z-index:3;border:1px solid rgba(255,255,255,0.3);}.simcard-fullscreen-toggle:checked+.profile-reroll-area-wrapper>.simcard-fullscreen-overlay{display:flex;align-items:center;justify-content:center;}</style>
-]]
-
-        local allRerollFormsBodyHtml = '<div><h2 style="text-align:center; margin-bottom: 15px;">저장된 시뮬레이션 카드 리롤 인터페이스</h2>'
-        local count = 0
-
-        for i, simId in ipairs(identifiers) do
-            local inlay = getChatVar(triggerId, simId) or "null"
-            if inlay == "null" then inlay = "" end
-
-            if inlay and type(inlay) == "string" and inlay ~= "" and inlay ~= "null" and string.len(inlay) > 5 then
-                count = count + 1
-                local uniqueId = "simcard-fs-" .. count
-                local rerollType = "SIMULATIONCARD"
-                local displayLabel = "NAME:"
-                local actionName = "SIMCARD_REROLL"
-                local buttonText = "시뮬봇 리롤"
-                local safeIdentifierHtml = escapeHtml(tostring(simId))
-                local safeIdentifierJson = escapeJsonValue(tostring(simId))
-                local risuBtnJson = string.format('{"action":%s, "identifier":%s}', escapeJsonValue(actionName), safeIdentifierJson)
-                local safeRisuBtnAttr = risuBtnJson
-
-                local singleFormHtml = string.format([[
-    <input type="checkbox" id="%s" class="simcard-fullscreen-toggle"><div class="profile-reroll-area-wrapper"><div class="profile-reroll-area"><div class="profile-info"><span class="profile-id-label" style="font-weight: bold;">%s</span><label for="%s" class="simcard-name-clickable">%s</label><div class="profile-preview">%s</div></div><div style="text-align: right; margin-top: 5px;"><button class="reroll-button" risu-btn='%s' style="padding: 5px 10px;">%s</button></div></div><div class="simcard-fullscreen-overlay"><label for="%s" class="simcard-fullscreen-close-label"></label><div class="simcard-fullscreen-content">%s<label for="%s" class="simcard-fullscreen-close-button">✕</label></div></div></div>
-                ]],
-                uniqueId,
-                displayLabel,
-                uniqueId,
-                safeIdentifierHtml,
-                inlay, -- 작은 미리보기
-                safeRisuBtnAttr,
-                buttonText,
-                -- 오버레이 부분
-                uniqueId, -- 배경 닫기 라벨
-                inlay, -- <<< 크게 보여줄 내용 (inlay 값 자체) >>>
-                uniqueId -- 'X' 닫기 버튼 라벨
-                )
-
-                allRerollFormsBodyHtml = allRerollFormsBodyHtml .. singleFormHtml
-            else
-                 print("ONLINEMODULE: WARN - Could not retrieve valid inlay for stored SIMCARD ID: [" .. simId .. "]. Skipping.")
-            end
-        end
-
-        local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
-        local safeGlobalRisuBtnAttr = globalBtnJson
-        local globalButtonHtml = string.format([[ ... ]])
-        local finalHtml = allRerollFormsCSS .. allRerollFormsBodyHtml .. globalButtonHtml .. "</div>"
-
-        if count > 0 then
-             print("ONLINEMODULE: Displaying reroll interface for " .. count .. " stored SIMULATIONCARDs via addChat.")
-             addChat(triggerId, "user", finalHtml)
-        else
-             addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터를 찾았으나, 유효한 이미지(inlay) 정보가 없습니다.")
-             print("ONLINEMODULE: Found identifiers but no valid inlays to display.")
-        end
-        
+        openRerollForm(triggerId)
         return
 
     elseif action == "EROSTATUS_REROLL" then
