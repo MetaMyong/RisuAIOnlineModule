@@ -444,6 +444,8 @@ local function inputEroStatus(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
+    - DO NOT PRINT <NAI0>.
+        - This is a Flag that already replaced.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
@@ -766,6 +768,8 @@ local function inputSimulCard(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
+    - DO NOT PRINT <NAI0>.
+        - This is a Flag that already replaced.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
@@ -980,6 +984,8 @@ local function inputStatusHybrid(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
+    - DO NOT PRINT <NAI0>.
+        - This is a Flag that already replaced.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
@@ -1043,6 +1049,8 @@ local function inputStatusHybrid(triggerId, data)
         if NAICARDNOIMAGE == "0" then
             data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
+    - DO NOT PRINT <NAI0>.
+        - This is a Flag that already replaced.
 ]]
         elseif NAICARDNOIMAGE == "1" then
             data = data .. [[
@@ -1521,6 +1529,8 @@ local function inputDCInside(triggerId, data)
     if NAICOMMUNITYNOIMAGE == "0" then
         data = data .. [[
         - If the post includes an image, print a specific keyword (e.g., '<NAI1>', '<NAI2>', etc.) to indicate where the prompt should be generated.
+        - DO NOT PRINT <NAI0>.
+            - This is a Flag that already replaced.
 ]]
     end
 
@@ -1868,7 +1878,7 @@ local function inputKAKAOTalk(triggerId, data)
     if NAIMESSENGERNOIMAGE == "0" then
         data = data .. [[
 	- When  {{char}} sends a picture or photo, print it will **exactly** output '<NAI>'.
-	- **DO NOT PRINT <NAI> MORE THAN ONCE.**        
+	- **DO NOT PRINT <NAI> MORE THAN ONCE.**
 ]]
     end
 
@@ -2117,44 +2127,45 @@ local function inputImage(triggerId, data)
 
 ### Image Prompt Usage
 - *DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER*
+- *NEVER* refer to the past chat history when outputting the prompt below:
 ]]
 
     if NAICARDNOIMAGE == "0" then
         if NAICARD == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
-- Output Format:
-    - EROSTATUS[...|INLAY:<NAI1>]
-	- [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - EROSTATUS[...|INLAY:<NAI2>]
-	- [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
+    - Output Format:
+        - EROSTATUS[...|INLAY:<NAI1>]
+        - [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
+        - EROSTATUS[...|INLAY:<NAI2>]
+        - [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         elseif NAICARD == "2" then
             data = data .. [[
-- *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
-- Output Format:
-    - SIMULSTATUS[...|INLAY:<NAI1>]
-    - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...|INLAY:<NAI2>]
-    - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
+    - Output Format:
+        - SIMULSTATUS[...|INLAY:<NAI1>]
+        - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<NAI2>]
+        - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         elseif NAICARD == "3" then
             data = data .. [[
-- *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
-- Output Format:
-    - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
-    - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
-    - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
+    - Output Format:
+        - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
+        - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
+        - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         end
     end
@@ -2177,18 +2188,18 @@ local function inputImage(triggerId, data)
     if NAICOMMUNITYNOIMAGE == "0" then
         if NAICOMMUNITY == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE*
-- Output Format:
-    - DC[...|<NAI1>...|<NAI2>...]
-	- If the post is normal:
-		- [NAIDCPROMPT:(Describe the situation of the normal post)]
-	- If the post is Selfie:
-		- [NAIDCPROMPT:(SITUATION),(LABEL),(ANGLE),(ACTIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAIDCPROMPT:(NEGATIVE PROMPT)]
-- The number of the POST CONTENT including '<NAI>' and the number of the prompt must match.
-	- Example: If 3rd POST CONTENT is including '<NAI3>'.
-		- [NAIDCPROMPT3:3rd Post's '<NAI3>' Prompt Generated]
-		- [NEG_NAIDCPROMPT3:3rd Post's '<NAI3>' (NEGATIVE PROMPT)]
+    - *ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE*
+    - Output Format:
+        - DC[...|<NAI1>...|<NAI2>...]
+        - If the post is normal:
+            - [NAIDCPROMPT:(Describe the situation of the normal post)]
+        - If the post is Selfie:
+            - [NAIDCPROMPT:(SITUATION),(LABEL),(ANGLE),(ACTIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAIDCPROMPT:(NEGATIVE PROMPT)]
+    - The number of the POST CONTENT including '<NAI>' and the number of the prompt must match.
+        - Example: If 3rd POST CONTENT is including '<NAI3>'.
+            - [NAIDCPROMPT3:3rd Post's '<NAI3>' Prompt Generated]
+            - [NEG_NAIDCPROMPT3:3rd Post's '<NAI3>' (NEGATIVE PROMPT)]
 ]]
         end
     end
@@ -2196,12 +2207,12 @@ local function inputImage(triggerId, data)
     if NAIMESSENGERNOIMAGE == "0" then
         if NAIMESSENGER == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE*
-- Print <NAI> Exactly once when {{char}} sends a picture or image.
-- Output Format:
-    - KAKAO[<NAI>|...]
-	- [NAIKAKAOPROMPT:(SITUATION),(LABEL),Selfie,portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAIKAKAOPROMPT:(NEGATIVE PROMPT)]
+    - *ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE*
+    - Print <NAI> Exactly once when {{char}} sends a picture or image.
+    - Output Format:
+        - KAKAO[<NAI>|...]
+        - [NAIKAKAOPROMPT:(SITUATION),(LABEL),Selfie,portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAIKAKAOPROMPT:(NEGATIVE PROMPT)]
 ]]
         end
     end
@@ -2360,7 +2371,7 @@ listenEdit("editRequest", function(triggerId, data)
     end
     
     for i = 1, #data, 1 do
-        -- 이후, 대화 내용이 "user"인 경우에 1회 한정으로 리퀘스트 삽입
+        -- 이후, 앞에서부터 대화 내용이 "user"인 경우에 1회 한정으로 리퀘스트 삽입
         local chat = data[i]
         if chat.role == "user" then
             local importantInput = inputImportant(triggerId, "")
@@ -2806,6 +2817,7 @@ onOutput = async(function (triggerId)
                                     local finalPromptStatus = artistPrompt .. foundStatusPrompt .. qualityPrompt
                                     local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
                                     if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and not string.find(inlayStatus, "fail", 1, true) and not string.find(inlayStatus, "error", 1, true) and not string.find(inlayStatus, "실패", 1, true) then
+                                        inlayStatus = "<NAI0>" .. inlayStatus
                                         local erostatusIdentifier = "EROSTATUS_" .. naiIndex
                                         local marker = "<!-- " .. erostatusIdentifier .. " -->"
                                         local content_offset = e_status_prefix
@@ -2968,6 +2980,7 @@ onOutput = async(function (triggerId)
                                     print("ONLINEMODULE: onOutput: generateImage result for NAI"..naiIndex..": ["..tostring(inlaySimul).."]")
                                     local isSuccess = (inlaySimul ~= nil) and (type(inlaySimul) == "string") and (string.len(inlaySimul) > 10) and not string.find(inlaySimul, "fail", 1, true) and not string.find(inlaySimul, "error", 1, true) and not string.find(inlaySimul, "실패", 1, true)
                                     if isSuccess then
+                                        inlaySimul = "<NAI0>" .. inlaySimul
                                         print("ONLINEMODULE: onOutput: Image generation SUCCESS for NAI"..naiIndex)
                                         local content_offset = e_simul_prefix 
                                         local nai_abs_start = content_offset + s_nai_in_content
@@ -3151,11 +3164,12 @@ onOutput = async(function (triggerId)
 
                                     local finalPrompt = artistPrompt .. foundPrompt .. qualityPrompt
                                     local inlay = generateImage(triggerId, finalPrompt, currentNegativePrompt):await()
-
+                                    print("ONLINEMODULE: onOutput: generateImage result for NAI" .. naiIndex .. ": [" .. tostring(inlay) .. "]")
                                     if inlay and type(inlay) == "string" and string.len(inlay) > 10 
                                        and not string.find(inlay, "fail", 1, true) 
                                        and not string.find(inlay, "error", 1, true)
                                        and not string.find(inlay, "실패", 1, true) then
+                                        inlay = "<NAI0>" .. inlay
 
                                         local identifier
                                         if isEroStatus then
@@ -3261,6 +3275,7 @@ onOutput = async(function (triggerId)
                             local inlayProfile = generateImage(triggerId, finalPromptTwitterProfile, currentNegativePromptProfile):await()
                             local isSuccessProfile = inlayProfile and type(inlayProfile) == "string" and string.len(inlayProfile) > 10 and not string.find(inlayProfile, "fail", 1, true) and not string.find(inlayProfile, "error", 1, true) and not string.find(inlayProfile, "실패", 1, true)
                             if isSuccessProfile then
+                                inlayProfile = "<NAI>" .. inlayProfile
                                 profileInlayToUse = inlayProfile
                                 setChatVar(triggerId, twitterId, profileInlayToUse)
                                 setchatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
@@ -3395,6 +3410,7 @@ onOutput = async(function (triggerId)
                                     local successCall, inlayDc = pcall(function() return generateImage(triggerId, finalPromptDc, currentNegativePromptDc):await() end)
                                     local isSuccessDc = successCall and (inlayDc ~= nil) and (type(inlayDc) == "string") and (string.len(inlayDc) > 10) and not string.find(inlayDc, "fail", 1, true) and not string.find(inlayDc, "error", 1, true) and not string.find(inlayDc, "실패", 1, true)
                                     if isSuccessDc then
+                                        inlayDc = "<NAI0>" .. inlayDc
                                         local dcIdentifier = postId
                                         local marker = "<!-- DC_MARKER_POSTID_" .. dcIdentifier .. " -->"
 
@@ -3482,6 +3498,7 @@ onOutput = async(function (triggerId)
                     local isSuccessKakao = successCall and inlayKakao and type(inlayKakao) == "string" and string.len(inlayKakao) > 10 and not string.find(inlayKakao, "fail", 1, true) and not string.find(inlayKakao, "error", 1, true) and not string.find(inlayKakao, "실패", 1, true)
         
                     if isSuccessKakao then
+                        inlayKakao = "<NAI>" .. inlayKakao
                         print("ONLINEMODULE: onOutput: KAKAO image generated successfully.")
                         local kakaoIdentifier = "KAKAO_" .. s_kakao
                         local marker = "<!-- " .. kakaoIdentifier .. " -->"
@@ -3506,9 +3523,6 @@ onOutput = async(function (triggerId)
                 print("ONLINEMODULE: onOutput: Last message data is not in the expected format.")
         end
     end
-
-    currentLine = string.gsub(currentLine, "%[[Nn][Aa][Ii][^:]*PROMPT[^:]*:[^%]]-%]", "")
-    currentLine = string.gsub(currentLine, "%[[Nn][Ee][Gg]_[Nn][Aa][Ii][^:]*PROMPT[^:]*:[^%]]-%]", "")
 
     print("ONLINEMODULE: onOutput: Always applying setChat to last message after prompt cleanup.")
     setChat(triggerId, lastIndex - 1, currentLine)
