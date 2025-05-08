@@ -14,6 +14,8 @@ local function escapeJsonValue(str)
     if type(str) ~= "string" then return '""' end
     str = string.gsub(str, "\\", "\\\\")
     str = string.gsub(str, "\"", "\\\"")
+    str = string.gsub(str, "\n", "\\n")
+    str = string.gsub(str, "\t", "\\t")
     return '"' .. str .. '"'
 end
 
@@ -35,107 +37,6 @@ local function ERR(triggerId, str, code)
 
     alertNormal(triggerId, "ERROR: " .. str .. ": " .. message)
 end
-
-local function showRerollForms(triggerId, generatedImagesInfo)
-    if not generatedImagesInfo or #generatedImagesInfo == 0 then
-        print("ONLINEMODULE: showRerollForms: No images generated in this run, skipping reroll form.")
-        return
-    end
-    local function addRerollForm(triggerId, rerollType, identifier, inlay)
-
-        local originalIdentifier = identifier
-        local trimmedIdentifier = nil
-        if type(identifier) == "string" then
-            trimmedIdentifier = identifier:match("^%s*(.-)%s*$")
-        else
-            trimmedIdentifier = identifier 
-        end
-
-        if not rerollType or not trimmedIdentifier or trimmedIdentifier == "" or not inlay then
-            print("ONLINEMODULE: addRerollForm: Invalid type, identifier (after trim:'" .. tostring(trimmedIdentifier) .."'), or inlay provided. Skipping snippet generation.")
-            return ""
-        end
-
-        local rerollAreaHtml = ""
-        local safeIdentifierHtml = escapeHtml(tostring(trimmedIdentifier)) 
-        local safeIdentifierJson = escapeJsonValue(tostring(trimmedIdentifier)) 
-        local displayIdentifier = safeIdentifierHtml
-        local displayLabel = "Identifier:"
-        local actionName = ""
-        local buttonText = ""
-
-        if rerollType == "PROFILE" then
-            displayLabel = "ID:"
-            actionName = "PROFILE_REROLL"
-            buttonText = ""
-        elseif rerollType == "SIMULATIONCARD" then
-            displayLabel = "NAME:"
-            actionName = "SIMCARD_REROLL"
-            buttonText = ""
-        elseif rerollType == "DC" then
-            displayLabel = "DC Index:"
-            actionName = "DC_REROLL"
-            buttonText = ""
-        elseif rerollType == "EROSTATUS" then
-            displayLabel = "EroStatus ID:"
-            actionName = "EROSTATUS_REROLL"
-            buttonText = ""
-        elseif rerollType == "TWEET" then
-            displayLabel = "Tweet ID:"
-            actionName = "TWEET_REROLL"
-            buttonText = ""
-        elseif rerollType == "KAKAO" then
-            displayLabel = "Kakao ID:"
-            actionName = "KAKAO_REROLL"
-            buttonText = ""
-        else
-            print("ONLINEMODULE: addRerollForm: Unknown reroll type '" .. tostring(rerollType) .. "'. Skipping snippet generation.")
-            return ""
-        end
-
-        print("ONLINEMODULE: addRerollForm: Generating reroll snippet for " .. rerollType .. " Identifier (trimmed): [" .. trimmedIdentifier .. "]")
-
-        local risuBtnJson = string.format('{"action":%s, "identifier":%s}', escapeJsonValue(actionName), safeIdentifierJson)
-        local safeRisuBtnAttr = string.gsub(risuBtnJson, "'", "'")
-
-        rerollAreaHtml = string.format([[
-<div class="profile-reroll-area">
-<div class="profile-info">
-<span class="profile-id-label">%s</span>
-<span class="profile-id-value">%s</span>
-<div class="profile-preview">%s</div>
-</div>
-<button class="reroll-button" risu-btn='%s'>%s</button>
-</div>
-        ]], displayLabel, displayIdentifier, inlay, safeRisuBtnAttr, buttonText)
-
-        return rerollAreaHtml
-    end
-    print("ONLINEMODULE: showRerollForms: Assembling reroll forms for " .. #generatedImagesInfo .. " generated images.")
-    local allRerollHtmlSnippets = {}
-    for i, info in ipairs(generatedImagesInfo) do
-        print("ONLINEMODULE: showRerollForms: Generating snippet #" .. i .. " - Type: " .. info.type .. ", ID: " .. tostring(info.identifier))
-        local snippet = addRerollForm(triggerId, info.type, info.identifier, info.inlay)
-        if snippet and snippet ~= "" then
-            table.insert(allRerollHtmlSnippets, snippet)
-        end
-    end
-
-    if #allRerollHtmlSnippets > 0 then
-        local prefixHtml = [[
-<style>@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.separator{height:2px;background-color:#000000;width:100%;margin:5px 0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;padding:10px 0;justify-content:space-between;flex-wrap:wrap;border-bottom:2px solid #000000;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.profile-id-value{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.profile-preview{width:32px;height:32px;border-radius:50%;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}</style>
-        ]]
-        local combinedSnippets = table.concat(allRerollHtmlSnippets, "\n")
-
-        local finalCombinedHtml = prefixHtml .. '<div class="simple-ui-bar">' .. combinedSnippets .. '</div>'
-
-        addChat(triggerId, "user", finalCombinedHtml)
-        print("ONLINEMODULE: showRerollForms: Finished adding combined reroll UI.")
-    else
-        print("ONLINEMODULE: showRerollForms: No valid snippets generated, skipping final addChat.")
-    end
-end
-
 
 local function openRerollForm(triggerId)
     local storedIdsVar = "STORED_SIMCARD_IDS"
@@ -3545,14 +3446,7 @@ onOutput = async(function (triggerId)
 
     print("ONLINEMODULE: onOutput: Always applying setChat to last message after prompt cleanup.")
     setChat(triggerId, lastIndex - 1, currentLine)
-    print("ONLINEMODULE: onOutput: setChat call complete (forced).")
-
-    if #generatedImagesInfo > 0 then
-        showRerollForms(triggerId, generatedImagesInfo)
-    else
-        print("ONLINEMODULE: onOutput: No images generated in this run, skipping reroll form.")
-    end
-
+    print("ONLINEMODULE: onOutput: setChat call complete.")
 end)
 
 
