@@ -2283,20 +2283,26 @@ listenEdit("editRequest", function(triggerId, data)
     local convertDialogueFlag = false
     local changedValue = false
     
-    for i = 1, #data, 1 do
-        local chat = data[i]
-        if (chat.role == "assistant" or chat.role == "model") and convertDialogueFlag == false and NAICARDFORCEOUTPUT == "1" then
-            currentIndex = i
-            chat.content = convertDialogue(triggerId, chat.content)
-            print([[ONLINEMODULE: editRequest: Converted dialogue to:
-            
-]] .. chat.content)
-            convertDialogueFlag = true
-        elseif NAICARDFORCEOUTPUT == "0" then
-            convertDialogueFlag = true
-        end
+    if NAICARDFORCEOUTPUT == "1" then
+        -- 받아온 리퀘스트 전부 ""변환
+        for i = 1, #data, 1 do
+            local chat = data[i]
+            -- 만약 role이 assistant 또는 model이라면
+            -- 대화 내용 변환
+            if (chat.role == "assistant" or chat.role == "model") then
+                chat.content = convertDialogue(triggerId, chat.content)
+                -- 50글자까지 변환된 대화 내용 출력
+                print([[ONLINEMODULE: editRequest: Converted dialogue to:
 
-        if chat.role == "user" and convertDialogueFlag == true then
+]] .. chat.content)
+            end
+        end
+    end
+    
+    for i = 1, #data, 1 do
+        -- 이후, 대화 내용이 "user"인 경우에 1회 한정으로 리퀘스트 삽입
+        local chat = data[i]
+        if chat.role == "user" then
             local importantInput = inputImportant(triggerId, "")
             currentInput = importantInput .. [[
             
