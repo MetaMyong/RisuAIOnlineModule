@@ -348,12 +348,16 @@ local function convertDialogue(triggerId, data)
     local anyReplacementMade = false 
     local searchStartIndex = 1 
 
-    local pattern = "\"(.-)\""
+    -- Add patterns for both quote styles
+    local patterns = {
+        '"(.-)"',        -- Western quotes
+        '「(.-)」'       -- Asian quotes
+    }
+    
     local prefixEroStatus = "EROSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
     local suffixEroStatus = "|MOUTH:MOUTH_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|NIPPLES:NIPPLES_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|UTERUS:UTERUS_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|VAGINAL:VAGINAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|ANAL:ANAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|OUTFITS:OUTFITS_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
     local prefixSimulStatus = "SIMULSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
     local suffixSimulStatus = "|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
-
 
     if NAICARD ~= "0" then
         local modifiedString = ""
@@ -361,20 +365,36 @@ local function convertDialogue(triggerId, data)
         local madeChange = false
 
         while currentIndex <= #lineToModify do
-            local s, e, captured_dialogue = string.find(lineToModify, pattern, currentIndex)
-            if s then
-                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex, s - 1)
+            local found = false
+            local earliest_s = nil
+            local earliest_e = nil
+            local earliest_captured = nil
+            local earliest_pattern = nil
+
+            -- Find the earliest occurrence of any quote style
+            for _, pattern in ipairs(patterns) do
+                local s, e, captured = string.find(lineToModify, pattern, currentIndex)
+                if s and (earliest_s == nil or s < earliest_s) then
+                    earliest_s = s
+                    earliest_e = e
+                    earliest_captured = captured
+                    found = true
+                end
+            end
+
+            if found then
+                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex, earliest_s - 1)
 
                 local replacementText
                 if NAICARD == "1" then
-                    replacementText = prefixEroStatus .. captured_dialogue .. suffixEroStatus
+                    replacementText = prefixEroStatus .. earliest_captured .. suffixEroStatus
                     madeChange = true
                 elseif NAICARD == "2" or NAICARD == "3" then
-                    replacementText = prefixSimulStatus .. captured_dialogue .. suffixSimulStatus
+                    replacementText = prefixSimulStatus .. earliest_captured .. suffixSimulStatus
                     madeChange = true
                 end
                 modifiedString = modifiedString .. replacementText
-                currentIndex = e + 1
+                currentIndex = earliest_e + 1
             else
                 modifiedString = modifiedString .. string.sub(lineToModify, currentIndex)
                 break
@@ -428,8 +448,8 @@ local function inputEroStatus(triggerId, data)
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DIALOGUE via "", REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* EROSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
@@ -788,8 +808,8 @@ local function inputSimulCard(triggerId, data)
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- *DO NOT PRINT* DIALOGUE via "", REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+- *DO NOT PRINT* DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* SIMULSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
 - Example:
@@ -934,8 +954,8 @@ local function inputStatusHybrid(triggerId, data)
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DIALOGUE via "", REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* EROSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
@@ -1035,8 +1055,8 @@ local function inputStatusHybrid(triggerId, data)
 ## Status Interface
 ### Simulation Status Interface
 - Male's Status Interface, NOT THE FEMALE.
-- *DO NOT PRINT MALE's DIALOGUE via "", REPLACE ALL MALE's DIALOGUE to SIMULSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+- *DO NOT PRINT MALE's DIALOGUE via "" or 「」, REPLACE ALL MALE's DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* SIMULSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
