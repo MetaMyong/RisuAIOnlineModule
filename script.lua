@@ -14,6 +14,8 @@ local function escapeJsonValue(str)
     if type(str) ~= "string" then return '""' end
     str = string.gsub(str, "\\", "\\\\")
     str = string.gsub(str, "\"", "\\\"")
+    str = string.gsub(str, "\n", "\\n")
+    str = string.gsub(str, "\t", "\\t")
     return '"' .. str .. '"'
 end
 
@@ -35,107 +37,6 @@ local function ERR(triggerId, str, code)
 
     alertNormal(triggerId, "ERROR: " .. str .. ": " .. message)
 end
-
-local function showRerollForms(triggerId, generatedImagesInfo)
-    if not generatedImagesInfo or #generatedImagesInfo == 0 then
-        print("ONLINEMODULE: showRerollForms: No images generated in this run, skipping reroll form.")
-        return
-    end
-    local function addRerollForm(triggerId, rerollType, identifier, inlay)
-
-        local originalIdentifier = identifier
-        local trimmedIdentifier = nil
-        if type(identifier) == "string" then
-            trimmedIdentifier = identifier:match("^%s*(.-)%s*$")
-        else
-            trimmedIdentifier = identifier 
-        end
-
-        if not rerollType or not trimmedIdentifier or trimmedIdentifier == "" or not inlay then
-            print("ONLINEMODULE: addRerollForm: Invalid type, identifier (after trim:'" .. tostring(trimmedIdentifier) .."'), or inlay provided. Skipping snippet generation.")
-            return ""
-        end
-
-        local rerollAreaHtml = ""
-        local safeIdentifierHtml = escapeHtml(tostring(trimmedIdentifier)) 
-        local safeIdentifierJson = escapeJsonValue(tostring(trimmedIdentifier)) 
-        local displayIdentifier = safeIdentifierHtml
-        local displayLabel = "Identifier:"
-        local actionName = ""
-        local buttonText = ""
-
-        if rerollType == "PROFILE" then
-            displayLabel = "ID:"
-            actionName = "PROFILE_REROLL"
-            buttonText = ""
-        elseif rerollType == "SIMULATIONCARD" then
-            displayLabel = "NAME:"
-            actionName = "SIMCARD_REROLL"
-            buttonText = ""
-        elseif rerollType == "DC" then
-            displayLabel = "DC Index:"
-            actionName = "DC_REROLL"
-            buttonText = ""
-        elseif rerollType == "EROSTATUS" then
-            displayLabel = "EroStatus ID:"
-            actionName = "EROSTATUS_REROLL"
-            buttonText = ""
-        elseif rerollType == "TWEET" then
-            displayLabel = "Tweet ID:"
-            actionName = "TWEET_REROLL"
-            buttonText = ""
-        elseif rerollType == "KAKAO" then
-            displayLabel = "Kakao ID:"
-            actionName = "KAKAO_REROLL"
-            buttonText = ""
-        else
-            print("ONLINEMODULE: addRerollForm: Unknown reroll type '" .. tostring(rerollType) .. "'. Skipping snippet generation.")
-            return ""
-        end
-
-        print("ONLINEMODULE: addRerollForm: Generating reroll snippet for " .. rerollType .. " Identifier (trimmed): [" .. trimmedIdentifier .. "]")
-
-        local risuBtnJson = string.format('{"action":%s, "identifier":%s}', escapeJsonValue(actionName), safeIdentifierJson)
-        local safeRisuBtnAttr = string.gsub(risuBtnJson, "'", "'")
-
-        rerollAreaHtml = string.format([[
-<div class="profile-reroll-area">
-<div class="profile-info">
-<span class="profile-id-label">%s</span>
-<span class="profile-id-value">%s</span>
-<div class="profile-preview">%s</div>
-</div>
-<button class="reroll-button" risu-btn='%s'>%s</button>
-</div>
-        ]], displayLabel, displayIdentifier, inlay, safeRisuBtnAttr, buttonText)
-
-        return rerollAreaHtml
-    end
-    print("ONLINEMODULE: showRerollForms: Assembling reroll forms for " .. #generatedImagesInfo .. " generated images.")
-    local allRerollHtmlSnippets = {}
-    for i, info in ipairs(generatedImagesInfo) do
-        print("ONLINEMODULE: showRerollForms: Generating snippet #" .. i .. " - Type: " .. info.type .. ", ID: " .. tostring(info.identifier))
-        local snippet = addRerollForm(triggerId, info.type, info.identifier, info.inlay)
-        if snippet and snippet ~= "" then
-            table.insert(allRerollHtmlSnippets, snippet)
-        end
-    end
-
-    if #allRerollHtmlSnippets > 0 then
-        local prefixHtml = [[
-<style>@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.separator{height:2px;background-color:#000000;width:100%;margin:5px 0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;padding:10px 0;justify-content:space-between;flex-wrap:wrap;border-bottom:2px solid #000000;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.profile-id-value{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.profile-preview{width:32px;height:32px;border-radius:50%;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}</style>
-        ]]
-        local combinedSnippets = table.concat(allRerollHtmlSnippets, "\n")
-
-        local finalCombinedHtml = prefixHtml .. '<div class="simple-ui-bar">' .. combinedSnippets .. '</div>'
-
-        addChat(triggerId, "user", finalCombinedHtml)
-        print("ONLINEMODULE: showRerollForms: Finished adding combined reroll UI.")
-    else
-        print("ONLINEMODULE: showRerollForms: No valid snippets generated, skipping final addChat.")
-    end
-end
-
 
 local function openRerollForm(triggerId)
     local storedIdsVar = "STORED_SIMCARD_IDS"
@@ -348,12 +249,16 @@ local function convertDialogue(triggerId, data)
     local anyReplacementMade = false 
     local searchStartIndex = 1 
 
-    local pattern = "\"(.-)\""
+    -- Add patterns for both quote styles
+    local patterns = {
+        '"(.-)"',        -- Western quotes
+        '「(.-)」'       -- Asian quotes
+    }
+    
     local prefixEroStatus = "EROSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
     local suffixEroStatus = "|MOUTH:MOUTH_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|NIPPLES:NIPPLES_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|UTERUS:UTERUS_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|VAGINAL:VAGINAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|ANAL:ANAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|OUTFITS:OUTFITS_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
     local prefixSimulStatus = "SIMULSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
     local suffixSimulStatus = "|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
-
 
     if NAICARD ~= "0" then
         local modifiedString = ""
@@ -361,20 +266,36 @@ local function convertDialogue(triggerId, data)
         local madeChange = false
 
         while currentIndex <= #lineToModify do
-            local s, e, captured_dialogue = string.find(lineToModify, pattern, currentIndex)
-            if s then
-                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex, s - 1)
+            local found = false
+            local earliest_s = nil
+            local earliest_e = nil
+            local earliest_captured = nil
+            local earliest_pattern = nil
+
+            -- Find the earliest occurrence of any quote style
+            for _, pattern in ipairs(patterns) do
+                local s, e, captured = string.find(lineToModify, pattern, currentIndex)
+                if s and (earliest_s == nil or s < earliest_s) then
+                    earliest_s = s
+                    earliest_e = e
+                    earliest_captured = captured
+                    found = true
+                end
+            end
+
+            if found then
+                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex, earliest_s - 1)
 
                 local replacementText
                 if NAICARD == "1" then
-                    replacementText = prefixEroStatus .. captured_dialogue .. suffixEroStatus
+                    replacementText = prefixEroStatus .. earliest_captured .. suffixEroStatus
                     madeChange = true
                 elseif NAICARD == "2" or NAICARD == "3" then
-                    replacementText = prefixSimulStatus .. captured_dialogue .. suffixSimulStatus
+                    replacementText = prefixSimulStatus .. earliest_captured .. suffixSimulStatus
                     madeChange = true
                 end
                 modifiedString = modifiedString .. replacementText
-                currentIndex = e + 1
+                currentIndex = earliest_e + 1
             else
                 modifiedString = modifiedString .. string.sub(lineToModify, currentIndex)
                 break
@@ -428,8 +349,8 @@ local function inputEroStatus(triggerId, data)
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DIALOGUE via "", REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* EROSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
@@ -464,11 +385,41 @@ local function inputEroStatus(triggerId, data)
 - Bodypart Info: Each item must provides objective information.
     - Each item must be short.
     - ↔: Internally replaced with <br>.
-    - Change the line with ↔(1~5 Line).
-    - **MUST Observe and fill out the personal information, like Menstrual cycle, Sex counts, etc.**
-        - Please print out the total count from birth to now.
-        - If character has no experience, state that character has no experience.
-        - **DO NOT PRINT UNKNOWN.**
+        - Change the line with ↔(Upto 5 lines)
+    - **ALWAYS OBSERVE and PRINT the EXACT VALUE.**.
+        - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
+        - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
+        - List:
+            - Mouth:
+                - Condition: Condition in the mouth(e.g., Cum swallowed, Blowjob, etc.)
+                - Swallowed cum amount: Total amount of cum swallowed, 0~99999 ml
+                - ...
+            - Nipples:
+                - Condition: Stimulation, Nipple climax, Breast milk discharge, etc.
+                - Nipple climax experience: Count of climax with nipples, 0~99999 times
+                - Breast milk discharge amount: Total amount of breast milk, 0~99999 ml
+                - ...
+            - Uterus:
+                - Condition: Menstual cycle(e.g., Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.)
+                - Injected cum amount: Total amount of cum injected into the uterus, 0~99999 ml
+                - Pregnancy probability: 0~100 %
+                - ...
+            - Vaginal:
+                - Condition: Virgin, Non-virgin, etc.
+                - Masturbation count: Total count of masturbation with fingers, 0~99999 times
+                - Vaginal intercourse count: Total count of penis round trips, 0~99999 times
+                - ...
+            - Anal:
+                - Condition: Undeveloped
+                - Anal intercourse count: Total count of penis round trips, 0~99999 times
+                - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
+                - ...
+            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
+                - Korean: 1 char.
+                - English: 0.5 char.
+                - Blank space: 0.5 char.
+    - Please print out the total count from birth to now.
+    - If character has no experience, state that character has no experience.
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: Current NPC's location and detail location.
 - OUTFITS: Current NPC's OUTFITS List.
@@ -516,17 +467,17 @@ local function inputEroStatus(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Condition: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Condition: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Condition: Ovulation period↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Condition: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
     data = data .. [[
         - If Character is MALE.
-            - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|Status: MALE|NIPPLES:MALE|Ha?|Status: MALE||TERUS:MALE|I don't have one.|Status: MALE|VAGINAL:MALE|I don't have one.|Status: MALE|ANAL:MALE|I don't have one.|Status: MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
+            - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|Condition: MALE|NIPPLES:MALE|Ha?|Condition: MALE||TERUS:MALE|I don't have one.|Condition: MALE|VAGINAL:MALE|I don't have one.|Condition: MALE|ANAL:MALE|I don't have one.|Condition: MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
 ]]
 
     return data
@@ -788,8 +739,8 @@ local function inputSimulCard(triggerId, data)
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- *DO NOT PRINT* DIALOGUE via "", REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+- *DO NOT PRINT* DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* SIMULSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
 - Example:
@@ -934,8 +885,8 @@ local function inputStatusHybrid(triggerId, data)
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DIALOGUE via "", REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* EROSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
@@ -970,11 +921,41 @@ local function inputStatusHybrid(triggerId, data)
 - Bodypart Info: Each item must provides objective information.
     - Each item must be short.
     - ↔: Internally replaced with <br>.
-    - Change the line with ↔(1~5 Line).
-    - **MUST Observe and fill out the personal information, like Menstrual cycle, Sex counts, etc.**
-        - Please print out the total count from birth to now.
-        - If character has no experience, state that character has no experience.
-        - **DO NOT PRINT UNKNOWN.**
+        - Change the line with ↔(Upto 5 lines)
+    - **ALWAYS OBSERVE and PRINT the EXACT VALUE.**.
+        - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
+        - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
+        - List:
+            - Mouth:
+                - Condition: Condition in the mouth(e.g., Cum swallowed, Blowjob, etc.)
+                - Swallowed cum amount: Total amount of cum swallowed, 0~99999 ml
+                - ...
+            - Nipples:
+                - Condition: Stimulation, Nipple climax, Breast milk discharge, etc.
+                - Nipple climax experience: Count of climax with nipples, 0~99999 times
+                - Breast milk discharge amount: Total amount of breast milk, 0~99999 ml
+                - ...
+            - Uterus:
+                - Condition: Menstual cycle(e.g., Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.)
+                - Injected cum amount: Total amount of cum injected into the uterus, 0~99999 ml
+                - Pregnancy probability: 0~100 %
+                - ...
+            - Vaginal:
+                - Condition: Virgin, Non-virgin, etc.
+                - Masturbation count: Total count of masturbation with fingers, 0~99999 times
+                - Vaginal intercourse count: Total count of penis round trips, 0~99999 times
+                - ...
+            - Anal:
+                - Condition: Undeveloped
+                - Anal intercourse count: Total count of penis round trips, 0~99999 times
+                - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
+                - ...
+            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
+                - Korean: 1 char.
+                - English: 0.5 char.
+                - Blank space: 0.5 char.
+    - Please print out the total count from birth to now.
+    - If character has no experience, state that character has no experience.
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: Current NPC's location and detail location.
 - OUTFITS: Current NPC's OUTFITS List.
@@ -1022,12 +1003,12 @@ local function inputStatusHybrid(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
 
@@ -1035,8 +1016,8 @@ local function inputStatusHybrid(triggerId, data)
 ## Status Interface
 ### Simulation Status Interface
 - Male's Status Interface, NOT THE FEMALE.
-- *DO NOT PRINT MALE's DIALOGUE via "", REPLACE ALL MALE's DIALOGUE to SIMULSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+- *DO NOT PRINT MALE's DIALOGUE via "" or 「」, REPLACE ALL MALE's DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* SIMULSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
@@ -2143,10 +2124,10 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
 - Output Format:
-    - EROSTATUS[...<NAI1>...]
+    - EROSTATUS[...|INLAY:<NAI1>]
 	- [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
 	- [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - EROSTATUS[...<NAI2>...]
+    - EROSTATUS[...|INLAY:<NAI2>]
 	- [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
 	- [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
@@ -2155,10 +2136,10 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
 - Output Format:
-    - SIMULSTATUS[...<NAI1>...]
+    - SIMULSTATUS[...|INLAY:<NAI1>]
     - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...<NAI2>...]
+    - SIMULSTATUS[...|INLAY:<NAI2>]
     - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
@@ -2167,10 +2148,10 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
 - Output Format:
-    - EROSTATUS[...<NAI1>...]  --> FEMALE
+    - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
     - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...<NAI2>...]  --> MALE
+    - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
     - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
@@ -2362,20 +2343,26 @@ listenEdit("editRequest", function(triggerId, data)
     local convertDialogueFlag = false
     local changedValue = false
     
-    for i = 1, #data, 1 do
-        local chat = data[i]
-        if (chat.role == "assistant" or chat.role == "model") and convertDialogueFlag == false and NAICARDFORCEOUTPUT == "1" then
-            currentIndex = i
-            chat.content = convertDialogue(triggerId, chat.content)
-            print([[ONLINEMODULE: editRequest: Converted dialogue to:
-            
-]] .. chat.content)
-            convertDialogueFlag = true
-        elseif NAICARDFORCEOUTPUT == "0" then
-            convertDialogueFlag = true
-        end
+    if NAICARDFORCEOUTPUT == "1" then
+        -- 받아온 리퀘스트 전부 ""변환
+        for i = 1, #data, 1 do
+            local chat = data[i]
+            -- 만약 role이 assistant 또는 model이라면
+            -- 대화 내용 변환
+            if (chat.role == "assistant" or chat.role == "model") then
+                chat.content = convertDialogue(triggerId, chat.content)
+                -- 50글자까지 변환된 대화 내용 출력
+                print([[ONLINEMODULE: editRequest: Converted dialogue to:
 
-        if chat.role == "user" and convertDialogueFlag == true then
+]] .. chat.content)
+            end
+        end
+    end
+    
+    for i = 1, #data, 1 do
+        -- 이후, 대화 내용이 "user"인 경우에 1회 한정으로 리퀘스트 삽입
+        local chat = data[i]
+        if chat.role == "user" then
             local importantInput = inputImportant(triggerId, "")
             currentInput = importantInput .. [[
             
@@ -2681,6 +2668,10 @@ onOutput = async(function (triggerId)
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
+    elseif NAIPRESETPROMPT == "6" then
+        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
+        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
+        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
     end
     	
 	print("-----------------------ART PROMPT-----------------------")
@@ -2918,15 +2909,15 @@ onOutput = async(function (triggerId)
                         local existingInlay = nil
                         local trimmedBlockName = nil
                         if currentBlockName then
-                        trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
-                        if trimmedBlockName ~= "" then
-                            print("ONLINEMODULE: onOutput: Trimmed NAME: [" .. trimmedBlockName .. "]")
-                            existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
-                            if existingInlay == "null" then existingInlay = nil end
-                            print("ONLINEMODULE: onOutput: Existing inlay found from chatVar: [" .. tostring(existingInlay) .. "]")
-                        else
-                            trimmedBlockName = nil
-                        end
+                            trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
+                            if trimmedBlockName ~= "" then
+                                print("ONLINEMODULE: onOutput: Trimmed NAME: [" .. trimmedBlockName .. "]")
+                                existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
+                                if existingInlay == "null" then existingInlay = nil end
+                                print("ONLINEMODULE: onOutput: Existing inlay found from chatVar: [" .. tostring(existingInlay) .. "]")
+                            else
+                                trimmedBlockName = nil
+                            end
                         end
 
                         local simulContent = string.sub(currentLine, e_simul_prefix + 1, e_simul_suffix - 1)
@@ -2934,7 +2925,7 @@ onOutput = async(function (triggerId)
                         local naiTagsFoundInBlock = 0
 
                         if existingInlay and trimmedBlockName then
-                        print("ONLINEMODULE: onOutput: Processing with existing inlay for block #" .. statusBlocksFound)
+                            print("ONLINEMODULE: onOutput: Processing with existing inlay for block #" .. statusBlocksFound)
                         while true do
                             local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<NAI(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then break end
@@ -2951,7 +2942,7 @@ onOutput = async(function (triggerId)
                             naiSearchPosInContent = e_nai_in_content + 1
                         end
                         else
-                        print("ONLINEMODULE: onOutput: Processing by generating new image for block #" .. statusBlocksFound)
+                            print("ONLINEMODULE: onOutput: Processing by generating new image for block #" .. statusBlocksFound)
                         while true do
                             local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<NAI(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then
@@ -2991,7 +2982,7 @@ onOutput = async(function (triggerId)
 
                                             local currentList = getChatVar(triggerId, listKey) or "null"
                                             if currentList == "null" then currentList = "" end
-                                            print("ONLINEMODULE: onOutput: Current list for key '" .. listKey .. "': [" .. currentList .. "]")
+                                                print("ONLINEMODULE: onOutput: Current list for key '" .. listKey .. "': [" .. currentList .. "]")
                                             local newList = currentList
                                             if not string.find("," .. currentList .. ",", "," .. trimmedBlockName .. ",", 1, true) then
                                                 if currentList == "" then
@@ -3026,12 +3017,12 @@ onOutput = async(function (triggerId)
                             end
                             naiSearchPosInContent = e_nai_in_content + 1
                         end
-                        end
-                        if naiTagsFoundInBlock == 0 then
-                            ERR(triggerId, "SIMULCARD", 3)
-                            print("ONLINEMODULE: onOutput: No <NAI> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
-                        end
-                        searchPos = e_simul_suffix + 1
+                    end
+                    if naiTagsFoundInBlock == 0 then
+                        ERR(triggerId, "SIMULCARD", 3)
+                        print("ONLINEMODULE: onOutput: No <NAI> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
+                    end
+                    searchPos = e_simul_suffix + 1
                     else
                         ERR(triggerId, "SIMULCARD", 1)
                         print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for SIMULSTATUS block #" .. statusBlocksFound .. " even after nested check! Something is wrong. Skipping to next search pos.")
@@ -3066,7 +3057,6 @@ onOutput = async(function (triggerId)
                 local listKey = "STORED_SIMCARD_IDS"
 
                 while true do
-                    -- Find either EROSTATUS or SIMULSTATUS blocks
                     local s_ero, e_ero = string.find(currentLine, "EROSTATUS%[", searchPos)
                     local s_sim, e_sim = string.find(currentLine, "SIMULSTATUS%[", searchPos)
                     
@@ -3080,13 +3070,12 @@ onOutput = async(function (triggerId)
                         e_status_prefix = e_sim
                         isEroStatus = false
                     else
-                        break -- No more blocks found
+                        break 
                     end
 
                     statusBlocksFound = statusBlocksFound + 1
                     print("ONLINEMODULE: onOutput: Found " .. (isEroStatus and "EROSTATUS" or "SIMULSTATUS") .. " block #" .. statusBlocksFound)
 
-                    -- Find matching closing bracket
                     local bracketLevel = 1
                     local e_status_suffix = e_status_prefix + 1
                     local foundClosingBracket = false
@@ -3128,13 +3117,12 @@ onOutput = async(function (triggerId)
                             if existingInlay == "null" then existingInlay = nil end
                         end
 
-                        -- Process NAI tags
                         local naiSearchPosInContent = 1
                         local naiTagsFoundInBlock = 0
 
                         while true do
-                            local s_nai, e_nai, naiIndex = string.find(blockContent, "<NAI(%d+)>", naiSearchPosInContent)
-                            if not s_nai then break end
+                            local s_nai_in_content, e_nai_in_content, naiIndex = string.find(blockContent, "<NAI(%d+)>", naiSearchPosInContent)
+                            if not s_nai_in_content then break end
                             naiTagsFoundInBlock = naiTagsFoundInBlock + 1
                             naiIndex = tonumber(naiIndex)
 
@@ -3178,8 +3166,8 @@ onOutput = async(function (triggerId)
 
                                         local marker = "<!-- " .. (isEroStatus and identifier or "SIMULSTATUS_" .. identifier) .. " -->"
                                         local content_offset = e_status_prefix
-                                        local nai_abs_start = content_offset + s_nai
-                                        local nai_abs_end = content_offset + e_nai
+                                        local nai_abs_start = content_offset + s_nai_in_content
+                                        local nai_abs_end = content_offset + e_nai_in_content
 
                                         table.insert(replacements, {
                                             start = nai_abs_start,
@@ -3205,7 +3193,6 @@ onOutput = async(function (triggerId)
                                             setChatVar(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
                                             setChatVar(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
 
-                                            -- Update SimCard list
                                             local currentList = getChatVar(triggerId, listKey) or "null"
                                             if currentList == "null" then currentList = "" end
                                             
@@ -3221,7 +3208,7 @@ onOutput = async(function (triggerId)
                                     ERR(triggerId, promptType, 0)
                                 end
                             end
-                            naiSearchPosInContent = e_nai + 1
+                            naiSearchPosInContent = e_nai_in_content + 1
                         end
 
                         if naiTagsFoundInBlock == 0 then
@@ -3236,17 +3223,17 @@ onOutput = async(function (triggerId)
 
                 if statusBlocksFound == 0 then
                     print("ONLINEMODULE: onOutput: No status blocks found in hybrid mode")
-                end
-
-                if #replacements > 0 then
-                    print("ONLINEMODULE: onOutput: Applying " .. #replacements .. " hybrid mode replacements")
-                    table.sort(replacements, function(a, b) return a.start > b.start end)
-                    for _, rep in ipairs(replacements) do
-                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                else
+                    if #replacements > 0 then
+                        print("ONLINEMODULE: onOutput: Applying " .. #replacements .. " hybrid mode replacements")
+                        table.sort(replacements, function(a, b) return a.start > b.start end)
+                        for _, rep in ipairs(replacements) do
+                            if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
+                                currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                            end
                         end
+                        lineModifiedInThisPass = true
                     end
-                    lineModifiedInThisPass = true
                 end
             end
 
@@ -3525,14 +3512,7 @@ onOutput = async(function (triggerId)
 
     print("ONLINEMODULE: onOutput: Always applying setChat to last message after prompt cleanup.")
     setChat(triggerId, lastIndex - 1, currentLine)
-    print("ONLINEMODULE: onOutput: setChat call complete (forced).")
-
-    if #generatedImagesInfo > 0 then
-        showRerollForms(triggerId, generatedImagesInfo)
-    else
-        print("ONLINEMODULE: onOutput: No images generated in this run, skipping reroll form.")
-    end
-
+    print("ONLINEMODULE: onOutput: setChat call complete.")
 end)
 
 
@@ -3631,6 +3611,10 @@ onButtonClick = async(function(triggerId, data)
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
+    elseif NAIPRESETPROMPT == "6" then
+        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
+        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
+        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
     end
 
     local foundSpecificPrompt = getChatVar(triggerId, specificPromptKey) or "null"
