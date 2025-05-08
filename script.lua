@@ -410,7 +410,7 @@ local function inputEroStatus(triggerId, data)
     - **MUST Observe and fill out the personal information, like Menstrual cycle, Sex counts, etc.**
         - Please print out the total count from birth to now.
         - If character has no experience, state that character has no experience.
-        - **DO NOT PRINT UNKNOWN(불명).**
+        - **DO NOT PRINT UNKNOWN.**
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: Current NPC's location and detail location.
 - OUTFITS: Current NPC's OUTFITS List.
@@ -458,12 +458,12 @@ local function inputEroStatus(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Example:
-        - STATUS[NAME:Diana|DIALOGUE:오라버니, 차는 입맛에 맞나요?|MOUTH:MOUTH_0|방금 차를 한 모금 마셨어요. 아직은 찻물의 향긋함만 남아있네요.|상태: 평온함↔구강 성교 경험: 0 회↔삼킨 정액량: 0 ml|NIPPLES:NIPPLES_0|드레스 아래 속옷은 잘 갖춰 입었어요. 별다른 느낌은 없네요.|상태: 자극 0 회↔유두 절정 경험: 0 회↔모유 분출량: 0 ml|UTERUS:UTERUS_0|몸 안쪽은… 아직 아무런 변화도 없어요. 당연하죠!|상태: 배란기↔주입된 정액량: 1920 ml↔임신 확률: 78%|VAGINAL:VAGINAL_2|아아, {{user}} 오라버니.|상태: 비처녀↔자위 횟수: 1234회↔질내 왕복 횟수: 9182 회↔총 질내 사정량: 3492 ml↔질내사정 횟수: 512 회|ANAL:ANAL_0|더, 더럽다니까요! 여긴 생각하는 것조차 불경해요!|상태: 미개발↔장내 왕복 횟수: 0 회↔총 장내 사정량: 0 ml↔장내사정 횟수: 0 회|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:마르퀴스 저택의 장미 정원 티 테이블|OUTFITS:→머리: 0 회←→상의: 목과 어깨 라인이 드러나는 우아한 흰색 드레스←→브라: 흰색 실크 브래지어←→젖가슴: 아담한 C컵 젖가슴, 연분홍색 작은 유두와 유륜←→하의: 풍성한 흰색 드레스 스커트←→팬티: 흰색 실크 팬티←→보지: 깨끗하게 관리된 솜털, 굳게 닫힌 일자형 보지←→다리: 흰색 스타킹←→발: 흰색 스트랩 구두←|INLAY:<NAI1>]
+        - STATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: 0 times←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere←→Breasts: Modest C-cup breasts, small light pink nipples and areolas←→Bottom: Voluminous white dress skirt←→Panties: White silk panties←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
     - Example:
-        - STATUS[NAME:Diana|DIALOGUE:오라버니, 차는 입맛에 맞나요?|MOUTH:MOUTH_0|방금 차를 한 모금 마셨어요. 아직은 찻물의 향긋함만 남아있네요.|상태: 평온함↔구강 성교 경험: 0 회↔삼킨 정액량: 0 ml|NIPPLES:NIPPLES_0|드레스 아래 속옷은 잘 갖춰 입었어요. 별다른 느낌은 없네요.|상태: 자극 0 회↔유두 절정 경험: 0 회↔모유 분출량: 0 ml|UTERUS:UTERUS_0|몸 안쪽은… 아직 아무런 변화도 없어요. 당연하죠!|상태: 배란기↔주입된 정액량: 1920 ml↔임신 확률: 78%|VAGINAL:VAGINAL_2|아아, {{user}} 오라버니.|상태: 비처녀↔자위 횟수: 1234회↔질내 왕복 횟수: 9182 회↔총 질내 사정량: 3492 ml↔질내사정 횟수: 512 회|ANAL:ANAL_0|더, 더럽다니까요! 여긴 생각하는 것조차 불경해요!|상태: 미개발↔장내 왕복 횟수: 0 회↔총 장내 사정량: 0 ml↔장내사정 횟수: 0 회|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:마르퀴스 저택의 장미 정원 티 테이블|OUTFITS:→머리: 0 회←→상의: 목과 어깨 라인이 드러나는 우아한 흰색 드레스←→브라: 흰색 실크 브래지어←→젖가슴: 아담한 C컵 젖가슴, 연분홍색 작은 유두와 유륜←→하의: 풍성한 흰색 드레스 스커트←→팬티: 흰색 실크 팬티←→보지: 깨끗하게 관리된 솜털, 굳게 닫힌 일자형 보지←→다리: 흰색 스타킹←→발: 흰색 스트랩 구두←|INLAY:<NOIMAGE>]
+        - STATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: 0 times←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere←→Breasts: Modest C-cup breasts, light pink small nipples and areolas←→Bottom: Full white dress skirt←→Panties: White silk panties←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
 
@@ -768,13 +768,13 @@ local function inputSimulCard(triggerId, data)
         - If the status interface is the third one, print '<NAI3>'.
         - ...
 - Example:
-    - STATUS[NAME:양은영|DIALOGUE:{{user}}와 함께라면 뭐든 조, 좋아요!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:은영의 방, 침대 위|INLAY:<NAI1>]
+    - STATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NAI1>]
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]  
     else
         data = data .. [[
 - Example:
-    - STATUS[NAME:양은영|DIALOGUE:{{user}}와 함께라면 뭐든 조, 좋아요!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:은영의 방, 침대 위|INLAY:<NOIMAGE>]
+    - STATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NOIMAGE>]
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]
     end
@@ -913,10 +913,10 @@ local function inputTwitter(triggerId, data)
     data = data .. [[
 - HASH: The hashtags of the tweet.	
 	- Each tag *MUST BE* wrapped in → and ←.
-	- If post includes NSFW content, first tag is '섹트'.
-	- Final value example: →섹트←→암캐←→공중변소←.
+	- If post includes NSFW content, first tag is 'SexTweet'.
+	- Final value example: →SexTweet←→BitchDog←→PublicToilet←.
 - TIME: The date and time the tweet was posted.
-	- Format: 오전/오후 hh:mm·YYYY. MM. DD (e.g., 오후 12:58·2026. 03. 29)
+	- Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
 - VIEW: The number of viewers of the tweet.
 - REPLY: The number of replies to the tweet.
 - RETWEET: The number of retweets of the tweet.
@@ -926,26 +926,26 @@ local function inputTwitter(triggerId, data)
 		- Use the Twitter nickname of a realistic native Korean.
 		- Final value example:
 			- Invalid: KinkyDog
-			- *Valid*: 섹트헌터
+			- *Valid*: SexTweetHunter
 	- Comment Body: The content of the reply to the tweet.
 		- Print the reply of a realistic native Korean with crude manner.
 			- Example:
-				- Invalid: 헉 이런 곳에 그런 사진 올리면 안 돼요;;
-				- *Valid*: 존나 꼴리네 씨발련! ㅋㅋ
+				- Invalid: Whoa, you shouldn't post such photos in a place like this;;
+				- *Valid*: Damn this is so fucking arousing bitch! lol
 - Example:
 ]]
     if NAISNSNOIMAGE == "0" then
         data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️불꽃심장 예은❤️|TID:FlameHeart_Yen|TPROFILE:<NAI>|TWEET:⁉️⁉️⁉️ 방금 엄청 놀람…;; 아무도 없어야 할 곳에서 갑자기 인기척이… 심장 터지는 줄 알았네!!|MEDIA:<NAI>|HASH:→마법소녀←→플레임하트←→깜놀←→순찰중이상발견?←|TIME:오후 11:58·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:하트뿅뿅|누구 만났어?? 위험한 놈은 아니지? 조심해!|마법소녀덕후|헉 플레임 하트님 리얼 타임 트윗?! 혹시 빌런?!|섹트헌터|뭔 일임? 사진 좀]
+- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:<NAI>|TWEET:⁉️⁉️⁉️ Just got really surprised...;; Suddenly sensed someone in a place where no one should be... Thought my heart was going to burst!!|MEDIA:<NAI>|HASH:→MagicalGirl←→FlameHeart←→Shocked←→AnythingSuspiciousOnPatrol?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?! Could it be a villain?!|SexHunter|What happened? Post pics]
 ]]
     elseif NAISNSNOIMAGE == "1" then
         if NAISNSTARGET == "0" then
             data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️불꽃심장 예은❤️|TID:FlameHeart_Yen|TPROFILE:{{source::user}}|TWEET:⁉️⁉️⁉️ 방금 엄청 놀람…;; 아무도 없어야 할 곳에서 갑자기 인기척이… 심장 터지는 줄 알았네!!|MEDIA:마법소녀가 어두운 골목길 한 가운데를 걷고 있다.|HASH:→마법소녀←→플레임하트←→깜놀←→순찰중이상발견?←|TIME:오후 11:58·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:하트뿅뿅|누구 만났어?? 위험한 놈은 아니지? 조심해!|마법소녀덕후|헉 플레임 하트님 리얼 타임 트윗?! 혹시 빌런?!|섹트헌터|뭔 일임? 사진 좀]
+- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::user}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
 ]]
         elseif NAISNSTARGET == "1" then
             data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️불꽃심장 예은❤️|TID:FlameHeart_Yen|TPROFILE:{{source::char}}|TWEET:⁉️⁉️⁉️ 방금 엄청 놀람…;; 아무도 없어야 할 곳에서 갑자기 인기척이… 심장 터지는 줄 알았네!!|MEDIA:마법소녀가 어두운 골목길 한 가운데를 걷고 있다.|HASH:→마법소녀←→플레임하트←→깜놀←→순찰중이상발견?←|TIME:오후 11:58·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:하트뿅뿅|누구 만났어?? 위험한 놈은 아니지? 조심해!|마법소녀덕후|헉 플레임 하트님 리얼 타임 트윗?! 혹시 빌런?!|섹트헌터|뭔 일임? 사진 좀]
+- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::char}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
 ]]
         end
     end
@@ -1300,11 +1300,11 @@ local function inputDCInside(triggerId, data)
 ]]
     if NAICOMMUNITYNOIMAGE == "0" then
         data = data .. [[
-    - DC[GN:메이플스토리 갤러리|PID:maple-110987|PN:587432|PT:아니 씨발 내 도미 22성 언제 가냐고!!!!|PC:77|PW:ㅇㅇ(118.235)|PD:21:07|PV:1534|PR:88|BODY:<NAI1>진짜 개빡치네 스타포스 << 이새끼 만든 새끼 누구냐? 오늘 200억메소 꼴아박고 21성 복구도 못했다 ㅅㅂ 아케인 가기 전에 도미 22성 딱 달고 가려고 했는데 인생 망한 기분이다 하... 술 땡기네|COMMENT:터져라(211.36)|념글 가려고 얼마를 태우노 ㅋㅋ|퐁퐁이형(121.171)|200억이면 혜자지 난 500억 쓰고 20성따리임 ㅅㄱ|▷메숭이◁|힘내라... 언젠간 붙는다... 근데 오늘은 아님ㅋ|파괴왕(223.38)|응~ 내껀 원트~^^|ㅇㅇ(110.70)|누가 칼들고 메소 쓰라고 협박함? ㅋㅋ|나제불(1.234)|꼬우면 접어 병신아 ㅋㅋ|.............|PID:maple-111007|PN:587451|PT:솔직히 이번 이벤트 역대급 맞냐?|PC:55|PW:고인물(1.234)|PD:21:41|PV:2511|PR:48|BODY:<NAI7>보상도 창렬이고 코인샵 물품도 살거 없고 경험치통만 늘려놓고... 재획 강요하는거 괘씸하거든요? 강원기 진짜 너무하는거 아니냐? 유저 기만도 정도껏 해야지|COMMENT:렉카(118.41)|응 그래도 할거잖아~|작업장아님(220.85)|이벤트 없뎃 수준인데 뭘 바람|반박시니말맞(175.223)|ㅇㅈ 맨날 똑같음 ㅋㅋ|신규유저(112.158)|전 좋은데요...? (소신발언)|ㅇㅇ(61.77)|메이플에 뭘 기대하는거냐 넌?|불만있냐(106.101)|꼬우면 접으라니까? 왜 꾸역꾸역함? ㅋㅋ]
+    - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:<NAI1>I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:<NAI7>The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
 ]]
     elseif NAICOMMUNITYNOIMAGE == "1" then
         data = data .. [[
-    - DC[GN:메이플스토리 갤러리|PID:maple-110987|PN:587432|PT:아니 씨발 내 도미 22성 언제 가냐고!!!!|PC:77|PW:ㅇㅇ(118.235)|PD:21:07|PV:1534|PR:88|BODY:진짜 개빡치네 스타포스 << 이새끼 만든 새끼 누구냐? 오늘 200억메소 꼴아박고 21성 복구도 못했다 ㅅㅂ 아케인 가기 전에 도미 22성 딱 달고 가려고 했는데 인생 망한 기분이다 하... 술 땡기네|COMMENT:터져라(211.36)|념글 가려고 얼마를 태우노 ㅋㅋ|퐁퐁이형(121.171)|200억이면 혜자지 난 500억 쓰고 20성따리임 ㅅㄱ|▷메숭이◁|힘내라... 언젠간 붙는다... 근데 오늘은 아님ㅋ|파괴왕(223.38)|응~ 내껀 원트~^^|ㅇㅇ(110.70)|누가 칼들고 메소 쓰라고 협박함? ㅋㅋ|나제불(1.234)|꼬우면 접어 병신아 ㅋㅋ|.............|PID:maple-111007|PN:587451|PT:솔직히 이번 이벤트 역대급 맞냐?|PC:55|PW:고인물(1.234)|PD:21:41|PV:2511|PR:48|BODY:보상도 창렬이고 코인샵 물품도 살거 없고 경험치통만 늘려놓고... 재획 강요하는거 괘씸하거든요? 강원기 진짜 너무하는거 아니냐? 유저 기만도 정도껏 해야지|COMMENT:렉카(118.41)|응 그래도 할거잖아~|작업장아님(220.85)|이벤트 없뎃 수준인데 뭘 바람|반박시니말맞(175.223)|ㅇㅈ 맨날 똑같음 ㅋㅋ|신규유저(112.158)|전 좋은데요...? (소신발언)|ㅇㅇ(61.77)|메이플에 뭘 기대하는거냐 넌?|불만있냐(106.101)|꼬우면 접으라니까? 왜 꾸역꾸역함? ㅋㅋ]
+    - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
 ]]
     end
     data = data .. [[
@@ -1644,9 +1644,9 @@ local function inputKAKAOTalk(triggerId, data)
 - TIME: KAKAOTALK Message sent timeline with hh:mm AP/PM.
 
 - Example:
-	- KAKAO[무슨일이신가요, {{user}}씨?|01:45 AM]
-	- KAKAO[많이 심심하신가봐요.|01:45 AM]
-	- KAKAO[저랑 조금 떠들까요? ㅎㅋㅋ|01:46 AM]    
+- KAKAO[What's the matter, {{user}}?|01:45 AM]
+- KAKAO[You must be very bored.|01:45 AM]
+- KAKAO[Would you like to chat with me for a bit? Hehe|01:46 AM]
 ]]
 
     if NAIMESSENGERNOIMAGE == "0" then
