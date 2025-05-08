@@ -856,13 +856,13 @@ local function changeSimulCard(triggerId, data)
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 * {box-sizing: border-box;margin: 0;padding: 0;}
 body { background-color: #f0f0f0;padding: 20px;}
-.status-card {width: 100%;max-width: 360px;margin: 20px auto;background-color: #ffe6f2;border: 3px solid #000000; box-shadow: 4px 4px 0px #000000;padding: 15px;font-family: 'Pixelify Sans', sans-serif; user-select: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;cursor: default;}
+.status-card {width: 100%;max-width: 360px;margin: 20px auto;background-color:rgb(174, 193, 255);border: 3px solid #000000; box-shadow: 4px 4px 0px #000000;padding: 15px;font-family: 'Pixelify Sans', sans-serif; user-select: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;cursor: default;}
 .content-area {position: relative; margin-bottom: 15px; }
 .placeholder-content {border: 3px solid #000000;background-color: #ffffff;padding: 15px; font-size: 13px;color: #555555;box-shadow: 3px 3px 0px #000000;min-height: 100px;line-height: 1.4;word-wrap: break-word;position: relative; z-index: 1; }
-.dialogue-overlay {position: absolute;bottom: 20px; left: 18px;right: 18px; background-color: rgba(255, 230, 242, 0.95); border: 2px solid #000000;box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);padding: 8px 12px;font-size: 15px;font-weight: bold;color: #000000;line-height: 1.5;z-index: 10;word-wrap: break-word; max-width: calc(100% - 36px);}
+.simul-dialogue-overlay {position: absolute;bottom: 20px; left: 18px;right: 18px; background-color: rgba(183, 195, 255, 0.95); border: 2px solid #000000;box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);padding: 8px 12px;font-size: 15px;font-weight: bold;color: #000000;line-height: 1.5;z-index: 10;word-wrap: break-word; max-width: calc(100% - 36px);}
 .details-info {background-color: rgba(255, 255, 255, 0.9);border: 3px solid #000000;padding: 10px 15px;box-shadow: 3px 3px 0px #000000;font-size: 14px;line-height: 1.5;}.info-line {margin-bottom: 8px;color: #000000;word-wrap: break-word;}
 .info-line:last-child {margin-bottom: 0;}
-.info-line .label {font-weight: bold;color: #ff69b4;margin-right: 5px;}
+.info-line .label {font-weight: bold;color:rgb(105, 170, 255);margin-right: 5px;}
 .info-line .value {color: #000000;}
 </style>
 ]]
@@ -879,7 +879,7 @@ body { background-color: #f0f0f0;padding: 20px;}
             table.insert(html, "    <div class=\"placeholder-content\"" .. styleAttribute .. "></div>")
         end
 
-        table.insert(html, "<div class=\"dialogue-overlay\">" .. (dialogue or "") .. "</div>")
+        table.insert(html, "<div class=\"simul-dialogue-overlay\">" .. (dialogue or "") .. "</div>")
         table.insert(html, "</div>")
         table.insert(html, "<div class=\"details-info\">")
         table.insert(html, "<div class=\"info-line\">")
