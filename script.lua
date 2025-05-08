@@ -2608,6 +2608,10 @@ onOutput = async(function (triggerId)
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
+    elseif NAIPRESETPROMPT == "6" then
+        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
+        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
+        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
     end
     	
 	print("-----------------------ART PROMPT-----------------------")
@@ -3548,6 +3552,10 @@ onButtonClick = async(function(triggerId, data)
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
+    elseif NAIPRESETPROMPT == "6" then
+        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
+        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
+        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
     end
 
     local foundSpecificPrompt = getChatVar(triggerId, specificPromptKey) or "null"
