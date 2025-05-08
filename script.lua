@@ -2360,8 +2360,8 @@ listenEdit("editRequest", function(triggerId, data)
         end
     end
     
-    for i = 1, #data, 1 do
-        -- 이후, 대화 내용이 "user"인 경우에 1회 한정으로 리퀘스트 삽입
+    for i = #data, 1, -1 do
+        -- 이후, 뒤에서부터 대화 내용이 "user"인 경우에 1회 한정으로 리퀘스트 삽입
         local chat = data[i]
         if chat.role == "user" then
             local importantInput = inputImportant(triggerId, "")
