@@ -3524,9 +3524,6 @@ onOutput = async(function (triggerId)
         end
     end
 
-    currentLine = string.gsub(currentLine, "%[[Nn][Aa][Ii][^:]*PROMPT[^:]*:[^%]]-%]", "")
-    currentLine = string.gsub(currentLine, "%[[Nn][Ee][Gg]_[Nn][Aa][Ii][^:]*PROMPT[^:]*:[^%]]-%]", "")
-
     print("ONLINEMODULE: onOutput: Always applying setChat to last message after prompt cleanup.")
     setChat(triggerId, lastIndex - 1, currentLine)
     print("ONLINEMODULE: onOutput: setChat call complete.")
