@@ -349,8 +349,9 @@ local function convertDialogue(triggerId, data)
     local searchStartIndex = 1 
 
     local pattern = "\"(.-)\""
-    local prefixStatus = "STATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
+    local prefixEroStatus = "EROSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
     local suffixEroStatus = "|MOUTH:MOUTH_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|NIPPLES:NIPPLES_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|UTERUS:UTERUS_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|VAGINAL:VAGINAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|ANAL:ANAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|OUTFITS:OUTFITS_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
+    local prefixSimulStatus = "SIMULSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
     local suffixSimulStatus = "|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
 
 
@@ -420,39 +421,39 @@ local function inputEroStatus(triggerId, data)
 ]]
     elseif NAICARDTARGET == "2" then
         data = data .. [[
-- DO NOT PRINT "DIALOGUE" OUTSIDE OF STATUS BLOCK.
+- DO NOT PRINT "DIALOGUE" OUTSIDE OF EROSTATUS BLOCK.
 - PRINT OUT ALL FEMALE CHARACTER's Erotic Status Interface.
 - PRINT OUT with ONE-SENTENCE ONLY.
 ]]      
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DAILOGUE via "", REPLACE ALL FEMALE's DIALOGUE to STATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of STATUS BLOCK(STATUS[NAME:...|DAILOGUE:dialogue|...]).
-        - *PRINT* STATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
+- *DO NOT PRINT FEMALE's DIALOGUE via "", REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* EROSTATUS[...] INSTEAD.
+    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
     - *Valid*:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - STATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
-        - STATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
+        - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
+        - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
         - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-
 
 #### Erotic Status Interface Template
 - AI must follow this template:
-- STATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
+- EROSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
 - NAME: English Name of NPC.
-- DAILOGUE: NPC's Dailogue.
+- DIALOGUE: NPC's Dailogue.
     - DO NOT INCLUDE "", '' HERE.
 - MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
 - Bodypart Image: Image of the Bodypart.
     - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
-    - 0: This is the default state for each keyword.
-    - 1: This is the aroused state for each keyword.
-    - 2: This is the cum-showered or injected state for each keyword.
+        - 0: This is the default state for each keyword.
+        - 1: This is the aroused state for each keyword.
+        - 2: This is the cum-showered or injected state for each keyword.
+    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
 - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
     - Include NPC's real-time assessment, use erotic language
     - Do not include "" or ''.
@@ -482,7 +483,7 @@ local function inputEroStatus(triggerId, data)
                 - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
             - Breasts: size, shape, Color and size of the nipple and areola.
             - Pussy: degree of opening, shape of pussy hair.
-            - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows “가려져 보이지 않음.”. However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
+            - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows "Not visible". However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
                 - Usually, when wearing a skirt or pants, the panties are not visible.
                 - Usually, when wearing panties or something similar, the vaginal is not visible.
                 - Usually, when wearing a top, bra, or dress, the breasts are not visible.
@@ -515,14 +516,18 @@ local function inputEroStatus(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Example:
-        - STATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: 0 times←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere←→Breasts: Modest C-cup breasts, small light pink nipples and areolas←→Bottom: Voluminous white dress skirt←→Panties: White silk panties←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
     - Example:
-        - STATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: 0 times←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere←→Breasts: Modest C-cup breasts, light pink small nipples and areolas←→Bottom: Full white dress skirt←→Panties: White silk panties←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
+    data = data .. [[
+        - If Character is MALE.
+            - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|Status: MALE|NIPPLES:MALE|Ha?|Status: MALE||TERUS:MALE|I don't have one.|Status: MALE|VAGINAL:MALE|I don't have one.|Status: MALE|ANAL:MALE|I don't have one.|Status: MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
+]]
 
     return data
 end
@@ -531,7 +536,7 @@ local function changeEroStatus(triggerId, data)
     local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
     local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
 
-    local erostatusPattern = "STATUS%[([^%]]*)%]"
+    local erostatusPattern = "EROSTATUS%[([^%]]*)%]"
     data = string.gsub(data, erostatusPattern, function(replacements)
         local EroStatusTemplate = [[
 <style>
@@ -783,21 +788,21 @@ local function inputSimulCard(triggerId, data)
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- *DO NOT PRINT* DAILOGUE via "", REPLACE ALL DIALOGUE to STATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of STATUS BLOCK(STATUS[NAME:...|DAILOGUE:dialogue|...]).
-        - *PRINT* STATUS[...] INSTEAD.
+- *DO NOT PRINT* DIALOGUE via "", REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* SIMULSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
     - *Valid*:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - STATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
-        - STATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
+        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
+        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
         - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
 
 #### Simulation Status Interface Template
-- STATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
+- SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
 - NAME: The name of the NPC.
 - DIALOGUE: The dialogue of the NPC.
     - Make sure to include NPC's dialogue here
@@ -825,13 +830,13 @@ local function inputSimulCard(triggerId, data)
         - If the status interface is the third one, print '<NAI3>'.
         - ...
 - Example:
-    - STATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NAI1>]
+    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NAI1>]
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]  
     else
         data = data .. [[
 - Example:
-    - STATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NOIMAGE>]
+    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NOIMAGE>]
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]
     end
@@ -842,7 +847,7 @@ end
 local function changeSimulCard(triggerId, data)
     local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
 
-    local simulPattern = "(STATUS)%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
+    local simulPattern = "(SIMULSTATUS)%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
     data = string.gsub(data, simulPattern, function(
         start_pattern, name, dialogue, time, location, inlayContent
         )
@@ -1940,10 +1945,10 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
 - Output Format:
-    - STATUS[...<NAI1>...]
+    - EROSTATUS[...<NAI1>...]
 	- [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
 	- [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - STATUS[...<NAI2>...]
+    - EROSTATUS[...<NAI2>...]
 	- [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
 	- [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
@@ -1953,10 +1958,10 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
 - Output Format:
-    - STATUS[...<NAI1>...]
+    - SIMULSTATUS[...<NAI1>...]
     - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
-    - STATUS[...<NAI2>...]
+    - SIMULSTATUS[...<NAI2>...]
     - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
@@ -2052,21 +2057,21 @@ local function inputImportant(triggerId, data)
 
     data = data .. [[
 # CRITICAL
-- *FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DAILOGUES*
+- *FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES*
 ]]
 
     if NAICARD == "1" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
-- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the STATUS[...] BLOCK*
-    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to STATUS[...|DIALOGUE:MESSAGE|...]*
+- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
+    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
 - *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
 ]]
     elseif NAICARD == "2" then
         data = data .. [[
 ## CRITICAL: SIMULATION STATUS INTERFACE
-- *DO NOT PRINT "MESSAGE" OUTSIDE of the STATUS[...] BLOCK*
-    - *MUST REPLACE "MESSAGE" to STATUS[...|DIALOGUE:MESSAGE|...]*
+- *DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
+    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
 ]]
     end
 
@@ -2149,7 +2154,7 @@ listenEdit("editRequest", function(triggerId, data)
         elseif NAICARDFORCEOUTPUT == "0" then
             convertDialogueFlag = true
         end
-        
+
         if chat.role == "user" and convertDialogueFlag == true then
             local importantInput = inputImportant(triggerId, "")
             currentInput = importantInput .. [[
@@ -2227,9 +2232,12 @@ listenEdit("editDisplay", function(triggerId, data)
     local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
     
-    if NAICARD == "1" then
+    if NAICARD ~= "1" then
         data = changeEroStatus(triggerId, data)
     elseif NAICARD == "2" then
+        data = changeSimulCard(triggerId, data)
+    elseif NAICARD == "3" then
+        data = changeEroStatus(triggerId, data)
         data = changeSimulCard(triggerId, data)
     end
 
@@ -2332,7 +2340,7 @@ function onInput(triggerId)
     local originalLine = targetMessageData.data
     local modifiedLine = originalLine
     local historyModifiedByWrapping = false
-    local prefixesToWrap = {"STATUS", "TWITTER", "DC"}
+    local prefixesToWrap = {"EROSTATUS", "SIMULSTATUS", "TWITTER", "DC"}
     local replacementFormat = "<details><summary><span>(열기/접기)</span></summary>%s</details>"
     local checkAlreadyWrappedStart = "<details><summary><span>(열기/접기)</span></summary>"
 
@@ -2525,13 +2533,13 @@ onOutput = async(function (triggerId)
                 local statusReplacements = {}
 
                 while true do
-                    local s_status, e_status_prefix = string.find(currentLine, "STATUS%[", searchPos)
+                    local s_status, e_status_prefix = string.find(currentLine, "EROSTATUS%[", searchPos)
                     if not s_status then
-                        print("ONLINEMODULE: onOutput: No more STATUS[ blocks found starting from position " .. searchPos)
+                        print("ONLINEMODULE: onOutput: No more EROSTATUS[ blocks found starting from position " .. searchPos)
                         break
                     end
                     statusBlocksFound = statusBlocksFound + 1
-                    print("ONLINEMODULE: onOutput: Found STATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_status)
+                    print("ONLINEMODULE: onOutput: Found EROSTATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_status)
 
                     local bracketLevel = 1
                     local e_status_suffix = e_status_prefix + 1
@@ -2552,9 +2560,9 @@ onOutput = async(function (triggerId)
                     end
 
                     if foundClosingBracket then
-                        print("ONLINEMODULE: onOutput: STATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_status_suffix)
+                        print("ONLINEMODULE: onOutput: EROSTATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_status_suffix)
                         local statusBlockContent = string.sub(currentLine, s_status, e_status_suffix)
-                        local statusPattern = "STATUS%[NAME:([^|]*)|"
+                        local statusPattern = "EROSTATUS%[NAME:([^|]*)|"
                         local _, _, currentBlockName = string.find(statusBlockContent, statusPattern)
                         local trimmedBlockName = nil
                         if currentBlockName then
@@ -2617,7 +2625,7 @@ onOutput = async(function (triggerId)
                         searchPos = e_status_suffix + 1
                     else
                         ERR(triggerId, "EROSTATUS", 1)
-                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for STATUS block #" .. statusBlocksFound .. " even after nested check! Skipping to next search pos.")
+                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for EROSTATUS block #" .. statusBlocksFound .. " even after nested check! Skipping to next search pos.")
                         searchPos = e_status_prefix + 1
                     end
                 end
@@ -2645,13 +2653,13 @@ onOutput = async(function (triggerId)
                 local listKey = "STORED_SIMCARD_IDS"
 
                 while true do
-                    local s_simul, e_simul_prefix = string.find(currentLine, "STATUS%[", searchPos)
+                    local s_simul, e_simul_prefix = string.find(currentLine, "SIMULSTATUS%[", searchPos)
                     if not s_simul then
-                        print("ONLINEMODULE: onOutput: No more STATUS[ blocks found starting from position " .. searchPos)
+                        print("ONLINEMODULE: onOutput: No more SIMULSTATUS[ blocks found starting from position " .. searchPos)
                         break
                     end
                     statusBlocksFound = statusBlocksFound + 1
-                    print("ONLINEMODULE: onOutput: Found STATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_simul)
+                    print("ONLINEMODULE: onOutput: Found SIMULSTATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_simul)
 
                     local bracketLevel = 1
                     local e_simul_suffix = e_simul_prefix + 1
@@ -2672,16 +2680,16 @@ onOutput = async(function (triggerId)
                     end
 
                     if foundClosingBracket then
-                        print("ONLINEMODULE: onOutput: STATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_simul_suffix)
+                        print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_simul_suffix)
 
                         local statusBlockContent = string.sub(currentLine, s_simul, e_simul_suffix)
-                        local statusBlockPattern = "STATUS%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
+                        local statusBlockPattern = "SIMULSTATUS%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
                         local _, _, currentBlockName = string.find(statusBlockContent, statusBlockPattern)
 
                         if currentBlockName then
-                            print("ONLINEMODULE: onOutput: STATUS block #" .. statusBlocksFound .. " NAME found: [" .. currentBlockName .. "]")
+                            print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " NAME found: [" .. currentBlockName .. "]")
                         else
-                            print("ONLINEMODULE: onOutput: STATUS block #" .. statusBlocksFound .. " NAME pattern did not match.")
+                            print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " NAME pattern did not match.")
                         end
 
                         local existingInlay = nil
@@ -2798,19 +2806,19 @@ onOutput = async(function (triggerId)
                         end
                         if naiTagsFoundInBlock == 0 then
                             ERR(triggerId, "SIMULCARD", 3)
-                            print("ONLINEMODULE: onOutput: No <NAI> tags found within STATUS block #"..statusBlocksFound.." content.")
+                            print("ONLINEMODULE: onOutput: No <NAI> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
                         end
                         searchPos = e_simul_suffix + 1
                     else
                         ERR(triggerId, "SIMULCARD", 1)
-                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for STATUS block #" .. statusBlocksFound .. " even after nested check! Something is wrong. Skipping to next search pos.")
+                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for SIMULSTATUS block #" .. statusBlocksFound .. " even after nested check! Something is wrong. Skipping to next search pos.")
                         searchPos = e_simul_prefix + 1
                     end
                 end
 
                 if statusBlocksFound == 0 then
                     ERR(triggerId, "SIMULCARD", 4)
-                    print("ONLINEMODULE: onOutput: No STATUS[...] blocks found in the entire message.")
+                    print("ONLINEMODULE: onOutput: No SIMULSTATUS[...] blocks found in the entire message.")
                 end
 
                 if #simulReplacements > 0 then
