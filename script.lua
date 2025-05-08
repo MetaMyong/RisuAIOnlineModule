@@ -2064,10 +2064,10 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
 - Output Format:
-    - EROSTATUS[...<NAI1>...]
+    - EROSTATUS[...|INLAY:<NAI1>]
 	- [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
 	- [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - EROSTATUS[...<NAI2>...]
+    - EROSTATUS[...|INLAY:<NAI2>]
 	- [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
 	- [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
@@ -2076,10 +2076,10 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
 - Output Format:
-    - SIMULSTATUS[...<NAI1>...]
+    - SIMULSTATUS[...|INLAY:<NAI1>]
     - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...<NAI2>...]
+    - SIMULSTATUS[...|INLAY:<NAI2>]
     - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
@@ -2088,10 +2088,10 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
 - Output Format:
-    - EROSTATUS[...<NAI1>...]  --> FEMALE
+    - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
     - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...<NAI2>...]  --> MALE
+    - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
     - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
