@@ -414,6 +414,10 @@ local function inputEroStatus(triggerId, data)
                 - Anal intercourse count: Total count of penis round trips, 0~99999 times
                 - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
                 - ...
+            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
+                - Korean: 1 char.
+                - English: 0.5 char.
+                - Blank space: 0.5 char.
     - Please print out the total count from birth to now.
     - If character has no experience, state that character has no experience.
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
@@ -946,6 +950,10 @@ local function inputStatusHybrid(triggerId, data)
                 - Anal intercourse count: Total count of penis round trips, 0~99999 times
                 - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
                 - ...
+            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
+                - Korean: 1 char.
+                - English: 0.5 char.
+                - Blank space: 0.5 char.
     - Please print out the total count from birth to now.
     - If character has no experience, state that character has no experience.
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
