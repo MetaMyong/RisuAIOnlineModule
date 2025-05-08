@@ -2117,44 +2117,45 @@ local function inputImage(triggerId, data)
 
 ### Image Prompt Usage
 - *DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER*
+- *NEVER* refer to the past chat history when outputting the prompt below:
 ]]
 
     if NAICARDNOIMAGE == "0" then
         if NAICARD == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
-- Output Format:
-    - EROSTATUS[...|INLAY:<NAI1>]
-	- [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - EROSTATUS[...|INLAY:<NAI2>]
-	- [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
+    - Output Format:
+        - EROSTATUS[...|INLAY:<NAI1>]
+        - [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
+        - EROSTATUS[...|INLAY:<NAI2>]
+        - [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         elseif NAICARD == "2" then
             data = data .. [[
-- *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
-- Output Format:
-    - SIMULSTATUS[...|INLAY:<NAI1>]
-    - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...|INLAY:<NAI2>]
-    - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
+    - Output Format:
+        - SIMULSTATUS[...|INLAY:<NAI1>]
+        - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<NAI2>]
+        - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         elseif NAICARD == "3" then
             data = data .. [[
-- *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
-- Output Format:
-    - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
-    - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
-    - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
+    - Output Format:
+        - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
+        - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
+        - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         end
     end
@@ -2177,18 +2178,18 @@ local function inputImage(triggerId, data)
     if NAICOMMUNITYNOIMAGE == "0" then
         if NAICOMMUNITY == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE*
-- Output Format:
-    - DC[...|<NAI1>...|<NAI2>...]
-	- If the post is normal:
-		- [NAIDCPROMPT:(Describe the situation of the normal post)]
-	- If the post is Selfie:
-		- [NAIDCPROMPT:(SITUATION),(LABEL),(ANGLE),(ACTIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAIDCPROMPT:(NEGATIVE PROMPT)]
-- The number of the POST CONTENT including '<NAI>' and the number of the prompt must match.
-	- Example: If 3rd POST CONTENT is including '<NAI3>'.
-		- [NAIDCPROMPT3:3rd Post's '<NAI3>' Prompt Generated]
-		- [NEG_NAIDCPROMPT3:3rd Post's '<NAI3>' (NEGATIVE PROMPT)]
+    - *ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE*
+    - Output Format:
+        - DC[...|<NAI1>...|<NAI2>...]
+        - If the post is normal:
+            - [NAIDCPROMPT:(Describe the situation of the normal post)]
+        - If the post is Selfie:
+            - [NAIDCPROMPT:(SITUATION),(LABEL),(ANGLE),(ACTIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAIDCPROMPT:(NEGATIVE PROMPT)]
+    - The number of the POST CONTENT including '<NAI>' and the number of the prompt must match.
+        - Example: If 3rd POST CONTENT is including '<NAI3>'.
+            - [NAIDCPROMPT3:3rd Post's '<NAI3>' Prompt Generated]
+            - [NEG_NAIDCPROMPT3:3rd Post's '<NAI3>' (NEGATIVE PROMPT)]
 ]]
         end
     end
@@ -2196,12 +2197,12 @@ local function inputImage(triggerId, data)
     if NAIMESSENGERNOIMAGE == "0" then
         if NAIMESSENGER == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE*
-- Print <NAI> Exactly once when {{char}} sends a picture or image.
-- Output Format:
-    - KAKAO[<NAI>|...]
-	- [NAIKAKAOPROMPT:(SITUATION),(LABEL),Selfie,portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAIKAKAOPROMPT:(NEGATIVE PROMPT)]
+    - *ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE*
+    - Print <NAI> Exactly once when {{char}} sends a picture or image.
+    - Output Format:
+        - KAKAO[<NAI>|...]
+        - [NAIKAKAOPROMPT:(SITUATION),(LABEL),Selfie,portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAIKAKAOPROMPT:(NEGATIVE PROMPT)]
 ]]
         end
     end
@@ -3555,7 +3556,6 @@ onButtonClick = async(function(triggerId, data)
 
     if action == "RUNREROLLSETTING" then
         print("ONLINEMODULE: ACTION - RUNREROLLSETTING triggered.")
-        removeChat(triggerId, (getChatLength(triggerId) - 1))
         openRerollForm(triggerId)
         return
 
