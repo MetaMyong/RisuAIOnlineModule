@@ -395,7 +395,7 @@ local function inputEroStatus(triggerId, data)
     - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
     - 0: This is the default state for each keyword.
     - 1: This is the aroused state for each keyword.
-    - 2: This is the cum-showered or injectedd state for each keyword.
+    - 2: This is the cum-showered or injected state for each keyword.
 - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
     - Include NPC's real-time assessment, use erotic language
     - Do not include "" or ''.
@@ -1987,6 +1987,33 @@ local function inputImage(triggerId, data)
     return data
 end
 
+local function inputImportant(triggerId, data)
+    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
+    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
+    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
+    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
+
+    data = data .. [[
+# IMPORTANT NOTE
+- *YOU MUST FOLLOW THE BELOW RULES*
+]]
+
+    if NAICARD == "1" then
+        data = data .. [[
+## IMPORTANT NOTE: EROTIC STATUS INTERFACE
+- *DO NOT PRINT "DIALOGUE" OUTSIDE of the STATUS[...] BLOCK*
+- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFFERRED LANGUAGE*
+]]
+    elseif NAICARD == "2" then
+        data = data .. [[
+## IMPORTANT NOTE: SIMULATION STATUS INTERFACE
+- *DO NOT PRINT "DIALOGUE" OUTSIDE of the STATUS[...] BLOCK*
+]]
+    end
+
+    return data
+end
+
 
 listenEdit("editInput", function(triggerId, data)
     if not data or data == "" then return "" end
@@ -2059,18 +2086,35 @@ listenEdit("editRequest", function(triggerId, data)
 
 ]]
             if NAIMESSENGER == "0" then
-                if NAICARD == "1" then currentInput = inputEroStatus(triggerId, currentInput)
-                elseif NAICARD == "2" then currentInput = inputSimulCard(triggerId, currentInput) end
+                if NAICARD == "1" then
+                    currentInput = inputEroStatus(triggerId, currentInput)
+                    changedValue = true
+                elseif NAICARD == "2" then
+                    currentInput = inputSimulCard(triggerId, currentInput)
+                    changedValue = true
+                end
                 
-                if NAISNS == "1" then currentInput = inputTwitter(triggerId, currentInput) end
-                if NAICOMMUNITY == "1" then currentInput = inputDCInside(triggerId, currentInput) end
+                if NAISNS == "1" then
+                    currentInput = inputTwitter(triggerId, currentInput)
+                    changedValue = true
+                end
+                if NAICOMMUNITY == "1" then
+                    currentInput = inputDCInside(triggerId, currentInput)
+                    changedValue = true
+                end
                 
             elseif NAIMESSENGER == "1" then
                 currentInput = inputKAKAOTalk(triggerId, currentInput)
+                changedValue = true
             end
 
             if NAIGLOBAL == "1" then
                 currentInput = inputImage(triggerId, currentInput)
+                changedValue = true
+            end
+
+            if changedValue == true then
+                currentInput  = inputImportant(triggerId, currentInput)
             end
 
             currentInput = currentInput .. [[
@@ -2087,7 +2131,6 @@ listenEdit("editRequest", function(triggerId, data)
 ]] .. currentInput)
 
             data[i].content = currentInput
-            changedValue = true
             break
         end
     end
