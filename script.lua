@@ -2839,15 +2839,15 @@ onOutput = async(function (triggerId)
                         local existingInlay = nil
                         local trimmedBlockName = nil
                         if currentBlockName then
-                        trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
-                        if trimmedBlockName ~= "" then
-                            print("ONLINEMODULE: onOutput: Trimmed NAME: [" .. trimmedBlockName .. "]")
-                            existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
-                            if existingInlay == "null" then existingInlay = nil end
-                            print("ONLINEMODULE: onOutput: Existing inlay found from chatVar: [" .. tostring(existingInlay) .. "]")
-                        else
-                            trimmedBlockName = nil
-                        end
+                            trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
+                            if trimmedBlockName ~= "" then
+                                print("ONLINEMODULE: onOutput: Trimmed NAME: [" .. trimmedBlockName .. "]")
+                                existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
+                                if existingInlay == "null" then existingInlay = nil end
+                                print("ONLINEMODULE: onOutput: Existing inlay found from chatVar: [" .. tostring(existingInlay) .. "]")
+                            else
+                                trimmedBlockName = nil
+                            end
                         end
 
                         local simulContent = string.sub(currentLine, e_simul_prefix + 1, e_simul_suffix - 1)
@@ -2855,7 +2855,7 @@ onOutput = async(function (triggerId)
                         local naiTagsFoundInBlock = 0
 
                         if existingInlay and trimmedBlockName then
-                        print("ONLINEMODULE: onOutput: Processing with existing inlay for block #" .. statusBlocksFound)
+                            print("ONLINEMODULE: onOutput: Processing with existing inlay for block #" .. statusBlocksFound)
                         while true do
                             local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<NAI(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then break end
@@ -2872,7 +2872,7 @@ onOutput = async(function (triggerId)
                             naiSearchPosInContent = e_nai_in_content + 1
                         end
                         else
-                        print("ONLINEMODULE: onOutput: Processing by generating new image for block #" .. statusBlocksFound)
+                            print("ONLINEMODULE: onOutput: Processing by generating new image for block #" .. statusBlocksFound)
                         while true do
                             local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<NAI(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then
@@ -2912,7 +2912,7 @@ onOutput = async(function (triggerId)
 
                                             local currentList = getChatVar(triggerId, listKey) or "null"
                                             if currentList == "null" then currentList = "" end
-                                            print("ONLINEMODULE: onOutput: Current list for key '" .. listKey .. "': [" .. currentList .. "]")
+                                                print("ONLINEMODULE: onOutput: Current list for key '" .. listKey .. "': [" .. currentList .. "]")
                                             local newList = currentList
                                             if not string.find("," .. currentList .. ",", "," .. trimmedBlockName .. ",", 1, true) then
                                                 if currentList == "" then
@@ -2947,12 +2947,12 @@ onOutput = async(function (triggerId)
                             end
                             naiSearchPosInContent = e_nai_in_content + 1
                         end
-                        end
-                        if naiTagsFoundInBlock == 0 then
-                            ERR(triggerId, "SIMULCARD", 3)
-                            print("ONLINEMODULE: onOutput: No <NAI> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
-                        end
-                        searchPos = e_simul_suffix + 1
+                    end
+                    if naiTagsFoundInBlock == 0 then
+                        ERR(triggerId, "SIMULCARD", 3)
+                        print("ONLINEMODULE: onOutput: No <NAI> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
+                    end
+                    searchPos = e_simul_suffix + 1
                     else
                         ERR(triggerId, "SIMULCARD", 1)
                         print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for SIMULSTATUS block #" .. statusBlocksFound .. " even after nested check! Something is wrong. Skipping to next search pos.")
@@ -2987,7 +2987,6 @@ onOutput = async(function (triggerId)
                 local listKey = "STORED_SIMCARD_IDS"
 
                 while true do
-                    -- Find either EROSTATUS or SIMULSTATUS blocks
                     local s_ero, e_ero = string.find(currentLine, "EROSTATUS%[", searchPos)
                     local s_sim, e_sim = string.find(currentLine, "SIMULSTATUS%[", searchPos)
                     
@@ -3001,13 +3000,12 @@ onOutput = async(function (triggerId)
                         e_status_prefix = e_sim
                         isEroStatus = false
                     else
-                        break -- No more blocks found
+                        break 
                     end
 
                     statusBlocksFound = statusBlocksFound + 1
                     print("ONLINEMODULE: onOutput: Found " .. (isEroStatus and "EROSTATUS" or "SIMULSTATUS") .. " block #" .. statusBlocksFound)
 
-                    -- Find matching closing bracket
                     local bracketLevel = 1
                     local e_status_suffix = e_status_prefix + 1
                     local foundClosingBracket = false
@@ -3049,13 +3047,12 @@ onOutput = async(function (triggerId)
                             if existingInlay == "null" then existingInlay = nil end
                         end
 
-                        -- Process NAI tags
                         local naiSearchPosInContent = 1
                         local naiTagsFoundInBlock = 0
 
                         while true do
-                            local s_nai, e_nai, naiIndex = string.find(blockContent, "<NAI(%d+)>", naiSearchPosInContent)
-                            if not s_nai then break end
+                            local s_nai_in_content, e_nai_in_content, naiIndex = string.find(blockContent, "<NAI(%d+)>", naiSearchPosInContent)
+                            if not s_nai_in_content then break end
                             naiTagsFoundInBlock = naiTagsFoundInBlock + 1
                             naiIndex = tonumber(naiIndex)
 
@@ -3099,8 +3096,8 @@ onOutput = async(function (triggerId)
 
                                         local marker = "<!-- " .. (isEroStatus and identifier or "SIMULSTATUS_" .. identifier) .. " -->"
                                         local content_offset = e_status_prefix
-                                        local nai_abs_start = content_offset + s_nai
-                                        local nai_abs_end = content_offset + e_nai
+                                        local nai_abs_start = content_offset + s_nai_in_content
+                                        local nai_abs_end = content_offset + e_nai_in_content
 
                                         table.insert(replacements, {
                                             start = nai_abs_start,
@@ -3126,7 +3123,6 @@ onOutput = async(function (triggerId)
                                             setChatVar(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
                                             setChatVar(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
 
-                                            -- Update SimCard list
                                             local currentList = getChatVar(triggerId, listKey) or "null"
                                             if currentList == "null" then currentList = "" end
                                             
@@ -3142,7 +3138,7 @@ onOutput = async(function (triggerId)
                                     ERR(triggerId, promptType, 0)
                                 end
                             end
-                            naiSearchPosInContent = e_nai + 1
+                            naiSearchPosInContent = e_nai_in_content + 1
                         end
 
                         if naiTagsFoundInBlock == 0 then
@@ -3157,17 +3153,17 @@ onOutput = async(function (triggerId)
 
                 if statusBlocksFound == 0 then
                     print("ONLINEMODULE: onOutput: No status blocks found in hybrid mode")
-                end
-
-                if #replacements > 0 then
-                    print("ONLINEMODULE: onOutput: Applying " .. #replacements .. " hybrid mode replacements")
-                    table.sort(replacements, function(a, b) return a.start > b.start end)
-                    for _, rep in ipairs(replacements) do
-                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                else
+                    if #replacements > 0 then
+                        print("ONLINEMODULE: onOutput: Applying " .. #replacements .. " hybrid mode replacements")
+                        table.sort(replacements, function(a, b) return a.start > b.start end)
+                        for _, rep in ipairs(replacements) do
+                            if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
+                                currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                            end
                         end
+                        lineModifiedInThisPass = true
                     end
-                    lineModifiedInThisPass = true
                 end
             end
 
