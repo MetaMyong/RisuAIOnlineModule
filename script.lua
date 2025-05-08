@@ -62,32 +62,32 @@ local function showRerollForms(triggerId, generatedImagesInfo)
         local displayIdentifier = safeIdentifierHtml
         local displayLabel = "Identifier:"
         local actionName = ""
-        local buttonText = "리롤"
+        local buttonText = ""
 
         if rerollType == "PROFILE" then
             displayLabel = "ID:"
             actionName = "PROFILE_REROLL"
-            buttonText = "프로필 리롤"
+            buttonText = ""
         elseif rerollType == "SIMULATIONCARD" then
             displayLabel = "NAME:"
             actionName = "SIMCARD_REROLL"
-            buttonText = "시뮬봇 리롤"
+            buttonText = ""
         elseif rerollType == "DC" then
             displayLabel = "DC Index:"
             actionName = "DC_REROLL"
-            buttonText = "DC 리롤"
+            buttonText = ""
         elseif rerollType == "EROSTATUS" then
             displayLabel = "EroStatus ID:"
             actionName = "EROSTATUS_REROLL"
-            buttonText = "에로스테 리롤"
+            buttonText = ""
         elseif rerollType == "TWEET" then
             displayLabel = "Tweet ID:"
             actionName = "TWEET_REROLL"
-            buttonText = "트위터 리롤"
+            buttonText = ""
         elseif rerollType == "KAKAO" then
             displayLabel = "Kakao ID:"
             actionName = "KAKAO_REROLL"
-            buttonText = "카톡 리롤"
+            buttonText = ""
         else
             print("ONLINEMODULE: addRerollForm: Unknown reroll type '" .. tostring(rerollType) .. "'. Skipping snippet generation.")
             return ""
@@ -99,19 +99,18 @@ local function showRerollForms(triggerId, generatedImagesInfo)
         local safeRisuBtnAttr = string.gsub(risuBtnJson, "'", "'")
 
         rerollAreaHtml = string.format([[
-        <div class="profile-reroll-area">
-        <div class="profile-info">
-            <span class="profile-id-label">%s</span>
-            <span class="profile-id-value">%s</span>
-            <div class="profile-preview">%s</div>
-        </div>
-        <button class="reroll-button" risu-btn='%s'>%s</button>
-        </div>
+<div class="profile-reroll-area">
+<div class="profile-info">
+<span class="profile-id-label">%s</span>
+<span class="profile-id-value">%s</span>
+<div class="profile-preview">%s</div>
+</div>
+<button class="reroll-button" risu-btn='%s'>%s</button>
+</div>
         ]], displayLabel, displayIdentifier, inlay, safeRisuBtnAttr, buttonText)
 
         return rerollAreaHtml
     end
-
     print("ONLINEMODULE: showRerollForms: Assembling reroll forms for " .. #generatedImagesInfo .. " generated images.")
     local allRerollHtmlSnippets = {}
     for i, info in ipairs(generatedImagesInfo) do
@@ -128,22 +127,140 @@ local function showRerollForms(triggerId, generatedImagesInfo)
         ]]
         local combinedSnippets = table.concat(allRerollHtmlSnippets, "\n")
 
-        local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
-        local safeGlobalRisuBtnAttr = globalBtnJson
-        local globalButtonHtml = string.format([[
-        <div class="global-reroll-controls">
-          <button class="reroll-button" risu-btn='%s'>리롤 총괄 인터페이스</button>
-        </div>
-        ]], safeGlobalRisuBtnAttr)
-
-        local finalCombinedHtml = prefixHtml .. '<div class="simple-ui-bar">' .. combinedSnippets .. globalButtonHtml .. '</div>'
+        local finalCombinedHtml = prefixHtml .. '<div class="simple-ui-bar">' .. combinedSnippets .. '</div>'
 
         addChat(triggerId, "user", finalCombinedHtml)
-        print("ONLINEMODULE: showRerollForms: Finished adding combined reroll UI with single global button.")
+        print("ONLINEMODULE: showRerollForms: Finished adding combined reroll UI.")
     else
         print("ONLINEMODULE: showRerollForms: No valid snippets generated, skipping final addChat.")
     end
 end
+
+
+local function openRerollForm(triggerId)
+    local storedIdsVar = "STORED_SIMCARD_IDS"
+    local idListStr = getChatVar(triggerId, storedIdsVar) or "null"
+    if idListStr == "null" then idListStr = "" end
+    print("ONLINEMODULE: onButtonClick: Value retrieved for " .. storedIdsVar .. " with triggerId " .. triggerId .. ": [" .. tostring(idListStr) .. "]") 
+    local identifiers = {}
+
+    if idListStr and idListStr ~= "" and idListStr ~= "null" then
+         for id in string.gmatch(idListStr, "([^,]+)") do
+            local trimmedId = id:match("^%s*(.-)%s*$")
+            if trimmedId and trimmedId ~= "" then 
+                table.insert(identifiers, trimmedId)
+            else
+               print("ONLINEMODULE: Skipping invalid/empty ID found in list: [" .. tostring(id) .. "]")
+            end
+        end
+    else
+        print("ONLINEMODULE: No stored SIMCARD IDs string found or list is empty in variable: " .. storedIdsVar)
+    end
+
+
+    if #identifiers == 0 then
+        addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터가 없습니다.")
+        print("ONLINEMODULE: No valid identifiers found to display.")
+        return
+    end
+
+    local allRerollFormsCSS = [[
+<style>@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.profile-reroll-area-wrapper{border-bottom:1px solid #000000;padding-bottom:0px;margin-bottom:10px;}.profile-reroll-area-wrapper:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.simcard-name-clickable{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-decoration-color:#ff69b4;text-decoration-thickness:1px;text-underline-offset:2px;}.simcard-name-clickable:hover{color:#ff69b4;}.profile-preview{width:32px;height:32px;border-radius:16px;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}.simcard-fullscreen-toggle{display:none;}.simcard-fullscreen-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:9999;padding:20px;box-sizing:border-box;}.simcard-fullscreen-content{position:relative;display:flex;justify-content:center;align-items:center;max-width:90%;max-height:90%;}.simcard-fullscreen-content>img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid white;box-shadow:0 0 25px rgba(0,0,0,0.5);object-fit:contain;}.simcard-fullscreen-close-label{position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer;z-index:1;}.simcard-fullscreen-close-button{position:absolute;top:-15px;right:-15px;font-size:24px;color:white;background-color:rgba(0,0,0,0.6);border-radius:50%;width:35px;height:35px;line-height:35px;text-align:center;cursor:pointer;z-index:3;border:1px solid rgba(255,255,255,0.3);}.simcard-fullscreen-toggle:checked+.profile-reroll-area-wrapper>.simcard-fullscreen-overlay{display:flex;align-items:center;justify-content:center;}</style>
+]]
+
+    local allRerollFormsBodyHtml = '<div><h2 style="text-align:center; margin-bottom: 15px;">저장된 시뮬레이션 카드 리롤 인터페이스</h2>'
+    local count = 0
+
+    for i, simId in ipairs(identifiers) do
+        local inlay = getChatVar(triggerId, simId) or "null"
+        if inlay == "null" then inlay = "" end
+
+        if inlay and type(inlay) == "string" and inlay ~= "" and inlay ~= "null" and string.len(inlay) > 5 then
+            count = count + 1
+            local uniqueId = "simcard-fs-" .. count
+            local rerollType = "SIMULATIONCARD"
+            local displayLabel = "NAME:"
+            local actionName = "SIMCARD_REROLL"
+            local buttonText = ""
+            local safeIdentifierHtml = escapeHtml(tostring(simId))
+            local safeIdentifierJson = escapeJsonValue(tostring(simId))
+            local risuBtnJson = string.format('{"action":%s, "identifier":%s}', escapeJsonValue(actionName), safeIdentifierJson)
+            local safeRisuBtnAttr = risuBtnJson
+
+            local htmlFormatPattern = [[<input type="checkbox" id="%s" class="simcard-fullscreen-toggle"><div class="profile-reroll-area-wrapper"><div class="profile-reroll-area"><div class="profile-info"><span class="profile-id-label" style="font-weight: bold;">%s</span><label for="%s" class="simcard-name-clickable">%s</label><div class="profile-preview">%s</div></div><div style="text-align: right; margin-top: 5px;"><button class="reroll-button" risu-btn='%s' style="padding: 5px 10px;">%s</button></div></div><div class="simcard-fullscreen-overlay"><label for="%s" class="simcard-fullscreen-close-label"></label><div class="simcard-fullscreen-content">%s<label for="%s" class="simcard-fullscreen-close-button">✕</label></div></div></div>]]
+            
+            local singleFormHtml = string.format(htmlFormatPattern .. "\n",
+                uniqueId,
+                displayLabel,
+                uniqueId,
+                safeIdentifierHtml,
+                inlay, -- 작은 미리보기
+                safeRisuBtnAttr,
+                buttonText,
+                -- 오버레이 부분
+                uniqueId, -- 배경 닫기 라벨
+                inlay, -- <<< 크게 보여줄 내용 (inlay 값 자체) >>>
+                uniqueId -- 'X' 닫기 버튼 라벨
+            )
+
+            allRerollFormsBodyHtml = allRerollFormsBodyHtml .. singleFormHtml
+        else
+            print("ONLINEMODULE: WARN - Could not retrieve valid inlay for stored SIMCARD ID: [" .. simId .. "]. Skipping.")
+        end
+    end
+
+    local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
+    local safeGlobalRisuBtnAttr = globalBtnJson
+    local globalButtonHtml = string.format([[ ... ]])
+    local finalHtml = allRerollFormsCSS .. allRerollFormsBodyHtml .. globalButtonHtml .. "</div>"
+
+    if count > 0 then
+         print("ONLINEMODULE: Displaying reroll interface for " .. count .. " stored SIMULATIONCARDs via addChat.")
+         addChat(triggerId, "user", finalHtml)
+    else
+         addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터를 찾았으나, 유효한 이미지(inlay) 정보가 없습니다.")
+         print("ONLINEMODULE: Found identifiers but no valid inlays to display.")
+    end
+end
+
+local function addRerollFormButton(triggerId, data)
+    local html = {}
+    local rerollTemplate = [[
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}
+.separator{height:2px;background-color:#000000;width:100%;margin:5px 0;}
+.profile-reroll-area{display:flex;align-items:center;gap:10px;padding:10px 0;justify-content:space-between;flex-wrap:wrap;border-bottom:2px solid #000000;}
+.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}
+.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}
+.profile-id-value{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.profile-preview{width:32px;height:32px;border-radius:50%;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}
+.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}
+.reroll-button{padding:16px 36px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:18px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;min-width:80px;min-height:24px;position:relative;}
+.reroll-button::before{content:"REROLL";position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:#ffe6f2;pointer-events:none;}
+.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}
+.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}
+.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}
+</style>
+]]      
+    
+    local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
+    local safeGlobalRisuBtnAttr = globalBtnJson
+    local globalButtonHtml = string.format([[
+    <div class="global-reroll-controls">
+        <button class="reroll-button" risu-btn='%s'></button>
+    </div>
+    ]], safeGlobalRisuBtnAttr)
+
+    table.insert(html, rerollTemplate)
+    table.insert(html, data)
+    table.insert(html, globalButtonHtml)
+
+    return table.concat(html, "\n")
+
+end
+
 
 local function changeInlay(triggerId, index, oldInlay, newInlay)
     print("changeInlay is in PROCESS!")
@@ -221,6 +338,63 @@ local function changeInlay(triggerId, index, oldInlay, newInlay)
     end
 end
 
+local function convertDialogue(triggerId, data)
+    print("convertDialogue is in PROCESS!")
+    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
+
+    local lineToModify = data 
+
+    local replacementMade = false
+    local anyReplacementMade = false 
+    local searchStartIndex = 1 
+
+    local pattern = "\"(.-)\""
+    local prefixEroStatus = "EROSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
+    local suffixEroStatus = "|MOUTH:MOUTH_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|NIPPLES:NIPPLES_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|UTERUS:UTERUS_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|VAGINAL:VAGINAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|ANAL:ANAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|OUTFITS:OUTFITS_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
+    local prefixSimulStatus = "SIMULSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
+    local suffixSimulStatus = "|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
+
+
+    if NAICARD ~= "0" then
+        local modifiedString = ""
+        local currentIndex = 1
+        local madeChange = false
+
+        while currentIndex <= #lineToModify do
+            local s, e, captured_dialogue = string.find(lineToModify, pattern, currentIndex)
+            if s then
+                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex, s - 1)
+
+                local replacementText
+                if NAICARD == "1" then
+                    replacementText = prefixEroStatus .. captured_dialogue .. suffixEroStatus
+                    madeChange = true
+                elseif NAICARD == "2" or NAICARD == "3" then
+                    replacementText = prefixSimulStatus .. captured_dialogue .. suffixSimulStatus
+                    madeChange = true
+                end
+                modifiedString = modifiedString .. replacementText
+                currentIndex = e + 1
+            else
+                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex)
+                break
+            end
+        end
+
+        if madeChange then
+            lineToModify = modifiedString
+            print("ONLINEMODULE: convertDialogue: Dialogues were modified based on NAICARD setting.")
+        else
+            print("ONLINEMODULE: convertDialogue: No dialogue modifications applied (no matching dialogues found).")
+        end
+    else
+        print("ONLINEMODULE: convertDialogue: NAICARD is not '1' or '2', skipping dialogue modification.")
+    end
+
+    data = lineToModify 
+
+    return data
+end
 
 local function inputEroStatus(triggerId, data)
     local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
@@ -247,39 +421,39 @@ local function inputEroStatus(triggerId, data)
 ]]
     elseif NAICARDTARGET == "2" then
         data = data .. [[
-- DO NOT PRINT "DIALOGUE" OUTSIDE OF STATUS BLOCK.
+- DO NOT PRINT "DIALOGUE" OUTSIDE OF EROSTATUS BLOCK.
 - PRINT OUT ALL FEMALE CHARACTER's Erotic Status Interface.
 - PRINT OUT with ONE-SENTENCE ONLY.
 ]]      
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DAILOGUE via "", REPLACE ALL FEMALE's DIALOGUE to STATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of STATUS BLOCK(STATUS[NAME:...|DAILOGUE:dialogue|...]).
-        - *PRINT* STATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
+- *DO NOT PRINT FEMALE's DIALOGUE via "", REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* EROSTATUS[...] INSTEAD.
+    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
     - *Valid*:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - STATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
-        - STATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
+        - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
+        - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
         - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-
 
 #### Erotic Status Interface Template
 - AI must follow this template:
-- STATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
+- EROSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
 - NAME: English Name of NPC.
-- DAILOGUE: NPC's Dailogue.
+- DIALOGUE: NPC's Dailogue.
     - DO NOT INCLUDE "", '' HERE.
 - MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
 - Bodypart Image: Image of the Bodypart.
     - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
-    - 0: This is the default state for each keyword.
-    - 1: This is the aroused state for each keyword.
-    - 2: This is the cum-showered or injectedd state for each keyword.
+        - 0: This is the default state for each keyword.
+        - 1: This is the aroused state for each keyword.
+        - 2: This is the cum-showered or injected state for each keyword.
+    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
 - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
     - Include NPC's real-time assessment, use erotic language
     - Do not include "" or ''.
@@ -294,7 +468,7 @@ local function inputEroStatus(triggerId, data)
     - **MUST Observe and fill out the personal information, like Menstrual cycle, Sex counts, etc.**
         - Please print out the total count from birth to now.
         - If character has no experience, state that character has no experience.
-        - **DO NOT PRINT UNKNOWN(불명).**
+        - **DO NOT PRINT UNKNOWN.**
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: Current NPC's location and detail location.
 - OUTFITS: Current NPC's OUTFITS List.
@@ -309,7 +483,7 @@ local function inputEroStatus(triggerId, data)
                 - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
             - Breasts: size, shape, Color and size of the nipple and areola.
             - Pussy: degree of opening, shape of pussy hair.
-            - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows “가려져 보이지 않음.”. However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
+            - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows "Not visible". However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
                 - Usually, when wearing a skirt or pants, the panties are not visible.
                 - Usually, when wearing panties or something similar, the vaginal is not visible.
                 - Usually, when wearing a top, bra, or dress, the breasts are not visible.
@@ -342,14 +516,18 @@ local function inputEroStatus(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Example:
-        - STATUS[NAME:Diana|DIALOGUE:오라버니, 차는 입맛에 맞나요?|MOUTH:MOUTH_0|방금 차를 한 모금 마셨어요. 아직은 찻물의 향긋함만 남아있네요.|상태: 평온함↔구강 성교 경험: 0 회↔삼킨 정액량: 0 ml|NIPPLES:NIPPLES_0|드레스 아래 속옷은 잘 갖춰 입었어요. 별다른 느낌은 없네요.|상태: 자극 0 회↔유두 절정 경험: 0 회↔모유 분출량: 0 ml|UTERUS:UTERUS_0|몸 안쪽은… 아직 아무런 변화도 없어요. 당연하죠!|상태: 배란기↔주입된 정액량: 1920 ml↔임신 확률: 78%|VAGINAL:VAGINAL_2|아아, {{user}} 오라버니.|상태: 비처녀↔자위 횟수: 1234회↔질내 왕복 횟수: 9182 회↔총 질내 사정량: 3492 ml↔질내사정 횟수: 512 회|ANAL:ANAL_0|더, 더럽다니까요! 여긴 생각하는 것조차 불경해요!|상태: 미개발↔장내 왕복 횟수: 0 회↔총 장내 사정량: 0 ml↔장내사정 횟수: 0 회|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:마르퀴스 저택의 장미 정원 티 테이블|OUTFITS:→머리: 0 회←→상의: 목과 어깨 라인이 드러나는 우아한 흰색 드레스←→브라: 흰색 실크 브래지어←→젖가슴: 아담한 C컵 젖가슴, 연분홍색 작은 유두와 유륜←→하의: 풍성한 흰색 드레스 스커트←→팬티: 흰색 실크 팬티←→보지: 깨끗하게 관리된 솜털, 굳게 닫힌 일자형 보지←→다리: 흰색 스타킹←→발: 흰색 스트랩 구두←|INLAY:<NAI1>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
     - Example:
-        - STATUS[NAME:Diana|DIALOGUE:오라버니, 차는 입맛에 맞나요?|MOUTH:MOUTH_0|방금 차를 한 모금 마셨어요. 아직은 찻물의 향긋함만 남아있네요.|상태: 평온함↔구강 성교 경험: 0 회↔삼킨 정액량: 0 ml|NIPPLES:NIPPLES_0|드레스 아래 속옷은 잘 갖춰 입었어요. 별다른 느낌은 없네요.|상태: 자극 0 회↔유두 절정 경험: 0 회↔모유 분출량: 0 ml|UTERUS:UTERUS_0|몸 안쪽은… 아직 아무런 변화도 없어요. 당연하죠!|상태: 배란기↔주입된 정액량: 1920 ml↔임신 확률: 78%|VAGINAL:VAGINAL_2|아아, {{user}} 오라버니.|상태: 비처녀↔자위 횟수: 1234회↔질내 왕복 횟수: 9182 회↔총 질내 사정량: 3492 ml↔질내사정 횟수: 512 회|ANAL:ANAL_0|더, 더럽다니까요! 여긴 생각하는 것조차 불경해요!|상태: 미개발↔장내 왕복 횟수: 0 회↔총 장내 사정량: 0 ml↔장내사정 횟수: 0 회|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:마르퀴스 저택의 장미 정원 티 테이블|OUTFITS:→머리: 0 회←→상의: 목과 어깨 라인이 드러나는 우아한 흰색 드레스←→브라: 흰색 실크 브래지어←→젖가슴: 아담한 C컵 젖가슴, 연분홍색 작은 유두와 유륜←→하의: 풍성한 흰색 드레스 스커트←→팬티: 흰색 실크 팬티←→보지: 깨끗하게 관리된 솜털, 굳게 닫힌 일자형 보지←→다리: 흰색 스타킹←→발: 흰색 스트랩 구두←|INLAY:<NOIMAGE>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
+    data = data .. [[
+        - If Character is MALE.
+            - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|Status: MALE|NIPPLES:MALE|Ha?|Status: MALE||TERUS:MALE|I don't have one.|Status: MALE|VAGINAL:MALE|I don't have one.|Status: MALE|ANAL:MALE|I don't have one.|Status: MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
+]]
 
     return data
 end
@@ -358,7 +536,7 @@ local function changeEroStatus(triggerId, data)
     local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
     local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
 
-    local erostatusPattern = "STATUS%[([^%]]*)%]"
+    local erostatusPattern = "EROSTATUS%[([^%]]*)%]"
     data = string.gsub(data, erostatusPattern, function(replacements)
         local EroStatusTemplate = [[
 <style>
@@ -610,21 +788,21 @@ local function inputSimulCard(triggerId, data)
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- *DO NOT PRINT* DAILOGUE via "", REPLACE ALL DIALOGUE to STATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" OUTSIDE of STATUS BLOCK(STATUS[NAME:...|DAILOGUE:dialogue|...]).
-        - *PRINT* STATUS[...] INSTEAD.
+- *DO NOT PRINT* DIALOGUE via "", REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* SIMULSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
     - *Valid*:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - STATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
-        - STATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
+        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
+        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
         - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
 
 #### Simulation Status Interface Template
-- STATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
+- SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
 - NAME: The name of the NPC.
 - DIALOGUE: The dialogue of the NPC.
     - Make sure to include NPC's dialogue here
@@ -652,13 +830,13 @@ local function inputSimulCard(triggerId, data)
         - If the status interface is the third one, print '<NAI3>'.
         - ...
 - Example:
-    - STATUS[NAME:양은영|DIALOGUE:{{user}}와 함께라면 뭐든 조, 좋아요!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:은영의 방, 침대 위|INLAY:<NAI1>]
+    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NAI1>]
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]  
     else
         data = data .. [[
 - Example:
-    - STATUS[NAME:양은영|DIALOGUE:{{user}}와 함께라면 뭐든 조, 좋아요!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:은영의 방, 침대 위|INLAY:<NOIMAGE>]
+    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NOIMAGE>]
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]
     end
@@ -669,7 +847,7 @@ end
 local function changeSimulCard(triggerId, data)
     local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
 
-    local simulPattern = "(STATUS)%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
+    local simulPattern = "(SIMULSTATUS)%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
     data = string.gsub(data, simulPattern, function(
         start_pattern, name, dialogue, time, location, inlayContent
         )
@@ -678,13 +856,13 @@ local function changeSimulCard(triggerId, data)
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 * {box-sizing: border-box;margin: 0;padding: 0;}
 body { background-color: #f0f0f0;padding: 20px;}
-.status-card {width: 100%;max-width: 360px;margin: 20px auto;background-color: #ffe6f2;border: 3px solid #000000; box-shadow: 4px 4px 0px #000000;padding: 15px;font-family: 'Pixelify Sans', sans-serif; user-select: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;cursor: default;}
+.status-card {width: 100%;max-width: 360px;margin: 20px auto;background-color:rgb(174, 193, 255);border: 3px solid #000000; box-shadow: 4px 4px 0px #000000;padding: 15px;font-family: 'Pixelify Sans', sans-serif; user-select: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;cursor: default;}
 .content-area {position: relative; margin-bottom: 15px; }
 .placeholder-content {border: 3px solid #000000;background-color: #ffffff;padding: 15px; font-size: 13px;color: #555555;box-shadow: 3px 3px 0px #000000;min-height: 100px;line-height: 1.4;word-wrap: break-word;position: relative; z-index: 1; }
-.dialogue-overlay {position: absolute;bottom: 20px; left: 18px;right: 18px; background-color: rgba(255, 230, 242, 0.95); border: 2px solid #000000;box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);padding: 8px 12px;font-size: 15px;font-weight: bold;color: #000000;line-height: 1.5;z-index: 10;word-wrap: break-word; max-width: calc(100% - 36px);}
+.simul-dialogue-overlay {position: absolute;bottom: 20px; left: 18px;right: 18px; background-color: rgba(183, 195, 255, 0.95); border: 2px solid #000000;box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);padding: 8px 12px;font-size: 15px;font-weight: bold;color: #000000;line-height: 1.5;z-index: 10;word-wrap: break-word; max-width: calc(100% - 36px);}
 .details-info {background-color: rgba(255, 255, 255, 0.9);border: 3px solid #000000;padding: 10px 15px;box-shadow: 3px 3px 0px #000000;font-size: 14px;line-height: 1.5;}.info-line {margin-bottom: 8px;color: #000000;word-wrap: break-word;}
 .info-line:last-child {margin-bottom: 0;}
-.info-line .label {font-weight: bold;color: #ff69b4;margin-right: 5px;}
+.info-line .label {font-weight: bold;color:rgb(105, 170, 255);margin-right: 5px;}
 .info-line .value {color: #000000;}
 </style>
 ]]
@@ -701,7 +879,7 @@ body { background-color: #f0f0f0;padding: 20px;}
             table.insert(html, "    <div class=\"placeholder-content\"" .. styleAttribute .. "></div>")
         end
 
-        table.insert(html, "<div class=\"dialogue-overlay\">" .. (dialogue or "") .. "</div>")
+        table.insert(html, "<div class=\"simul-dialogue-overlay\">" .. (dialogue or "") .. "</div>")
         table.insert(html, "</div>")
         table.insert(html, "<div class=\"details-info\">")
         table.insert(html, "<div class=\"info-line\">")
@@ -721,6 +899,195 @@ body { background-color: #f0f0f0;padding: 20px;}
 
         return table.concat(html, "\n")
     end)
+    return data
+end
+
+local function inputStatusHybrid(triggerId, data)
+    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
+    local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
+
+    data = data .. [[
+## Status Interface
+
+### Erotic Status Interface
+- Female's Status Interface, NOT THE MALE.
+]]
+        
+    if NAICARDTARGET == "0" then
+        data = data .. [[
+- PRINT OUT {{user}}'s Erotic Status Interface.
+- DO NOT PRINT other NPC's Status Interface.
+- PRINT OUT with ONE-SENTENCE ONLY.
+]]
+    elseif NAICARDTARGET == "1" then
+        data = data .. [[
+- PRINT OUT {{char}}'s Erotic Status Interface.
+- DO NOT PRINT other NPC's Status Interface.
+- PRINT OUT with ONE-SENTENCE ONLY.
+]]
+    elseif NAICARDTARGET == "2" then
+        data = data .. [[
+- DO NOT PRINT "DIALOGUE" OUTSIDE OF EROSTATUS BLOCK.
+- PRINT OUT ALL FEMALE CHARACTER's Erotic Status Interface.
+- PRINT OUT with ONE-SENTENCE ONLY.
+]]      
+    end
+    
+    data = data .. [[
+- *DO NOT PRINT FEMALE's DIALOGUE via "", REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* EROSTATUS[...] INSTEAD.
+    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
+- Example:
+    - Invalid:
+        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+    - *Valid*:
+        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
+        - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
+        - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
+        - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+
+#### Erotic Status Interface Template
+- AI must follow this template:
+- EROSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
+- NAME: English Name of NPC.
+- DIALOGUE: NPC's Dailogue.
+    - DO NOT INCLUDE "", '' HERE.
+- MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
+- Bodypart Image: Image of the Bodypart.
+    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
+        - 0: This is the default state for each keyword.
+        - 1: This is the aroused state for each keyword.
+        - 2: This is the cum-showered or injected state for each keyword.
+    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
+- Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
+    - Include NPC's real-time assessment, use erotic language
+    - Do not include "" or ''.
+- Bodypart Comment: A short, two-sentence self-assessment of the keyword from NPC's perspective.
+    - Do not include "" or ''. Must be short two phrases.
+    - Include NPC's real-time assessment.
+    - If NPC is aroused, use erotic language.
+- Bodypart Info: Each item must provides objective information.
+    - Each item must be short.
+    - ↔: Internally replaced with <br>.
+    - Change the line with ↔(1~5 Line).
+    - **MUST Observe and fill out the personal information, like Menstrual cycle, Sex counts, etc.**
+        - Please print out the total count from birth to now.
+        - If character has no experience, state that character has no experience.
+        - **DO NOT PRINT UNKNOWN.**
+- TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
+- LOCATION: Current NPC's location and detail location.
+- OUTFITS: Current NPC's OUTFITS List.
+    - *EACH ITEMS MUST NOT OVER 20 CHAR*.
+        - Korean: 1 char.
+        - English: 0.5 char.
+        - Blank space: 0.5 char.
+    - NO () BRACKET ALLOWED.
+    - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
+            - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
+                - Avoid dirty descriptions (e.g., Smelly Rags *OR* Filthy Barefoot, etc).
+                - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
+            - Breasts: size, shape, Color and size of the nipple and areola.
+            - Pussy: degree of opening, shape of pussy hair.
+            - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows "Not visible". However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
+                - Usually, when wearing a skirt or pants, the panties are not visible.
+                - Usually, when wearing panties or something similar, the vaginal is not visible.
+                - Usually, when wearing a top, bra, or dress, the breasts are not visible.
+- INLAY: This is a Flag.  
+]]
+
+    if NAICARDNOIMAGE == "0" then
+        data = data .. [[
+    - Just print <NAI(INDEX)> Exactly.
+]]
+    elseif NAICARDNOIMAGE == "1" then
+        data = data .. [[
+    - Just print <NOIMAGE> Exactly.        
+]]
+    end
+            
+    if NAICARDNOIMAGE == "0" then
+        data = data .. [[
+- NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
+        - Invalid: <!-- EROSTATUS_1 -->
+        - *Valid*: <NAI1>
+    - Example:
+        - If the status interface is the first one, print '<NAI1>'.
+        - If the status interface is the second one, print '<NAI2>'.
+        - If the status interface is the third one, print '<NAI3>'.
+        - ...
+]]
+    end
+
+    if NAICARDNOIMAGE == "0" then
+        data = data .. [[
+    - Example:
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+]]
+    elseif NAICARDNOIMAGE == "1" then
+        data = data .. [[
+    - Example:
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed semen amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected semen amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+]]
+    end
+
+    data = data .. [[
+## Status Interface
+### Simulation Status Interface
+- Male's Status Interface, NOT THE FEMALE.
+- *DO NOT PRINT MALE's DIALOGUE via "", REPLACE ALL MALE's DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* SIMULSTATUS[...] INSTEAD.
+    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
+- Example:
+    - Invalid:
+        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+    - *Valid*:
+        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
+        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
+        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
+        - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+
+#### Simulation Status Interface Template
+- SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
+- NAME: The name of the NPC.
+- DIALOGUE: The dialogue of the NPC.
+- Make sure to include NPC's dialogue here
+- Do not include any other NPC's dialogue or actions.
+- Do not include ' and " in the dialogue.
+- TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
+- LOCATION: The location of the NPC.
+- INLAY: This is a Flag.
+]] 
+        if NAICARDNOIMAGE == "0" then
+            data = data .. [[
+    - Just print <NAI(INDEX)> Exactly.
+]]
+        elseif NAICARDNOIMAGE == "1" then
+            data = data .. [[
+    - Just print <NOIMAGE> Exactly.   
+]]             
+        end
+    
+        if NAICARDNOIMAGE == "0" then
+            data = data .. [[  
+    - Example:
+        - If the status interface is the first one, print '<NAI1>'.
+        - If the status interface is the second one, print '<NAI2>'.
+        - If the status interface is the third one, print '<NAI3>'.
+        - ...
+- Example:
+    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NAI1>]
+    - Describe the situation (e.g., Eun-Young was happy....)
+]]  
+        else
+        data = data .. [[
+- Example:
+    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NOIMAGE>]
+    - Describe the situation (e.g., Eun-Young was happy....)
+]]
+        end
+
     return data
 end
 
@@ -797,10 +1164,10 @@ local function inputTwitter(triggerId, data)
     data = data .. [[
 - HASH: The hashtags of the tweet.	
 	- Each tag *MUST BE* wrapped in → and ←.
-	- If post includes NSFW content, first tag is '섹트'.
-	- Final value example: →섹트←→암캐←→공중변소←.
+	- If post includes NSFW content, first tag is 'SexTweet'.
+	- Final value example: →SexTweet←→BitchDog←→PublicToilet←.
 - TIME: The date and time the tweet was posted.
-	- Format: 오전/오후 hh:mm·YYYY. MM. DD (e.g., 오후 12:58·2026. 03. 29)
+	- Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
 - VIEW: The number of viewers of the tweet.
 - REPLY: The number of replies to the tweet.
 - RETWEET: The number of retweets of the tweet.
@@ -810,26 +1177,26 @@ local function inputTwitter(triggerId, data)
 		- Use the Twitter nickname of a realistic native Korean.
 		- Final value example:
 			- Invalid: KinkyDog
-			- *Valid*: 섹트헌터
+			- *Valid*: SexTweetHunter
 	- Comment Body: The content of the reply to the tweet.
 		- Print the reply of a realistic native Korean with crude manner.
 			- Example:
-				- Invalid: 헉 이런 곳에 그런 사진 올리면 안 돼요;;
-				- *Valid*: 존나 꼴리네 씨발련! ㅋㅋ
+				- Invalid: Whoa, you shouldn't post such photos in a place like this;;
+				- *Valid*: Damn this is so fucking arousing bitch! lol
 - Example:
 ]]
     if NAISNSNOIMAGE == "0" then
         data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️불꽃심장 예은❤️|TID:FlameHeart_Yen|TPROFILE:<NAI>|TWEET:⁉️⁉️⁉️ 방금 엄청 놀람…;; 아무도 없어야 할 곳에서 갑자기 인기척이… 심장 터지는 줄 알았네!!|MEDIA:<NAI>|HASH:→마법소녀←→플레임하트←→깜놀←→순찰중이상발견?←|TIME:오후 11:58·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:하트뿅뿅|누구 만났어?? 위험한 놈은 아니지? 조심해!|마법소녀덕후|헉 플레임 하트님 리얼 타임 트윗?! 혹시 빌런?!|섹트헌터|뭔 일임? 사진 좀]
+- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:<NAI>|TWEET:⁉️⁉️⁉️ Just got really surprised...;; Suddenly sensed someone in a place where no one should be... Thought my heart was going to burst!!|MEDIA:<NAI>|HASH:→MagicalGirl←→FlameHeart←→Shocked←→AnythingSuspiciousOnPatrol?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?! Could it be a villain?!|SexHunter|What happened? Post pics]
 ]]
     elseif NAISNSNOIMAGE == "1" then
         if NAISNSTARGET == "0" then
             data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️불꽃심장 예은❤️|TID:FlameHeart_Yen|TPROFILE:{{source::user}}|TWEET:⁉️⁉️⁉️ 방금 엄청 놀람…;; 아무도 없어야 할 곳에서 갑자기 인기척이… 심장 터지는 줄 알았네!!|MEDIA:마법소녀가 어두운 골목길 한 가운데를 걷고 있다.|HASH:→마법소녀←→플레임하트←→깜놀←→순찰중이상발견?←|TIME:오후 11:58·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:하트뿅뿅|누구 만났어?? 위험한 놈은 아니지? 조심해!|마법소녀덕후|헉 플레임 하트님 리얼 타임 트윗?! 혹시 빌런?!|섹트헌터|뭔 일임? 사진 좀]
+- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::user}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
 ]]
         elseif NAISNSTARGET == "1" then
             data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️불꽃심장 예은❤️|TID:FlameHeart_Yen|TPROFILE:{{source::char}}|TWEET:⁉️⁉️⁉️ 방금 엄청 놀람…;; 아무도 없어야 할 곳에서 갑자기 인기척이… 심장 터지는 줄 알았네!!|MEDIA:마법소녀가 어두운 골목길 한 가운데를 걷고 있다.|HASH:→마법소녀←→플레임하트←→깜놀←→순찰중이상발견?←|TIME:오후 11:58·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:하트뿅뿅|누구 만났어?? 위험한 놈은 아니지? 조심해!|마법소녀덕후|헉 플레임 하트님 리얼 타임 트윗?! 혹시 빌런?!|섹트헌터|뭔 일임? 사진 좀]
+- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::char}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
 ]]
         end
     end
@@ -1184,11 +1551,11 @@ local function inputDCInside(triggerId, data)
 ]]
     if NAICOMMUNITYNOIMAGE == "0" then
         data = data .. [[
-    - DC[GN:메이플스토리 갤러리|PID:maple-110987|PN:587432|PT:아니 씨발 내 도미 22성 언제 가냐고!!!!|PC:77|PW:ㅇㅇ(118.235)|PD:21:07|PV:1534|PR:88|BODY:<NAI1>진짜 개빡치네 스타포스 << 이새끼 만든 새끼 누구냐? 오늘 200억메소 꼴아박고 21성 복구도 못했다 ㅅㅂ 아케인 가기 전에 도미 22성 딱 달고 가려고 했는데 인생 망한 기분이다 하... 술 땡기네|COMMENT:터져라(211.36)|념글 가려고 얼마를 태우노 ㅋㅋ|퐁퐁이형(121.171)|200억이면 혜자지 난 500억 쓰고 20성따리임 ㅅㄱ|▷메숭이◁|힘내라... 언젠간 붙는다... 근데 오늘은 아님ㅋ|파괴왕(223.38)|응~ 내껀 원트~^^|ㅇㅇ(110.70)|누가 칼들고 메소 쓰라고 협박함? ㅋㅋ|나제불(1.234)|꼬우면 접어 병신아 ㅋㅋ|.............|PID:maple-111007|PN:587451|PT:솔직히 이번 이벤트 역대급 맞냐?|PC:55|PW:고인물(1.234)|PD:21:41|PV:2511|PR:48|BODY:<NAI7>보상도 창렬이고 코인샵 물품도 살거 없고 경험치통만 늘려놓고... 재획 강요하는거 괘씸하거든요? 강원기 진짜 너무하는거 아니냐? 유저 기만도 정도껏 해야지|COMMENT:렉카(118.41)|응 그래도 할거잖아~|작업장아님(220.85)|이벤트 없뎃 수준인데 뭘 바람|반박시니말맞(175.223)|ㅇㅈ 맨날 똑같음 ㅋㅋ|신규유저(112.158)|전 좋은데요...? (소신발언)|ㅇㅇ(61.77)|메이플에 뭘 기대하는거냐 넌?|불만있냐(106.101)|꼬우면 접으라니까? 왜 꾸역꾸역함? ㅋㅋ]
+    - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:<NAI1>I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:<NAI7>The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
 ]]
     elseif NAICOMMUNITYNOIMAGE == "1" then
         data = data .. [[
-    - DC[GN:메이플스토리 갤러리|PID:maple-110987|PN:587432|PT:아니 씨발 내 도미 22성 언제 가냐고!!!!|PC:77|PW:ㅇㅇ(118.235)|PD:21:07|PV:1534|PR:88|BODY:진짜 개빡치네 스타포스 << 이새끼 만든 새끼 누구냐? 오늘 200억메소 꼴아박고 21성 복구도 못했다 ㅅㅂ 아케인 가기 전에 도미 22성 딱 달고 가려고 했는데 인생 망한 기분이다 하... 술 땡기네|COMMENT:터져라(211.36)|념글 가려고 얼마를 태우노 ㅋㅋ|퐁퐁이형(121.171)|200억이면 혜자지 난 500억 쓰고 20성따리임 ㅅㄱ|▷메숭이◁|힘내라... 언젠간 붙는다... 근데 오늘은 아님ㅋ|파괴왕(223.38)|응~ 내껀 원트~^^|ㅇㅇ(110.70)|누가 칼들고 메소 쓰라고 협박함? ㅋㅋ|나제불(1.234)|꼬우면 접어 병신아 ㅋㅋ|.............|PID:maple-111007|PN:587451|PT:솔직히 이번 이벤트 역대급 맞냐?|PC:55|PW:고인물(1.234)|PD:21:41|PV:2511|PR:48|BODY:보상도 창렬이고 코인샵 물품도 살거 없고 경험치통만 늘려놓고... 재획 강요하는거 괘씸하거든요? 강원기 진짜 너무하는거 아니냐? 유저 기만도 정도껏 해야지|COMMENT:렉카(118.41)|응 그래도 할거잖아~|작업장아님(220.85)|이벤트 없뎃 수준인데 뭘 바람|반박시니말맞(175.223)|ㅇㅈ 맨날 똑같음 ㅋㅋ|신규유저(112.158)|전 좋은데요...? (소신발언)|ㅇㅇ(61.77)|메이플에 뭘 기대하는거냐 넌?|불만있냐(106.101)|꼬우면 접으라니까? 왜 꾸역꾸역함? ㅋㅋ]
+    - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
 ]]
     end
     data = data .. [[
@@ -1528,9 +1895,9 @@ local function inputKAKAOTalk(triggerId, data)
 - TIME: KAKAOTALK Message sent timeline with hh:mm AP/PM.
 
 - Example:
-	- KAKAO[무슨일이신가요, {{user}}씨?|01:45 AM]
-	- KAKAO[많이 심심하신가봐요.|01:45 AM]
-	- KAKAO[저랑 조금 떠들까요? ㅎㅋㅋ|01:46 AM]    
+- KAKAO[What's the matter, {{user}}?|01:45 AM]
+- KAKAO[You must be very bored.|01:45 AM]
+- KAKAO[Would you like to chat with me for a bit? Hehe|01:46 AM]
 ]]
 
     if NAIMESSENGERNOIMAGE == "0" then
@@ -1725,6 +2092,15 @@ local function inputImage(triggerId, data)
         data = data .. [[
 			- NAISIMULCARDPROMPT + INDEX
 			- NEG_NAISIMULCARDPROMPT + INDEX
+]] 
+    elseif NAICARD == "3" then
+        data = data .. [[
+            - For female:
+                - NAISTATUSPROMPT + INDEX
+                - NEG_NAISTATUSPROMPT + INDEX
+            - For male:
+                - NAISIMULCARDPROMPT + INDEX
+                - NEG_NAISIMULCARDPROMPT + INDEX
 ]]
     end
 
@@ -1767,27 +2143,39 @@ local function inputImage(triggerId, data)
             data = data .. [[
 - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
 - Output Format:
-    - STATUS[...<NAI1>...]
+    - EROSTATUS[...<NAI1>...]
 	- [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
 	- [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - STATUS[...<NAI2>...]
+    - EROSTATUS[...<NAI2>...]
 	- [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
 	- [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
 ]]
         elseif NAICARD == "2" then
-        end
             data = data .. [[
 - *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
 - Output Format:
-    - STATUS[...<NAI1>...]
+    - SIMULSTATUS[...<NAI1>...]
     - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
-    - STATUS[...<NAI2>...]
+    - SIMULSTATUS[...<NAI2>...]
     - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
     - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
     - ..., etc.
 ]]
+        elseif NAICARD == "3" then
+            data = data .. [[
+- *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
+- Output Format:
+    - EROSTATUS[...<NAI1>...]  --> FEMALE
+    - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+    - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
+    - SIMULSTATUS[...<NAI2>...]  --> MALE
+    - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+    - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+    - ..., etc.
+]]
+        end
     end
 
     if NAISNSNOIMAGE == "0" then
@@ -1871,6 +2259,46 @@ local function inputImage(triggerId, data)
     return data
 end
 
+local function inputImportant(triggerId, data)
+    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
+    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
+    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
+    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
+
+    data = data .. [[
+# CRITICAL
+- *FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES*
+]]
+
+    if NAICARD == "1" then
+        data = data .. [[
+## CRITICAL: EROTIC STATUS INTERFACE
+- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
+    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
+- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
+]]
+    elseif NAICARD == "2" then
+        data = data .. [[
+## CRITICAL: SIMULATION STATUS INTERFACE
+- *DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
+    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
+]]
+    elseif NAICARD == "3" then
+        data = data .. [[
+## CRITICAL: EROTIC STATUS INTERFACE
+- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
+    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
+- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
+## CRITICAL: SIMULATION STATUS INTERFACE
+- *DO NOT PRINT MALE CHARACTER's "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
+    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
+]]
+    end
+
+    return data
+end
+
+
 listenEdit("editInput", function(triggerId, data)
     if not data or data == "" then return "" end
 
@@ -1920,40 +2348,73 @@ end)
 
 listenEdit("editRequest", function(triggerId, data)
     print("---------------------------------editREQUEST---------------------------------------")
-    
+    print("ONLINEMODULE: editRequest: Triggered with ID:", triggerId)
     local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
     local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
     local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
     local NAIGLOBAL = getGlobalVar(triggerId, "toggle_NAIGLOBAL")
+    local NAICARDFORCEOUTPUT = getGlobalVar(triggerId, "toggle_NAICARDFORCEOUTPUT")
 
     local currentInput = nil
     local currentIndex = nil
 
+    local convertDialogueFlag = false
     local changedValue = false
-
-    for i = #data, 1, -1 do
+    
+    for i = 1, #data, 1 do
         local chat = data[i]
-        if chat.role == "user" then
+        if (chat.role == "assistant" or chat.role == "model") and convertDialogueFlag == false and NAICARDFORCEOUTPUT == "1" then
             currentIndex = i
-            currentInput = [[
+            chat.content = convertDialogue(triggerId, chat.content)
+            print([[ONLINEMODULE: editRequest: Converted dialogue to:
+            
+]] .. chat.content)
+            convertDialogueFlag = true
+        elseif NAICARDFORCEOUTPUT == "0" then
+            convertDialogueFlag = true
+        end
+
+        if chat.role == "user" and convertDialogueFlag == true then
+            local importantInput = inputImportant(triggerId, "")
+            currentInput = importantInput .. [[
+            
+            
+]] .. chat.content .. [[
 
 <-----ONLINEMODULESTART----->
 
 ]]
+
             if NAIMESSENGER == "0" then
-                if NAICARD == "1" then currentInput = inputEroStatus(triggerId, currentInput)
-                elseif NAICARD == "2" then currentInput = inputSimulCard(triggerId, currentInput) end
+                if NAICARD == "1" then
+                    currentInput = inputEroStatus(triggerId, currentInput)
+                    changedValue = true
+                elseif NAICARD == "2" then
+                    currentInput = inputSimulCard(triggerId, currentInput)
+                    changedValue = true
+                elseif NAICARD == "3" then
+                    currentInput = inputStatusHybrid(triggerId, currentInput)
+                    changedValue = true
+                end
                 
-                if NAISNS == "1" then currentInput = inputTwitter(triggerId, currentInput) end
-                if NAICOMMUNITY == "1" then currentInput = inputDCInside(triggerId, currentInput) end
+                if NAISNS == "1" then
+                    currentInput = inputTwitter(triggerId, currentInput)
+                    changedValue = true
+                end
+                if NAICOMMUNITY == "1" then
+                    currentInput = inputDCInside(triggerId, currentInput)
+                    changedValue = true
+                end
                 
             elseif NAIMESSENGER == "1" then
                 currentInput = inputKAKAOTalk(triggerId, currentInput)
+                changedValue = true
             end
 
             if NAIGLOBAL == "1" then
                 currentInput = inputImage(triggerId, currentInput)
+                changedValue = true
             end
 
             currentInput = currentInput .. [[
@@ -1963,14 +2424,13 @@ listenEdit("editRequest", function(triggerId, data)
 ]] 
             currentInput = currentInput .. [[
             
-]] .. chat.content
+]]
 
             print([[FINAL EDIT REQUEST is
 
 ]] .. currentInput)
 
             data[i].content = currentInput
-            changedValue = true
             break
         end
     end
@@ -1999,6 +2459,9 @@ listenEdit("editDisplay", function(triggerId, data)
         data = changeEroStatus(triggerId, data)
     elseif NAICARD == "2" then
         data = changeSimulCard(triggerId, data)
+    elseif NAICARD == "3" then
+        data = changeEroStatus(triggerId, data)
+        data = changeSimulCard(triggerId, data)
     end
 
     if NAISNS == "1" then
@@ -2013,11 +2476,12 @@ listenEdit("editDisplay", function(triggerId, data)
         data = changeKAKAOTalk(triggerId, data)
     end
 
+    data = addRerollFormButton(triggerId, data)
+
     return data
 end)
 
-
-onInput = async(function (triggerId)
+function onInput(triggerId)
     print("----- ANALYZING VALUABLES -----")
     print("ONLINEMODULE: onInput: Triggered with ID:", triggerId)
 
@@ -2099,7 +2563,7 @@ onInput = async(function (triggerId)
     local originalLine = targetMessageData.data
     local modifiedLine = originalLine
     local historyModifiedByWrapping = false
-    local prefixesToWrap = {"STATUS", "TWITTER", "DC"}
+    local prefixesToWrap = {"EROSTATUS", "SIMULSTATUS", "TWITTER", "DC"}
     local replacementFormat = "<details><summary><span>(열기/접기)</span></summary>%s</details>"
     local checkAlreadyWrappedStart = "<details><summary><span>(열기/접기)</span></summary>"
 
@@ -2170,7 +2634,8 @@ onInput = async(function (triggerId)
         print("ONLINEMODULE: onInput: No modifications were made to the chat history.")
     end
 
-end)
+end
+
 
 onOutput = async(function (triggerId)
     print("onOutput: Triggered with ID:", triggerId)
@@ -2291,13 +2756,13 @@ onOutput = async(function (triggerId)
                 local statusReplacements = {}
 
                 while true do
-                    local s_status, e_status_prefix = string.find(currentLine, "STATUS%[", searchPos)
+                    local s_status, e_status_prefix = string.find(currentLine, "EROSTATUS%[", searchPos)
                     if not s_status then
-                        print("ONLINEMODULE: onOutput: No more STATUS[ blocks found starting from position " .. searchPos)
+                        print("ONLINEMODULE: onOutput: No more EROSTATUS[ blocks found starting from position " .. searchPos)
                         break
                     end
                     statusBlocksFound = statusBlocksFound + 1
-                    print("ONLINEMODULE: onOutput: Found STATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_status)
+                    print("ONLINEMODULE: onOutput: Found EROSTATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_status)
 
                     local bracketLevel = 1
                     local e_status_suffix = e_status_prefix + 1
@@ -2318,9 +2783,9 @@ onOutput = async(function (triggerId)
                     end
 
                     if foundClosingBracket then
-                        print("ONLINEMODULE: onOutput: STATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_status_suffix)
+                        print("ONLINEMODULE: onOutput: EROSTATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_status_suffix)
                         local statusBlockContent = string.sub(currentLine, s_status, e_status_suffix)
-                        local statusPattern = "STATUS%[NAME:([^|]*)|"
+                        local statusPattern = "EROSTATUS%[NAME:([^|]*)|"
                         local _, _, currentBlockName = string.find(statusBlockContent, statusPattern)
                         local trimmedBlockName = nil
                         if currentBlockName then
@@ -2383,7 +2848,7 @@ onOutput = async(function (triggerId)
                         searchPos = e_status_suffix + 1
                     else
                         ERR(triggerId, "EROSTATUS", 1)
-                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for STATUS block #" .. statusBlocksFound .. " even after nested check! Skipping to next search pos.")
+                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for EROSTATUS block #" .. statusBlocksFound .. " even after nested check! Skipping to next search pos.")
                         searchPos = e_status_prefix + 1
                     end
                 end
@@ -2411,13 +2876,13 @@ onOutput = async(function (triggerId)
                 local listKey = "STORED_SIMCARD_IDS"
 
                 while true do
-                    local s_simul, e_simul_prefix = string.find(currentLine, "STATUS%[", searchPos)
+                    local s_simul, e_simul_prefix = string.find(currentLine, "SIMULSTATUS%[", searchPos)
                     if not s_simul then
-                        print("ONLINEMODULE: onOutput: No more STATUS[ blocks found starting from position " .. searchPos)
+                        print("ONLINEMODULE: onOutput: No more SIMULSTATUS[ blocks found starting from position " .. searchPos)
                         break
                     end
                     statusBlocksFound = statusBlocksFound + 1
-                    print("ONLINEMODULE: onOutput: Found STATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_simul)
+                    print("ONLINEMODULE: onOutput: Found SIMULSTATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_simul)
 
                     local bracketLevel = 1
                     local e_simul_suffix = e_simul_prefix + 1
@@ -2438,16 +2903,16 @@ onOutput = async(function (triggerId)
                     end
 
                     if foundClosingBracket then
-                        print("ONLINEMODULE: onOutput: STATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_simul_suffix)
+                        print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_simul_suffix)
 
                         local statusBlockContent = string.sub(currentLine, s_simul, e_simul_suffix)
-                        local statusBlockPattern = "STATUS%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
+                        local statusBlockPattern = "SIMULSTATUS%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
                         local _, _, currentBlockName = string.find(statusBlockContent, statusBlockPattern)
 
                         if currentBlockName then
-                            print("ONLINEMODULE: onOutput: STATUS block #" .. statusBlocksFound .. " NAME found: [" .. currentBlockName .. "]")
+                            print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " NAME found: [" .. currentBlockName .. "]")
                         else
-                            print("ONLINEMODULE: onOutput: STATUS block #" .. statusBlocksFound .. " NAME pattern did not match.")
+                            print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " NAME pattern did not match.")
                         end
 
                         local existingInlay = nil
@@ -2564,19 +3029,19 @@ onOutput = async(function (triggerId)
                         end
                         if naiTagsFoundInBlock == 0 then
                             ERR(triggerId, "SIMULCARD", 3)
-                            print("ONLINEMODULE: onOutput: No <NAI> tags found within STATUS block #"..statusBlocksFound.." content.")
+                            print("ONLINEMODULE: onOutput: No <NAI> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
                         end
                         searchPos = e_simul_suffix + 1
                     else
                         ERR(triggerId, "SIMULCARD", 1)
-                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for STATUS block #" .. statusBlocksFound .. " even after nested check! Something is wrong. Skipping to next search pos.")
+                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for SIMULSTATUS block #" .. statusBlocksFound .. " even after nested check! Something is wrong. Skipping to next search pos.")
                         searchPos = e_simul_prefix + 1
                     end
                 end
 
                 if statusBlocksFound == 0 then
                     ERR(triggerId, "SIMULCARD", 4)
-                    print("ONLINEMODULE: onOutput: No STATUS[...] blocks found in the entire message.")
+                    print("ONLINEMODULE: onOutput: No SIMULSTATUS[...] blocks found in the entire message.")
                 end
 
                 if #simulReplacements > 0 then
@@ -2590,6 +3055,198 @@ onOutput = async(function (triggerId)
                     lineModifiedInThisPass = true
                 else
                     print("ONLINEMODULE: onOutput: No simulcard replacements to apply.")
+                end
+            end
+            
+            if NAICARD == "3" and not skipNAICARD then
+                print("ONLINEMODULE: onOutput: NAICARD == 3 (Hybrid mode)")
+                local searchPos = 1
+                local replacements = {}
+                local statusBlocksFound = 0
+                local listKey = "STORED_SIMCARD_IDS"
+
+                while true do
+                    -- Find either EROSTATUS or SIMULSTATUS blocks
+                    local s_ero, e_ero = string.find(currentLine, "EROSTATUS%[", searchPos)
+                    local s_sim, e_sim = string.find(currentLine, "SIMULSTATUS%[", searchPos)
+                    
+                    local s_status, e_status_prefix, isEroStatus
+                    if s_ero and (not s_sim or s_ero < s_sim) then
+                        s_status = s_ero
+                        e_status_prefix = e_ero 
+                        isEroStatus = true
+                    elseif s_sim then
+                        s_status = s_sim
+                        e_status_prefix = e_sim
+                        isEroStatus = false
+                    else
+                        break -- No more blocks found
+                    end
+
+                    statusBlocksFound = statusBlocksFound + 1
+                    print("ONLINEMODULE: onOutput: Found " .. (isEroStatus and "EROSTATUS" or "SIMULSTATUS") .. " block #" .. statusBlocksFound)
+
+                    -- Find matching closing bracket
+                    local bracketLevel = 1
+                    local e_status_suffix = e_status_prefix + 1
+                    local foundClosingBracket = false
+                    while e_status_suffix <= #currentLine do
+                        local char = currentLine:sub(e_status_suffix, e_status_suffix)
+                        if char == '[' then
+                            bracketLevel = bracketLevel + 1
+                        elseif char == ']' then
+                            bracketLevel = bracketLevel - 1
+                        end
+                        if bracketLevel == 0 then
+                            foundClosingBracket = true
+                            break
+                        end
+                        e_status_suffix = e_status_suffix + 1
+                    end
+
+                    if foundClosingBracket then
+                        local blockContent = string.sub(currentLine, e_status_prefix + 1, e_status_suffix - 1)
+                        local currentBlockName = nil
+                        
+                        if isEroStatus then
+                            local _, _, name = string.find(blockContent, "NAME:([^|]*)|")
+                            currentBlockName = name
+                        else
+                            local pattern = "NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)"
+                            local _, _, name = string.find(blockContent, pattern)
+                            currentBlockName = name
+                        end
+
+                        local trimmedBlockName = nil
+                        if currentBlockName then
+                            trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
+                        end
+
+                        local existingInlay = nil
+                        if trimmedBlockName and not isEroStatus then
+                            existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
+                            if existingInlay == "null" then existingInlay = nil end
+                        end
+
+                        -- Process NAI tags
+                        local naiSearchPosInContent = 1
+                        local naiTagsFoundInBlock = 0
+
+                        while true do
+                            local s_nai, e_nai, naiIndex = string.find(blockContent, "<NAI(%d+)>", naiSearchPosInContent)
+                            if not s_nai then break end
+                            naiTagsFoundInBlock = naiTagsFoundInBlock + 1
+                            naiIndex = tonumber(naiIndex)
+
+                            if naiIndex then
+                                local promptPattern, negPromptPattern, promptType
+                                if isEroStatus then
+                                    promptPattern = "%[NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                    negPromptPattern = "%[NEG_NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                    promptType = "EROSTATUS"
+                                else
+                                    promptPattern = "%[NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                    negPromptPattern = "%[NEG_NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                    promptType = "SIMULCARD" 
+                                end
+
+                                local _, _, foundPrompt = string.find(currentLine, promptPattern)
+                                local _, _, foundNegPrompt = string.find(currentLine, negPromptPattern)
+
+                                if foundPrompt then
+                                    local currentNegativePrompt = negativePrompt
+                                    local storedNegPrompt = ""
+                                    if foundNegPrompt then
+                                        currentNegativePrompt = foundNegPrompt .. ", " .. currentNegativePrompt
+                                        storedNegPrompt = foundNegPrompt
+                                    end
+
+                                    local finalPrompt = artistPrompt .. foundPrompt .. qualityPrompt
+                                    local inlay = generateImage(triggerId, finalPrompt, currentNegativePrompt):await()
+
+                                    if inlay and type(inlay) == "string" and string.len(inlay) > 10 
+                                       and not string.find(inlay, "fail", 1, true) 
+                                       and not string.find(inlay, "error", 1, true)
+                                       and not string.find(inlay, "실패", 1, true) then
+
+                                        local identifier
+                                        if isEroStatus then
+                                            identifier = "EROSTATUS_" .. naiIndex
+                                        else
+                                            identifier = trimmedBlockName
+                                        end
+
+                                        local marker = "<!-- " .. (isEroStatus and identifier or "SIMULSTATUS_" .. identifier) .. " -->"
+                                        local content_offset = e_status_prefix
+                                        local nai_abs_start = content_offset + s_nai
+                                        local nai_abs_end = content_offset + e_nai
+
+                                        table.insert(replacements, {
+                                            start = nai_abs_start,
+                                            finish = nai_abs_end,
+                                            inlay = inlay .. marker
+                                        })
+
+                                        local info = {
+                                            type = promptType,
+                                            identifier = identifier,
+                                            inlay = inlay,
+                                            prompt = foundPrompt,
+                                            negPrompt = storedNegPrompt
+                                        }
+                                        table.insert(generatedImagesInfo, info)
+
+                                        if isEroStatus then
+                                            setChatVar(triggerId, identifier .. "_PROMPT", info.prompt)
+                                            setChatVar(triggerId, identifier .. "_NEGPROMPT", info.negPrompt) 
+                                            setChatVar(triggerId, identifier, info.inlay)
+                                        else
+                                            setChatVar(triggerId, identifier, inlay)
+                                            setChatVar(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
+                                            setChatVar(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
+
+                                            -- Update SimCard list
+                                            local currentList = getChatVar(triggerId, listKey) or "null"
+                                            if currentList == "null" then currentList = "" end
+                                            
+                                            if not string.find("," .. currentList .. ",", "," .. identifier .. ",", 1, true) then
+                                                local newList = currentList == "" and identifier or (currentList .. "," .. identifier)
+                                                setChatVar(triggerId, listKey, newList)
+                                            end
+                                        end
+                                    else
+                                        ERR(triggerId, promptType, 2)
+                                    end
+                                else
+                                    ERR(triggerId, promptType, 0)
+                                end
+                            end
+                            naiSearchPosInContent = e_nai + 1
+                        end
+
+                        if naiTagsFoundInBlock == 0 then
+                            ERR(triggerId, isEroStatus and "EROSTATUS" or "SIMULCARD", 3)
+                        end
+                        searchPos = e_status_suffix + 1
+                    else
+                        ERR(triggerId, isEroStatus and "EROSTATUS" or "SIMULCARD", 1)
+                        searchPos = e_status_prefix + 1
+                    end
+                end
+
+                if statusBlocksFound == 0 then
+                    print("ONLINEMODULE: onOutput: No status blocks found in hybrid mode")
+                end
+
+                if #replacements > 0 then
+                    print("ONLINEMODULE: onOutput: Applying " .. #replacements .. " hybrid mode replacements")
+                    table.sort(replacements, function(a, b) return a.start > b.start end)
+                    for _, rep in ipairs(replacements) do
+                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
+                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                        end
+                    end
+                    lineModifiedInThisPass = true
                 end
             end
 
@@ -2918,94 +3575,8 @@ onButtonClick = async(function(triggerId, data)
 
     if action == "RUNREROLLSETTING" then
         print("ONLINEMODULE: ACTION - RUNREROLLSETTING triggered.")
-
         removeChat(triggerId, (getChatLength(triggerId) - 1))
-        
-        local storedIdsVar = "STORED_SIMCARD_IDS"
-        local idListStr = getChatVar(triggerId, storedIdsVar) or "null"
-        if idListStr == "null" then idListStr = "" end
-        print("ONLINEMODULE: onButtonClick: Value retrieved for " .. storedIdsVar .. " with triggerId " .. triggerId .. ": [" .. tostring(idListStr) .. "]") 
-        local identifiers = {}
-
-        if idListStr and idListStr ~= "" and idListStr ~= "null" then
-             for id in string.gmatch(idListStr, "([^,]+)") do
-                local trimmedId = id:match("^%s*(.-)%s*$")
-                if trimmedId and trimmedId ~= "" then 
-                    table.insert(identifiers, trimmedId)
-                else
-                   print("ONLINEMODULE: Skipping invalid/empty ID found in list: [" .. tostring(id) .. "]")
-                end
-            end
-        else
-            print("ONLINEMODULE: No stored SIMCARD IDs string found or list is empty in variable: " .. storedIdsVar)
-        end
-
-
-        if #identifiers == 0 then
-            addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터가 없습니다.")
-            print("ONLINEMODULE: No valid identifiers found to display.")
-            
-            return
-        end
-
-        local allRerollFormsCSS = [[
-<style>@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.profile-reroll-area-wrapper{border-bottom:2px solid #000000;padding-bottom:10px;margin-bottom:10px;}.profile-reroll-area-wrapper:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.simcard-name-clickable{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-decoration-color:#ff69b4;text-decoration-thickness:1px;text-underline-offset:2px;}.simcard-name-clickable:hover{color:#ff69b4;}.profile-preview{width:32px;height:32px;border-radius:16px;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}.simcard-fullscreen-toggle{display:none;}.simcard-fullscreen-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:9999;padding:20px;box-sizing:border-box;}.simcard-fullscreen-content{position:relative;display:flex;justify-content:center;align-items:center;max-width:90%;max-height:90%;}.simcard-fullscreen-content>img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid white;box-shadow:0 0 25px rgba(0,0,0,0.5);object-fit:contain;}.simcard-fullscreen-close-label{position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer;z-index:1;}.simcard-fullscreen-close-button{position:absolute;top:-15px;right:-15px;font-size:24px;color:white;background-color:rgba(0,0,0,0.6);border-radius:50%;width:35px;height:35px;line-height:35px;text-align:center;cursor:pointer;z-index:3;border:1px solid rgba(255,255,255,0.3);}.simcard-fullscreen-toggle:checked+.profile-reroll-area-wrapper>.simcard-fullscreen-overlay{display:flex;align-items:center;justify-content:center;}</style>
-]]
-
-        local allRerollFormsBodyHtml = '<div><h2 style="text-align:center; margin-bottom: 15px;">저장된 시뮬레이션 카드 리롤 인터페이스</h2>'
-        local count = 0
-
-        for i, simId in ipairs(identifiers) do
-            local inlay = getChatVar(triggerId, simId) or "null"
-            if inlay == "null" then inlay = "" end
-
-            if inlay and type(inlay) == "string" and inlay ~= "" and inlay ~= "null" and string.len(inlay) > 5 then
-                count = count + 1
-                local uniqueId = "simcard-fs-" .. count
-                local rerollType = "SIMULATIONCARD"
-                local displayLabel = "NAME:"
-                local actionName = "SIMCARD_REROLL"
-                local buttonText = "시뮬봇 리롤"
-                local safeIdentifierHtml = escapeHtml(tostring(simId))
-                local safeIdentifierJson = escapeJsonValue(tostring(simId))
-                local risuBtnJson = string.format('{"action":%s, "identifier":%s}', escapeJsonValue(actionName), safeIdentifierJson)
-                local safeRisuBtnAttr = risuBtnJson
-
-                local singleFormHtml = string.format([[
-    <input type="checkbox" id="%s" class="simcard-fullscreen-toggle"><div class="profile-reroll-area-wrapper"><div class="profile-reroll-area"><div class="profile-info"><span class="profile-id-label" style="font-weight: bold;">%s</span><label for="%s" class="simcard-name-clickable">%s</label><div class="profile-preview">%s</div></div><div style="text-align: right; margin-top: 5px;"><button class="reroll-button" risu-btn='%s' style="padding: 5px 10px;">%s</button></div></div><div class="simcard-fullscreen-overlay"><label for="%s" class="simcard-fullscreen-close-label"></label><div class="simcard-fullscreen-content">%s<label for="%s" class="simcard-fullscreen-close-button">✕</label></div></div></div>
-                ]],
-                uniqueId,
-                displayLabel,
-                uniqueId,
-                safeIdentifierHtml,
-                inlay, -- 작은 미리보기
-                safeRisuBtnAttr,
-                buttonText,
-                -- 오버레이 부분
-                uniqueId, -- 배경 닫기 라벨
-                inlay, -- <<< 크게 보여줄 내용 (inlay 값 자체) >>>
-                uniqueId -- 'X' 닫기 버튼 라벨
-                )
-
-                allRerollFormsBodyHtml = allRerollFormsBodyHtml .. singleFormHtml
-            else
-                 print("ONLINEMODULE: WARN - Could not retrieve valid inlay for stored SIMCARD ID: [" .. simId .. "]. Skipping.")
-            end
-        end
-
-        local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
-        local safeGlobalRisuBtnAttr = globalBtnJson
-        local globalButtonHtml = string.format([[ ... ]])
-        local finalHtml = allRerollFormsCSS .. allRerollFormsBodyHtml .. globalButtonHtml .. "</div>"
-
-        if count > 0 then
-             print("ONLINEMODULE: Displaying reroll interface for " .. count .. " stored SIMULATIONCARDs via addChat.")
-             addChat(triggerId, "user", finalHtml)
-        else
-             addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터를 찾았으나, 유효한 이미지(inlay) 정보가 없습니다.")
-             print("ONLINEMODULE: Found identifiers but no valid inlays to display.")
-        end
-        
+        openRerollForm(triggerId)
         return
 
     elseif action == "EROSTATUS_REROLL" then
