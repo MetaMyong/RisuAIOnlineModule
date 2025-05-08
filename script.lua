@@ -3575,7 +3575,6 @@ onButtonClick = async(function(triggerId, data)
 
     if action == "RUNREROLLSETTING" then
         print("ONLINEMODULE: ACTION - RUNREROLLSETTING triggered.")
-        removeChat(triggerId, (getChatLength(triggerId) - 1))
         openRerollForm(triggerId)
         return
 
