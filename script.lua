@@ -2136,21 +2136,20 @@ listenEdit("editRequest", function(triggerId, data)
 
     local convertDialogueFlag = false
     local changedValue = false
-
-    if NAICARDFORCEOUTPUT == "1" then
-        convertDialogueFlag = true
-    end
-
+    
     for i = 1, #data, 1 do
         local chat = data[i]
-        if (chat.role == "assistant" or chat.role == "model") and convertDialogueFlag == false then
+        if (chat.role == "assistant" or chat.role == "model") and convertDialogueFlag == false and NAICARDFORCEOUTPUT == "1" then
             currentIndex = i
             chat.content = convertDialogue(triggerId, chat.content)
             print([[ONLINEMODULE: editRequest: Converted dialogue to:
             
 ]] .. chat.content)
             convertDialogueFlag = true
+        elseif NAICARDFORCEOUTPUT == "0" then
+            convertDialogueFlag = true
         end
+        
         if chat.role == "user" and convertDialogueFlag == true then
             local importantInput = inputImportant(triggerId, "")
             currentInput = importantInput .. [[
