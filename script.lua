@@ -338,6 +338,63 @@ local function changeInlay(triggerId, index, oldInlay, newInlay)
     end
 end
 
+local function convertDialogue(triggerId, data)
+    print("convertDialogue is in PROCESS!")
+    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
+
+    local lineToModify = data 
+
+    local replacementMade = false
+    local anyReplacementMade = false 
+    local searchStartIndex = 1 
+
+    local pattern = "\"(.-)\""
+    local prefixStatus = "STATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
+    local suffixEroStatus = "|MOUTH:MOUTH_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|NIPPLES:NIPPLES_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|UTERUS:UTERUS_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|VAGINAL:VAGINAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|ANAL:ANAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|OUTFITS:OUTFITS_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
+    local suffixSimulStatus = "|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
+
+
+    if NAICARD == "1" or NAICARD == "2" then
+        local modifiedString = ""
+        local currentIndex = 1
+        local madeChange = false
+
+        while currentIndex <= #lineToModify do
+            local s, e, captured_dialogue = string.find(lineToModify, pattern, currentIndex)
+            if s then
+                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex, s - 1)
+
+                local replacementText
+                if NAICARD == "1" then
+                    replacementText = prefixStatus .. captured_dialogue .. suffixEroStatus
+                    madeChange = true
+                elseif NAICARD == "2" then
+                    replacementText = prefixStatus .. captured_dialogue .. suffixSimulStatus
+                    madeChange = true
+                end
+                modifiedString = modifiedString .. replacementText
+                currentIndex = e + 1
+            else
+                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex)
+                break
+            end
+        end
+
+        if madeChange then
+            lineToModify = modifiedString
+            print("ONLINEMODULE: convertDialogue: Dialogues were modified based on NAICARD setting.")
+        else
+            print("ONLINEMODULE: convertDialogue: No dialogue modifications applied (no matching dialogues found).")
+        end
+    else
+        print("ONLINEMODULE: convertDialogue: NAICARD is not '1' or '2', skipping dialogue modification.")
+    end
+
+    data = lineToModify 
+
+    return data
+end
+
 local function inputEroStatus(triggerId, data)
     local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
     local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
@@ -1994,20 +2051,22 @@ local function inputImportant(triggerId, data)
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
 
     data = data .. [[
-# IMPORTANT NOTE
-- *YOU MUST FOLLOW THE BELOW RULES*
+# CRITICAL
+- *FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DAILOGUES*
 ]]
 
     if NAICARD == "1" then
         data = data .. [[
-## IMPORTANT NOTE: EROTIC STATUS INTERFACE
-- *DO NOT PRINT "DIALOGUE" OUTSIDE of the STATUS[...] BLOCK*
-- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFFERRED LANGUAGE*
+## CRITICAL: EROTIC STATUS INTERFACE
+- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the STATUS[...] BLOCK*
+    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to STATUS[...|DIALOGUE:MESSAGE|...]*
+- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
 ]]
     elseif NAICARD == "2" then
         data = data .. [[
-## IMPORTANT NOTE: SIMULATION STATUS INTERFACE
-- *DO NOT PRINT "DIALOGUE" OUTSIDE of the STATUS[...] BLOCK*
+## CRITICAL: SIMULATION STATUS INTERFACE
+- *DO NOT PRINT "MESSAGE" OUTSIDE of the STATUS[...] BLOCK*
+    - *MUST REPLACE "MESSAGE" to STATUS[...|DIALOGUE:MESSAGE|...]*
 ]]
     end
 
@@ -2070,21 +2129,39 @@ listenEdit("editRequest", function(triggerId, data)
     local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
     local NAIGLOBAL = getGlobalVar(triggerId, "toggle_NAIGLOBAL")
+    local NAICARDFORCEOUTPUT = getGlobalVar(triggerId, "toggle_NAICARDFORCEOUTPUT")
 
     local currentInput = nil
     local currentIndex = nil
 
+    local convertDialogueFlag = false
     local changedValue = false
 
-    for i = #data, 1, -1 do
+    if NAICARDFORCEOUTPUT == "1" then
+        convertDialogueFlag = true
+    end
+
+    for i = 1, #data, 1 do
         local chat = data[i]
-        if chat.role == "user" then
+        if (chat.role == "assistant" or chat.role == "model") and convertDialogueFlag == false then
             currentIndex = i
-            currentInput = [[
+            chat.content = convertDialogue(triggerId, chat.content)
+            print([[ONLINEMODULE: editRequest: Converted dialogue to:
+            
+]] .. chat.content)
+            convertDialogueFlag = true
+        end
+        if chat.role == "user" and convertDialogueFlag == true then
+            local importantInput = inputImportant(triggerId, "")
+            currentInput = importantInput .. [[
+            
+            
+]] .. chat.content .. [[
 
 <-----ONLINEMODULESTART----->
 
 ]]
+
             if NAIMESSENGER == "0" then
                 if NAICARD == "1" then
                     currentInput = inputEroStatus(triggerId, currentInput)
@@ -2113,10 +2190,6 @@ listenEdit("editRequest", function(triggerId, data)
                 changedValue = true
             end
 
-            if changedValue == true then
-                currentInput  = inputImportant(triggerId, currentInput)
-            end
-
             currentInput = currentInput .. [[
 
 <-----ONLINEMODULEEND----->
@@ -2124,7 +2197,7 @@ listenEdit("editRequest", function(triggerId, data)
 ]] 
             currentInput = currentInput .. [[
             
-]] .. chat.content
+]]
 
             print([[FINAL EDIT REQUEST is
 
