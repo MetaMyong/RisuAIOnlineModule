@@ -1003,12 +1003,12 @@ local function inputStatusHybrid(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Condition: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Condition: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Condition: Ovulation period↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Condition: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
 
@@ -2248,6 +2248,7 @@ local function inputImportant(triggerId, data)
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
 
     data = data .. [[
+
 # CRITICAL
 - *FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES*
 ]]
@@ -2348,9 +2349,9 @@ listenEdit("editRequest", function(triggerId, data)
         -- 받아온 리퀘스트 전부 ""변환
         for i = 1, #data, 1 do
             local chat = data[i]
-            -- 만약 role이 assistant 또는 model이라면
+            -- 만약 role이 assistant이라면
             -- 대화 내용 변환
-            if (chat.role == "assistant" or chat.role == "model") then
+            if chat.role == "assistant" then
                 chat.content = convertDialogue(triggerId, chat.content)
                 -- 50글자까지 변환된 대화 내용 출력
                 print([[ONLINEMODULE: editRequest: Converted dialogue to:
@@ -2361,67 +2362,73 @@ listenEdit("editRequest", function(triggerId, data)
     end
     
     for i = 1, #data, 1 do
-        -- 이후, 앞에서부터 대화 내용이 "user"인 경우에 1회 한정으로 리퀘스트 삽입
+        -- 이후, 앞에서부터 role이 "system"인 경우에 1회 한정으로 inputImportant 삽입
         local chat = data[i]
-        if chat.role == "user" then
-            local importantInput = inputImportant(triggerId, "")
-            currentInput = importantInput .. [[
+        if chat.role == "system" then
+            local importantInput = inputImportant(triggerId, chat.content)
+            print ([[ONLINEMODULE: editRequest: Inserted important input to: "
             
-            
-]] .. chat.content .. [[
+]] .. importantInput .. [[ "]])
+            data[i].content = importantInput
+            break
+        end
+    end
+
+
+
+    local chat = data[#data]
+        -- 가장 마지막에 로직 삽입
+    currentInput = chat.content .. [[
 
 <-----ONLINEMODULESTART----->
 
 ]]
 
-            if NAIMESSENGER == "0" then
-                if NAICARD == "1" then
-                    currentInput = inputEroStatus(triggerId, currentInput)
-                    changedValue = true
-                elseif NAICARD == "2" then
-                    currentInput = inputSimulCard(triggerId, currentInput)
-                    changedValue = true
-                elseif NAICARD == "3" then
-                    currentInput = inputStatusHybrid(triggerId, currentInput)
-                    changedValue = true
-                end
-                
-                if NAISNS == "1" then
-                    currentInput = inputTwitter(triggerId, currentInput)
-                    changedValue = true
-                end
-                if NAICOMMUNITY == "1" then
-                    currentInput = inputDCInside(triggerId, currentInput)
-                    changedValue = true
-                end
-                
-            elseif NAIMESSENGER == "1" then
-                currentInput = inputKAKAOTalk(triggerId, currentInput)
-                changedValue = true
-            end
+    if NAIMESSENGER == "0" then
+        if NAICARD == "1" then
+            currentInput = inputEroStatus(triggerId, currentInput)
+            changedValue = true
+        elseif NAICARD == "2" then
+            currentInput = inputSimulCard(triggerId, currentInput)
+            changedValue = true
+        elseif NAICARD == "3" then
+            currentInput = inputStatusHybrid(triggerId, currentInput)
+            changedValue = true
+        end
+        
+        if NAISNS == "1" then
+            currentInput = inputTwitter(triggerId, currentInput)
+            changedValue = true
+        end
+        if NAICOMMUNITY == "1" then
+            currentInput = inputDCInside(triggerId, currentInput)
+            changedValue = true
+        end
+        
+    elseif NAIMESSENGER == "1" then
+        currentInput = inputKAKAOTalk(triggerId, currentInput)
+        changedValue = true
+    end
 
-            if NAIGLOBAL == "1" then
-                currentInput = inputImage(triggerId, currentInput)
-                changedValue = true
-            end
+    if NAIGLOBAL == "1" then
+        currentInput = inputImage(triggerId, currentInput)
+        changedValue = true
+    end
 
-            currentInput = currentInput .. [[
+    currentInput = currentInput .. [[
 
 <-----ONLINEMODULEEND----->
 
 ]] 
-            currentInput = currentInput .. [[
-            
+    currentInput = currentInput .. [[
+    
 ]]
 
-            print([[FINAL EDIT REQUEST is
+    print([[FINAL EDIT REQUEST is
 
 ]] .. currentInput)
 
-            data[i].content = currentInput
-            break
-        end
-    end
+    data[#data].content = currentInput
     
     if changedValue then
         print("Successful.")
