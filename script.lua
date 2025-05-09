@@ -444,8 +444,6 @@ local function inputEroStatus(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
-    - DO NOT PRINT <NAI0>.
-        - This is a Flag that already replaced.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
@@ -768,8 +766,6 @@ local function inputSimulCard(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
-    - DO NOT PRINT <NAI0>.
-        - This is a Flag that already replaced.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
@@ -984,8 +980,6 @@ local function inputStatusHybrid(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
-    - DO NOT PRINT <NAI0>.
-        - This is a Flag that already replaced.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
@@ -1049,8 +1043,6 @@ local function inputStatusHybrid(triggerId, data)
         if NAICARDNOIMAGE == "0" then
             data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
-    - DO NOT PRINT <NAI0>.
-        - This is a Flag that already replaced.
 ]]
         elseif NAICARDNOIMAGE == "1" then
             data = data .. [[
@@ -1529,8 +1521,6 @@ local function inputDCInside(triggerId, data)
     if NAICOMMUNITYNOIMAGE == "0" then
         data = data .. [[
         - If the post includes an image, print a specific keyword (e.g., '<NAI1>', '<NAI2>', etc.) to indicate where the prompt should be generated.
-        - DO NOT PRINT <NAI0>.
-            - This is a Flag that already replaced.
 ]]
     end
 
@@ -2817,7 +2807,7 @@ onOutput = async(function (triggerId)
                                     local finalPromptStatus = artistPrompt .. foundStatusPrompt .. qualityPrompt
                                     local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
                                     if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and not string.find(inlayStatus, "fail", 1, true) and not string.find(inlayStatus, "error", 1, true) and not string.find(inlayStatus, "실패", 1, true) then
-                                        inlayStatus = "<NAI0>" .. inlayStatus
+                                        inlayStatus = "<NAI" .. naiIndex .. ">" .. inlayStatus
                                         local erostatusIdentifier = "EROSTATUS_" .. naiIndex
                                         local marker = "<!-- " .. erostatusIdentifier .. " -->"
                                         local content_offset = e_status_prefix
@@ -2980,7 +2970,7 @@ onOutput = async(function (triggerId)
                                     print("ONLINEMODULE: onOutput: generateImage result for NAI"..naiIndex..": ["..tostring(inlaySimul).."]")
                                     local isSuccess = (inlaySimul ~= nil) and (type(inlaySimul) == "string") and (string.len(inlaySimul) > 10) and not string.find(inlaySimul, "fail", 1, true) and not string.find(inlaySimul, "error", 1, true) and not string.find(inlaySimul, "실패", 1, true)
                                     if isSuccess then
-                                        inlaySimul = "<NAI0>" .. inlaySimul
+                                        inlaySimul = "<NAI" .. naiIndex .. ">" .. inlaySimul
                                         print("ONLINEMODULE: onOutput: Image generation SUCCESS for NAI"..naiIndex)
                                         local content_offset = e_simul_prefix 
                                         local nai_abs_start = content_offset + s_nai_in_content
@@ -3169,7 +3159,7 @@ onOutput = async(function (triggerId)
                                        and not string.find(inlay, "fail", 1, true) 
                                        and not string.find(inlay, "error", 1, true)
                                        and not string.find(inlay, "실패", 1, true) then
-                                        inlay = "<NAI0>" .. inlay
+                                        inlay = "<NAI" .. naiIndex .. ">" .. inlay
 
                                         local identifier
                                         if isEroStatus then
@@ -3410,7 +3400,7 @@ onOutput = async(function (triggerId)
                                     local successCall, inlayDc = pcall(function() return generateImage(triggerId, finalPromptDc, currentNegativePromptDc):await() end)
                                     local isSuccessDc = successCall and (inlayDc ~= nil) and (type(inlayDc) == "string") and (string.len(inlayDc) > 10) and not string.find(inlayDc, "fail", 1, true) and not string.find(inlayDc, "error", 1, true) and not string.find(inlayDc, "실패", 1, true)
                                     if isSuccessDc then
-                                        inlayDc = "<NAI0>" .. inlayDc
+                                        inlayDc = "<NAI" .. naiIndex .. ">" .. inlayDc
                                         local dcIdentifier = postId
                                         local marker = "<!-- DC_MARKER_POSTID_" .. dcIdentifier .. " -->"
 
