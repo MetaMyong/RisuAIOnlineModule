@@ -349,14 +349,14 @@ local function inputEroStatus(triggerId, data)
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - *PRINT* EROSTATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
+- DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.
+    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - PRINT EROSTATUS[...] INSTEAD.
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - *Valid*:
+    - Valid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -370,11 +370,11 @@ local function inputEroStatus(triggerId, data)
     - DO NOT INCLUDE "", '' HERE.
 - MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
 - Bodypart Image: Image of the Bodypart.
-    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
+    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 OR UTERUS_2, etc.).
         - 0: This is the default state for each keyword.
         - 1: This is the aroused state for each keyword.
         - 2: This is the cum-showered or injected state for each keyword.
-    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
+    - If Character is MALE, PRINT OUT "MALE" instead of the keyword.
 - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
     - Include NPC's real-time assessment, use erotic language
     - Do not include "" or ''.
@@ -386,7 +386,7 @@ local function inputEroStatus(triggerId, data)
     - Each item must be short.
     - ↔: Internally replaced with <br>.
         - Change the line with ↔(Upto 5 lines)
-    - **ALWAYS OBSERVE and PRINT the EXACT VALUE.**.
+    - ALWAYS OBSERVE and PRINT the EXACT VALUE..
         - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
         - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
         - List:
@@ -414,7 +414,7 @@ local function inputEroStatus(triggerId, data)
                 - Anal intercourse count: Total count of penis round trips, 0~99999 times
                 - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
                 - ...
-            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
+            - EACH ITEMS MUST NOT OVER 15 CHAR.
                 - Korean: 1 char.
                 - English: 0.5 char.
                 - Blank space: 0.5 char.
@@ -423,14 +423,14 @@ local function inputEroStatus(triggerId, data)
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: Current NPC's location and detail location.
 - OUTFITS: Current NPC's OUTFITS List.
-    - *EACH ITEMS MUST NOT OVER 20 CHAR*.
+    - EACH ITEMS MUST NOT OVER 20 CHAR.
         - Korean: 1 char.
         - English: 0.5 char.
         - Blank space: 0.5 char.
     - NO () BRACKET ALLOWED.
     - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
             - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
-                - Avoid dirty descriptions (e.g., Smelly Rags *OR* Filthy Barefoot, etc).
+                - Avoid dirty descriptions (e.g., Smelly Rags OR Filthy Barefoot, etc).
                 - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
             - Breasts: size, shape, Color and size of the nipple and areola.
             - Pussy: degree of opening, shape of pussy hair.
@@ -455,7 +455,7 @@ local function inputEroStatus(triggerId, data)
         data = data .. [[
 - NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
         - Invalid: <!-- EROSTATUS_1 -->
-        - *Valid*: <NAI1>
+        - Valid: <NAI1>
     - Example:
         - If the status interface is the first one, print '<NAI1>'.
         - If the status interface is the second one, print '<NAI2>'.
@@ -739,14 +739,14 @@ local function inputSimulCard(triggerId, data)
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- *DO NOT PRINT* DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - *PRINT* SIMULSTATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
+- DO NOT PRINT DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.
+    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - PRINT SIMULSTATUS[...] INSTEAD.
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPERATE THEM
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - *Valid*:
+    - Valid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -885,14 +885,14 @@ local function inputStatusHybrid(triggerId, data)
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - *PRINT* EROSTATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
+- DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.
+    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - PRINT EROSTATUS[...] INSTEAD.
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - *Valid*:
+    - Valid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -906,11 +906,11 @@ local function inputStatusHybrid(triggerId, data)
     - DO NOT INCLUDE "", '' HERE.
 - MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
 - Bodypart Image: Image of the Bodypart.
-    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
+    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 OR UTERUS_2, etc.).
         - 0: This is the default state for each keyword.
         - 1: This is the aroused state for each keyword.
         - 2: This is the cum-showered or injected state for each keyword.
-    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
+    - If Character is MALE, PRINT OUT "MALE" instead of the keyword.
 - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
     - Include NPC's real-time assessment, use erotic language
     - Do not include "" or ''.
@@ -922,7 +922,7 @@ local function inputStatusHybrid(triggerId, data)
     - Each item must be short.
     - ↔: Internally replaced with <br>.
         - Change the line with ↔(Upto 5 lines)
-    - **ALWAYS OBSERVE and PRINT the EXACT VALUE.**.
+    - ALWAYS OBSERVE and PRINT the EXACT VALUE..
         - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
         - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
         - List:
@@ -950,7 +950,7 @@ local function inputStatusHybrid(triggerId, data)
                 - Anal intercourse count: Total count of penis round trips, 0~99999 times
                 - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
                 - ...
-            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
+            - EACH ITEMS MUST NOT OVER 15 CHAR.
                 - Korean: 1 char.
                 - English: 0.5 char.
                 - Blank space: 0.5 char.
@@ -959,14 +959,14 @@ local function inputStatusHybrid(triggerId, data)
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: Current NPC's location and detail location.
 - OUTFITS: Current NPC's OUTFITS List.
-    - *EACH ITEMS MUST NOT OVER 20 CHAR*.
+    - EACH ITEMS MUST NOT OVER 20 CHAR.
         - Korean: 1 char.
         - English: 0.5 char.
         - Blank space: 0.5 char.
     - NO () BRACKET ALLOWED.
     - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
             - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
-                - Avoid dirty descriptions (e.g., Smelly Rags *OR* Filthy Barefoot, etc).
+                - Avoid dirty descriptions (e.g., Smelly Rags OR Filthy Barefoot, etc).
                 - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
             - Breasts: size, shape, Color and size of the nipple and areola.
             - Pussy: degree of opening, shape of pussy hair.
@@ -991,7 +991,7 @@ local function inputStatusHybrid(triggerId, data)
         data = data .. [[
 - NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
         - Invalid: <!-- EROSTATUS_1 -->
-        - *Valid*: <NAI1>
+        - Valid: <NAI1>
     - Example:
         - If the status interface is the first one, print '<NAI1>'.
         - If the status interface is the second one, print '<NAI2>'.
@@ -1016,14 +1016,14 @@ local function inputStatusHybrid(triggerId, data)
 ## Status Interface
 ### Simulation Status Interface
 - If the character is NOT a FEMALE, PRINT OUT the Simulation Status Interface.
-- *DO NOT PRINT CHARACTER's DIALOGUE via "" or 「」, REPLACE ALL CHARACTER's DIALOGUE to SIMULSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - *PRINT* SIMULSTATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
+- DO NOT PRINT CHARACTER's DIALOGUE via "" or 「」, REPLACE ALL CHARACTER's DIALOGUE to SIMULSTATUS BLOCK.
+    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - PRINT SIMULSTATUS[...] INSTEAD.
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
 - Example:
     - Invalid:
         - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
-    - *Valid*:
+    - Valid:
         - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect.|...]
         - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed.|...]
@@ -1083,25 +1083,25 @@ local function inputTwitter(triggerId, data)
 ]]
     if NAISNSREAL == "0" then
         data = data .. [[
-- **PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY**
+- PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY
 ]]
     elseif NAISNSREAL == "1" then
         data = data .. [[
-- **PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY AFTER UPLOADING TWITTER POST**
+- PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY AFTER UPLOADING TWITTER POST
 ]]
     end
 
     if NAISNSTARGET == "0" then
         data = data .. [[
-- *MAKE a {{user}}'s TWITTER INTERFACE*
+- MAKE a {{user}}'s TWITTER INTERFACE
 ]]
     elseif NAISNSTARGET == "1" then
         data = data .. [[
-- *MAKE a {{char}}'s TWITTER INTERFACE*
+- MAKE a {{char}}'s TWITTER INTERFACE
 ]]
     elseif NAISNSTARGET == "2" then
         data = data .. [[
-- *MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE*
+- MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE
 ]]
     end
 
@@ -1118,7 +1118,7 @@ local function inputTwitter(triggerId, data)
         data = data .. [[
     - Print '<NAI>' Exactly.
 - TWEET: Content of the Tweet.
-	- *NO #HASHTAGS ALLOWED AT HERE.*
+	- NO #HASHTAGS ALLOWED AT HERE.
 - MEDIA: Media of the post
     - Print '<NAI>' Exactly.
 ]]
@@ -1127,7 +1127,7 @@ local function inputTwitter(triggerId, data)
             data = data .. [[
     - Print {{source::user}} Exactly.
 - TWEET: Content of the Tweet.
-	- *NO #HASHTAGS ALLOWED AT HERE.*
+	- NO #HASHTAGS ALLOWED AT HERE.
 - MEDIA: Media of the post
     - Describe the situation of the twitter post.
 ]]
@@ -1135,7 +1135,7 @@ local function inputTwitter(triggerId, data)
             data = data .. [[
     - Print {{source::char}} Exactly.
 - TWEET: Content of the Tweet.
-	- *NO #HASHTAGS ALLOWED AT HERE.*
+	- NO #HASHTAGS ALLOWED AT HERE.
 - MEDIA: Media of the post
     - Describe the situation of the twitter post.
 ]]           
@@ -1144,7 +1144,7 @@ local function inputTwitter(triggerId, data)
 
     data = data .. [[
 - HASH: The hashtags of the tweet.	
-	- Each tag *MUST BE* wrapped in → and ←.
+	- Each tag MUST BE wrapped in → and ←.
 	- If post includes NSFW content, first tag is 'SexTweet'.
 	- Final value example: →SexTweet←→BitchDog←→PublicToilet←.
 - TIME: The date and time the tweet was posted.
@@ -1158,12 +1158,12 @@ local function inputTwitter(triggerId, data)
 		- Use the Twitter nickname of a realistic native Korean.
 		- Final value example:
 			- Invalid: KinkyDog
-			- *Valid*: SexTweetHunter
+			- Valid: SexTweetHunter
 	- Comment Body: The content of the reply to the tweet.
 		- Print the reply of a realistic native Korean with crude manner.
 			- Example:
 				- Invalid: Whoa, you shouldn't post such photos in a place like this;;
-				- *Valid*: Damn this is so fucking arousing bitch! lol
+				- Valid: Damn this is so fucking arousing bitch! lol
 - Example:
 ]]
     if NAISNSNOIMAGE == "0" then
@@ -1499,24 +1499,24 @@ local function inputDCInside(triggerId, data)
     data = data .. [[
 ## Community Interface
 ### DCInside Gallery Interface
-- *PRINT OUT EXACTLY ONE DCINSIDE GALLERY INTERFACE at the BOTTOM of the RESPONSE**
-- *MAKE ]] .. NAIDCPOSTNUMBER .. [[ POSTS EXACTLY*
+- PRINT OUT EXACTLY ONE DCINSIDE GALLERY INTERFACE at the BOTTOM of the RESPONSE
+- MAKE ]] .. NAIDCPOSTNUMBER .. [[ POSTS EXACTLY
 
 #### DCInside Gallery Interface Template
 - AI must follow this template:
-- DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. NAIDCPOSTNUMBER ..[[ TIMES *MORE* ]
+- DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. NAIDCPOSTNUMBER ..[[ TIMES MORE ]
 - GN: The name of the gallery where the post is located.
 - PID: The unique identifier for the post in the gallery.
 - PN: The unique number of the post in the gallery.
 - PT: The title of the post.
-	- **Do not include ', ", [, |, ] in the title.**
+	- Do not include ', ", [, |, ] in the title.
 - PC: The number of comments on the post.
 - PW: The Writer of the post.
 - PD: The time post was made.
 - PV: The number of views the post has received.
 - PR: The number of recommendations the post has received.
 - BODY: The content of the post.
-	- **Do not include ', ", [, |, ] in the content.**
+	- Do not include ', ", [, |, ] in the content.
 ]]
     if NAICOMMUNITYNOIMAGE == "0" then
         data = data .. [[
@@ -1541,7 +1541,7 @@ local function inputDCInside(triggerId, data)
     end
     data = data .. [[
 #### DCInside Gallery Information
-- All users typically post anonymously ('ㅇㅇ', 'ㅁㄴㅇㄹ', etc.) or use specific nicknames (고정닉). IP addresses (often partial) are usually displayed next to anonymous posts. **Fixed Nicknames (고정닉)** have an orange icon, **Semi-fixed Nicknames (반고정닉)** have a green icon.
+- All users typically post anonymously ('ㅇㅇ', 'ㅁㄴㅇㄹ', etc.) or use specific nicknames (고정닉). IP addresses (often partial) are usually displayed next to anonymous posts. Fixed Nicknames (고정닉) have an orange icon, Semi-fixed Nicknames (반고정닉) have a green icon.
 	- Wrap with ▶ and ◀ for fixed nicknames (고정닉), ▷ and ◁ for semi-fixed nicknames (반고정닉) before the author information.
 		- ▶: Internally replaced with <h1>.
 		- ◀: Internally replaced with </h1>.
@@ -1557,8 +1557,8 @@ local function inputDCInside(triggerId, data)
 ]]
     if NAIDCNOSTALKER == "1" then
         data = data .. [[
-### DCInside Gallery **CRITICAL**
-- ***DO NOT MENTION {{user}} and {{char}} in DCInside***     
+### DCInside Gallery CRITICAL
+- DO NOT MENTION {{user}} and {{char}} in DCInside     
 ]]
     end
 
@@ -1867,8 +1867,8 @@ local function inputKAKAOTalk(triggerId, data)
 
     if NAIMESSENGERNOIMAGE == "0" then
         data = data .. [[
-	- When  {{char}} sends a picture or photo, print it will **exactly** output '<NAI>'.
-	- **DO NOT PRINT <NAI> MORE THAN ONCE.**
+	- When  {{char}} sends a picture or photo, print it will exactly output '<NAI>'.
+	- DO NOT PRINT <NAI> MORE THAN ONCE.
 ]]
     end
 
@@ -2116,14 +2116,14 @@ local function inputImage(triggerId, data)
 	- [NEG_PROMPTPLACEHOLDER: 1girl,female,...]
 
 ### Image Prompt Usage
-- *DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER*
-- *NEVER* refer to the past chat history when outputting the prompt below:
+- DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER
+- NEVER refer to the past chat history when outputting the prompt below:
 ]]
 
     if NAICARDNOIMAGE == "0" then
         if NAICARD == "1" then
             data = data .. [[
-    - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
+    - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE
     - Output Format:
         - EROSTATUS[...|INLAY:<NAI1>]
         - [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
@@ -2135,7 +2135,7 @@ local function inputImage(triggerId, data)
 ]]
         elseif NAICARD == "2" then
             data = data .. [[
-    - *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
+    - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - SIMULSTATUS[...|INLAY:<NAI1>]
         - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
@@ -2147,7 +2147,7 @@ local function inputImage(triggerId, data)
 ]]
         elseif NAICARD == "3" then
             data = data .. [[
-    - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
+    - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
         - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
@@ -2163,12 +2163,12 @@ local function inputImage(triggerId, data)
     if NAISNSNOIMAGE == "0" then
         if NAISNS == "1" then
             data = data .. [[
-    - *ALWAYS PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the TWITTER INTERFACE*
+    - ALWAYS PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the TWITTER INTERFACE
     - Output Format:
         - TWITTER[...<NAI>...<NAI>...]
         - [NAISNSPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
         - [NEG_NAISNSPROMPT:(NEGATIVE PROMPT)]
-        - If Character does not have **own** profile image:
+        - If Character does not have own profile image:
             - [NAISNSPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
             - [NEG_NAISNSPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]
@@ -2178,7 +2178,7 @@ local function inputImage(triggerId, data)
     if NAICOMMUNITYNOIMAGE == "0" then
         if NAICOMMUNITY == "1" then
             data = data .. [[
-    - *ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE*
+    - ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE
     - Output Format:
         - DC[...|<NAI1>...|<NAI2>...]
         - If the post is normal:
@@ -2197,7 +2197,7 @@ local function inputImage(triggerId, data)
     if NAIMESSENGERNOIMAGE == "0" then
         if NAIMESSENGER == "1" then
             data = data .. [[
-    - *ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE*
+    - ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE
     - Print <NAI> Exactly once when {{char}} sends a picture or image.
     - Output Format:
         - KAKAO[<NAI>|...]
@@ -2232,7 +2232,7 @@ local function inputImage(triggerId, data)
 
     if tonumber(NAICOMPATIBILITY) >= 1 then
         data = data .. [[
-- ***REPLACE { and } to ( and ) in IMAGE PROMPT!!!***
+- REPLACE { and } to ( and ) in IMAGE PROMPT!!!
 	- Example:
 		- {1girl} => (1girl)
 		- {{1boy}} => ((1boy))
@@ -2250,31 +2250,31 @@ local function inputImportant(triggerId, data)
     data = data .. [[
 
 # CRITICAL
-- *FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES*
+- FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES
 ]]
 
     if NAICARD == "1" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
-- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
-    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
-- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
+- DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK
+    - MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]
+- BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE
 ]]
     elseif NAICARD == "2" then
         data = data .. [[
 ## CRITICAL: SIMULATION STATUS INTERFACE
-- *DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
-    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
+- DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK
+    - MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]
 ]]
     elseif NAICARD == "3" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
-- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
-    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
-- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
+- DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK
+    - MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]
+- BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE
 ## CRITICAL: SIMULATION STATUS INTERFACE
-- *DO NOT PRINT MALE CHARACTER's "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
-    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
+- DO NOT PRINT MALE CHARACTER's "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK
+    - MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]
 ]]
     end
 
