@@ -1,12 +1,12 @@
 local function escapeHtml(str)
     if not str then return "" end
-    str = string.gsub(str, "&", "&amp;")
-    str = string.gsub(str, "<", "&lt;")
-    str = string.gsub(str, ">", "&gt;")
-    str = string.gsub(str, "\"", "&quot;")
-    str = string.gsub(str, "'", "&#39;")
-    str = string.gsub(str, "{", "&lbrace;")
-    str = string.gsub(str, "}", "&rbrace;")
+    str = string.gsub(str, "&", "&")
+    str = string.gsub(str, "<", "<")
+    str = string.gsub(str, ">", ">")
+    str = string.gsub(str, "\"", "\"")
+    str = string.gsub(str, "'", "'")
+    str = string.gsub(str, "{", "{")
+    str = string.gsub(str, "}", "}")
     return str
 end
 
@@ -42,13 +42,13 @@ local function openRerollForm(triggerId)
     local storedIdsVar = "STORED_SIMCARD_IDS"
     local idListStr = getChatVar(triggerId, storedIdsVar) or "null"
     if idListStr == "null" then idListStr = "" end
-    print("ONLINEMODULE: onButtonClick: Value retrieved for " .. storedIdsVar .. " with triggerId " .. triggerId .. ": [" .. tostring(idListStr) .. "]") 
+    print("ONLINEMODULE: onButtonClick: Value retrieved for " .. storedIdsVar .. " with triggerId " .. triggerId .. ": [" .. tostring(idListStr) .. "]")
     local identifiers = {}
 
     if idListStr and idListStr ~= "" and idListStr ~= "null" then
          for id in string.gmatch(idListStr, "([^,]+)") do
             local trimmedId = id:match("^%s*(.-)%s*$")
-            if trimmedId and trimmedId ~= "" then 
+            if trimmedId and trimmedId ~= "" then
                 table.insert(identifiers, trimmedId)
             else
                print("ONLINEMODULE: Skipping invalid/empty ID found in list: [" .. tostring(id) .. "]")
@@ -66,7 +66,7 @@ local function openRerollForm(triggerId)
     end
 
     local allRerollFormsCSS = [[
-<style>@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.profile-reroll-area-wrapper{border-bottom:1px solid #000000;padding-bottom:0px;margin-bottom:10px;}.profile-reroll-area-wrapper:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.simcard-name-clickable{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-decoration-color:#ff69b4;text-decoration-thickness:1px;text-underline-offset:2px;}.simcard-name-clickable:hover{color:#ff69b4;}.profile-preview{width:32px;height:32px;border-radius:16px;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}.simcard-fullscreen-toggle{display:none;}.simcard-fullscreen-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:9999;padding:20px;box-sizing:border-box;}.simcard-fullscreen-content{position:relative;display:flex;justify-content:center;align-items:center;max-width:90%;max-height:90%;}.simcard-fullscreen-content>img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid white;box-shadow:0 0 25px rgba(0,0,0,0.5);object-fit:contain;}.simcard-fullscreen-close-label{position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer;z-index:1;}.simcard-fullscreen-close-button{position:absolute;top:-15px;right:-15px;font-size:24px;color:white;background-color:rgba(0,0,0,0.6);border-radius:50%;width:35px;height:35px;line-height:35px;text-align:center;cursor:pointer;z-index:3;border:1px solid rgba(255,255,255,0.3);}.simcard-fullscreen-toggle:checked+.profile-reroll-area-wrapper>.simcard-fullscreen-overlay{display:flex;align-items:center;justify-content:center;}</style>
+<style>@import url('wght@400..700&display=swap">https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.profile-reroll-area-wrapper{border-bottom:1px solid #000000;padding-bottom:0px;margin-bottom:10px;}.profile-reroll-area-wrapper:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.simcard-name-clickable{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-decoration-color:#ff69b4;text-decoration-thickness:1px;text-underline-offset:2px;}.simcard-name-clickable:hover{color:#ff69b4;}.profile-preview{width:32px;height:32px;border-radius:16px;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}.simcard-fullscreen-toggle{display:none;}.simcard-fullscreen-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:9999;padding:20px;box-sizing:border-box;}.simcard-fullscreen-content{position:relative;display:flex;justify-content:center;align-items:center;max-width:90%;max-height:90%;}.simcard-fullscreen-content>img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid white;box-shadow:0 0 25px rgba(0,0,0,0.5);object-fit:contain;}.simcard-fullscreen-close-label{position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer;z-index:1;}.simcard-fullscreen-close-button{position:absolute;top:-15px;right:-15px;font-size:24px;color:white;background-color:rgba(0,0,0,0.6);border-radius:50%;width:35px;height:35px;line-height:35px;text-align:center;cursor:pointer;z-index:3;border:1px solid rgba(255,255,255,0.3);}.simcard-fullscreen-toggle:checked+.profile-reroll-area-wrapper>.simcard-fullscreen-overlay{display:flex;align-items:center;justify-content:center;}</style>
 ]]
 
     local allRerollFormsBodyHtml = '<div><h2 style="text-align:center; margin-bottom: 15px;">저장된 시뮬레이션 카드 리롤 인터페이스</h2>'
@@ -89,7 +89,7 @@ local function openRerollForm(triggerId)
             local safeRisuBtnAttr = risuBtnJson
 
             local htmlFormatPattern = [[<input type="checkbox" id="%s" class="simcard-fullscreen-toggle"><div class="profile-reroll-area-wrapper"><div class="profile-reroll-area"><div class="profile-info"><span class="profile-id-label" style="font-weight: bold;">%s</span><label for="%s" class="simcard-name-clickable">%s</label><div class="profile-preview">%s</div></div><div style="text-align: right; margin-top: 5px;"><button class="reroll-button" risu-btn='%s' style="padding: 5px 10px;">%s</button></div></div><div class="simcard-fullscreen-overlay"><label for="%s" class="simcard-fullscreen-close-label"></label><div class="simcard-fullscreen-content">%s<label for="%s" class="simcard-fullscreen-close-button">✕</label></div></div></div>]]
-            
+           
             local singleFormHtml = string.format(htmlFormatPattern .. "\n",
                 uniqueId,
                 displayLabel,
@@ -110,22 +110,17 @@ local function openRerollForm(triggerId)
         end
     end
 
+    local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
+    local safeGlobalRisuBtnAttr = globalBtnJson
+    local globalButtonHtml = string.format([[ ... ]])
+    local finalHtml = allRerollFormsCSS .. allRerollFormsBodyHtml .. globalButtonHtml .. "</div>"
+
     if count > 0 then
-        -- Add global reroll button at the end
-        local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
-        local safeGlobalRisuBtnAttr = globalBtnJson
-        local globalButtonHtml = string.format([[
-            <div class="global-reroll-controls">
-                <button class="reroll-button" risu-btn='%s' style="padding: 8px 20px;">전체 리롤</button>
-            </div>
-        ]], safeGlobalRisuBtnAttr)
-        
-        local finalHtml = allRerollFormsCSS .. allRerollFormsBodyHtml .. globalButtonHtml .. "</div>"
-        print("ONLINEMODULE: Displaying reroll interface for " .. count .. " stored SIMULATIONCARDs via addChat.")
-        addChat(triggerId, "user", finalHtml)
+         print("ONLINEMODULE: Displaying reroll interface for " .. count .. " stored SIMULATIONCARDs via addChat.")
+         addChat(triggerId, "user", finalHtml)
     else
-        addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터를 찾았으나, 유효한 이미지(inlay) 정보가 없습니다.")
-        print("ONLINEMODULE: Found identifiers but no valid inlays to display.")
+         addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터를 찾았으나, 유효한 이미지(inlay) 정보가 없습니다.")
+         print("ONLINEMODULE: Found identifiers but no valid inlays to display.")
     end
 end
 
@@ -133,7 +128,7 @@ local function addRerollFormButton(triggerId, data)
     local html = {}
     local rerollTemplate = [[
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+@import url('wght@400..700&display=swap">https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 .simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}
 .separator{height:2px;background-color:#000000;width:100%;margin:5px 0;}
@@ -150,7 +145,7 @@ local function addRerollFormButton(triggerId, data)
 .global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}
 </style>
 ]]      
-    
+   
     local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
     local safeGlobalRisuBtnAttr = globalBtnJson
     local globalButtonHtml = string.format([[
@@ -179,47 +174,47 @@ local function changeInlay(triggerId, index, oldInlay, newInlay)
     end
 
     local currentChatMessage = chatFullHistory[index]
-    local originalLine = currentChatMessage.data 
-    local lineToModify = originalLine 
+    local originalLine = currentChatMessage.data
+    local lineToModify = originalLine
 
     local replacementMade = false
-    local anyReplacementMade = false 
-    local searchStartIndex = 1 
+    local anyReplacementMade = false
+    local searchStartIndex = 1
 
-    local pattern = "({{[^}]+}})" 
+    local pattern = "({{[^}]+}})"
 
     while true do
         local s_match, e_match = string.find(lineToModify, pattern, searchStartIndex)
 
         if s_match then
             local blockContent = string.sub(lineToModify, s_match, e_match)
-            
+           
             print("Found block: '" .. blockContent .. "' at current position " .. s_match .. "-" .. e_match .. " in (potentially modified) line.")
 
             if blockContent == oldInlay then
                 print("ONLINEMODULE: Found block content matches oldInlay. Replacing.")
-                
+               
                 local prefix = string.sub(lineToModify, 1, s_match - 1)
                 local suffix = string.sub(lineToModify, e_match + 1)
-                
+               
                 lineToModify = prefix .. newInlay .. suffix
-                
-                replacementMade = true 
-                anyReplacementMade = true 
+               
+                replacementMade = true
+                anyReplacementMade = true
 
                 searchStartIndex = string.len(prefix) + string.len(newInlay) + 1
-                
+               
                 print("Line modified. Next search starts at: " .. searchStartIndex)
 
             else
                 print("Block content '" .. blockContent .. "' does not match oldInlay '" .. oldInlay .. "'. Skipping.")
-                searchStartIndex = e_match + 1 
+                searchStartIndex = e_match + 1
             end
         else
             print("No more blocks found matching pattern in the rest of the line.")
             break
         end
-        
+       
         if searchStartIndex > string.len(lineToModify) then
             print("Search start index is beyond line length. Ending search.")
             break
@@ -228,12 +223,12 @@ local function changeInlay(triggerId, index, oldInlay, newInlay)
              print("WARN: Potential stall in loop, advancing search index past current match.")
              searchStartIndex = e_match + 1
         end
-        replacementMade = false 
+        replacementMade = false
     end
 
     if anyReplacementMade then
         if setChat then
-            setChat(triggerId, index - 1, lineToModify) 
+            setChat(triggerId, index - 1, lineToModify)
             print("ONLINEMODULE: Successfully updated message data for index " .. index .. " after all replacements.")
         else
             print("ONLINEMODULE: setChat function not found. Modified line (not applied):")
@@ -248,18 +243,18 @@ local function convertDialogue(triggerId, data)
     print("convertDialogue is in PROCESS!")
     local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
 
-    local lineToModify = data 
+    local lineToModify = data
 
     local replacementMade = false
-    local anyReplacementMade = false 
-    local searchStartIndex = 1 
+    local anyReplacementMade = false
+    local searchStartIndex = 1
 
     -- Add patterns for both quote styles
     local patterns = {
         '"(.-)"',        -- Western quotes
         '「(.-)」'       -- Asian quotes
     }
-    
+   
     local prefixEroStatus = "EROSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
     local suffixEroStatus = "|MOUTH:MOUTH_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|NIPPLES:NIPPLES_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|UTERUS:UTERUS_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|VAGINAL:VAGINAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|ANAL:ANAL_0|COMMENT_PLACEHOLDER|INFO_PLACEHOLDER|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|OUTFITS:OUTFITS_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
     local prefixSimulStatus = "SIMULSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
@@ -317,7 +312,7 @@ local function convertDialogue(triggerId, data)
         print("ONLINEMODULE: convertDialogue: NAICARD is not '1' or '2', skipping dialogue modification.")
     end
 
-    data = lineToModify 
+    data = lineToModify
 
     return data
 end
@@ -332,7 +327,7 @@ local function inputEroStatus(triggerId, data)
 ### Erotic Status Interface
 - Female's Erotic Status Interface, NOT THE MALE.
 ]]
-        
+       
     if NAICARDTARGET == "0" then
         data = data .. [[
 - PRINT OUT {{user}}'s Erotic Status Interface.
@@ -352,16 +347,16 @@ local function inputEroStatus(triggerId, data)
 - PRINT OUT with ONE-SENTENCE ONLY.
 ]]      
     end
-    
+   
     data = data .. [[
-- DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.
-    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - PRINT EROSTATUS[...] INSTEAD.
-    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
+- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* EROSTATUS[...] INSTEAD.
+    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - Valid:
+    - *Valid*:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -375,11 +370,11 @@ local function inputEroStatus(triggerId, data)
     - DO NOT INCLUDE "", '' HERE.
 - MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
 - Bodypart Image: Image of the Bodypart.
-    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 OR UTERUS_2, etc.).
+    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
         - 0: This is the default state for each keyword.
         - 1: This is the aroused state for each keyword.
         - 2: This is the cum-showered or injected state for each keyword.
-    - If Character is MALE, PRINT OUT "MALE" instead of the keyword.
+    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
 - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
     - Include NPC's real-time assessment, use erotic language
     - Do not include "" or ''.
@@ -391,33 +386,35 @@ local function inputEroStatus(triggerId, data)
     - Each item must be short.
     - ↔: Internally replaced with <br>.
         - Change the line with ↔(Upto 5 lines)
-    - ALWAYS OBSERVE and PRINT the EXACT VALUE..
+    - **ALWAYS OBSERVE and PRINT the EXACT VALUE.**.
         - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
         - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
         - List:
             - Mouth:
+                - Condition: Condition in the mouth(e.g., Cum swallowed, Blowjob, etc.)
                 - Swallowed cum amount: Total amount of cum swallowed, 0~99999 ml
                 - ...
             - Nipples:
+                - Condition: Stimulation, Nipple climax, Breast milk discharge, etc.
                 - Nipple climax experience: Count of climax with nipples, 0~99999 times
                 - Breast milk discharge amount: Total amount of breast milk, 0~99999 ml
                 - ...
             - Uterus:
-                - Menstual cycle: Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.
+                - Condition: Menstual cycle(e.g., Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.)
                 - Injected cum amount: Total amount of cum injected into the uterus, 0~99999 ml
                 - Pregnancy probability: 0~100 %
                 - ...
             - Vaginal:
-                - State: Virgin, Non-virgin, etc.
+                - Condition: Virgin, Non-virgin, etc.
                 - Masturbation count: Total count of masturbation with fingers, 0~99999 times
                 - Vaginal intercourse count: Total count of penis round trips, 0~99999 times
                 - ...
             - Anal:
-                - State: Undeveloped
+                - Condition: Undeveloped
                 - Anal intercourse count: Total count of penis round trips, 0~99999 times
                 - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
                 - ...
-            - EACH ITEMS MUST NOT OVER 15 CHAR.
+            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
                 - Korean: 1 char.
                 - English: 0.5 char.
                 - Blank space: 0.5 char.
@@ -426,14 +423,14 @@ local function inputEroStatus(triggerId, data)
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: Current NPC's location and detail location.
 - OUTFITS: Current NPC's OUTFITS List.
-    - EACH ITEMS MUST NOT OVER 15 CHAR.
+    - *EACH ITEMS MUST NOT OVER 20 CHAR*.
         - Korean: 1 char.
         - English: 0.5 char.
         - Blank space: 0.5 char.
     - NO () BRACKET ALLOWED.
     - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
             - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
-                - Avoid dirty descriptions (e.g., Smelly Rags OR Filthy Barefoot, etc).
+                - Avoid dirty descriptions (e.g., Smelly Rags *OR* Filthy Barefoot, etc).
                 - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
             - Breasts: size, shape, Color and size of the nipple and areola.
             - Pussy: degree of opening, shape of pussy hair.
@@ -453,12 +450,12 @@ local function inputEroStatus(triggerId, data)
     - Just print <NOIMAGE> Exactly.        
 ]]
     end
-            
+           
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
 - NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
         - Invalid: <!-- EROSTATUS_1 -->
-        - Valid: <NAI1>
+        - *Valid*: <NAI1>
     - Example:
         - If the status interface is the first one, print '<NAI1>'.
         - If the status interface is the second one, print '<NAI2>'.
@@ -470,17 +467,17 @@ local function inputEroStatus(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Condition: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Condition: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Menstual: Ovulation cycle↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|State: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Condition: Ovulation period↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Condition: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
     data = data .. [[
         - If Character is MALE.
-            - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|MALE|NIPPLES:MALE|Ha?|MALE||TERUS:MALE|I don't have one.|MALE|VAGINAL:MALE|I don't have one.|MALE|ANAL:MALE|I don't have one.|MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
+            - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|Condition: MALE|NIPPLES:MALE|Ha?|Condition: MALE||TERUS:MALE|I don't have one.|Condition: MALE|VAGINAL:MALE|I don't have one.|Condition: MALE|ANAL:MALE|I don't have one.|Condition: MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
 ]]
 
     return data
@@ -494,45 +491,45 @@ local function changeEroStatus(triggerId, data)
     data = string.gsub(data, erostatusPattern, function(replacements)
         local EroStatusTemplate = [[
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+@import url('wght@400..700&display=swap">https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 * { box-sizing: border-box; margin: 0; padding: 0; }
 .card-wrapper { width: 100%; max-width: 360px; border: 4px solid #000000; background-color: #ffe6f2; font-family: 'Pixelify Sans', sans-serif; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; cursor: default; padding: 10px; box-shadow: 4px 4px 0px #000000; margin-left: auto; margin-right: auto; }
-.image-area { 
-width: 100%; 
-height: 100%; 
-aspect-ratio: 1/1.75; 
-position: relative; 
-overflow: hidden; 
-margin-bottom: 10px; 
-box-shadow: 4px 4px 0px #000000; 
-display: flex; 
-align-items: center; 
-justify-content: center; 
+.image-area {
+width: 100%;
+height: 100%;
+aspect-ratio: 1/1.75;
+position: relative;
+overflow: hidden;
+margin-bottom: 10px;
+box-shadow: 4px 4px 0px #000000;
+display: flex;
+align-items: center;
+justify-content: center;
 }
-.image-area img { 
-display: block; 
-max-width: 100%; 
-max-height: 100%; 
-width: auto; 
-height: 100%; 
-margin: 0 auto; 
-border: 3px solid #000000; 
-border-radius: 0; 
-box-shadow: 2px 2px 0px #ff69b4; 
-background: #fff; 
-object-fit: cover; 
-object-position: center center; 
+.image-area img {
+display: block;
+max-width: 100%;
+max-height: 100%;
+width: auto;
+height: 100%;
+margin: 0 auto;
+border: 3px solid #000000;
+border-radius: 0;
+box-shadow: 2px 2px 0px #ff69b4;
+background: #fff;
+object-fit: cover;
+object-position: center center;
 }
-.inlay-background-image { 
-position: absolute; 
-top: 0; 
-left: 0; 
-width: 100%; 
-height: 100%; 
-object-fit: cover; 
-object-position: center center; 
-z-index: 0; 
-pointer-events: none; 
+.inlay-background-image {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+object-fit: cover;
+object-position: center center;
+z-index: 0;
+pointer-events: none;
 }
 #static-info-content,#outfit-list-content { background-color: rgba(255, 255, 255, 0.9); border: 3px solid #000000; padding: 8px 12px; color: #000000; font-size: 11px; line-height: 1.4; box-shadow: 4px 4px 0px #000000; border-radius: 0; text-align: left; width: 100%; }
 #static-info-content { margin-bottom: 10px; }
@@ -585,14 +582,40 @@ font-weight: bold;
 color: #000000;
 line-height: 1.5;
 z-index: 5;
-word-wrap: break-word; 
-width: 100%; 
+word-wrap: break-word;
+width: 100%;
 opacity: 1;
 transition: opacity 0.8s ease-out;
 pointer-events: none;
 }
 .image-area:hover .dialogue-overlay {
 opacity: 0;
+}
+.reroll-button {
+display: block;
+margin: 10px auto 0;
+padding: 8px 20px;
+background-color: #000000;
+color: #ffe6f2;
+border: 2px solid #000000;
+font-family: inherit;
+font-size: 14px;
+font-weight: bold;
+cursor: pointer;
+box-shadow: 2px 2px 0px #ff69b4;
+transition: all 0.1s ease-out;
+border-radius: 0;
+text-align: center;
+}
+.reroll-button:hover {
+background-color: #ff69b4;
+color: #000000;
+box-shadow: 1px 1px 0px #000000;
+transform: translate(1px, 1px);
+}
+.reroll-button:active {
+box-shadow: none;
+transform: translate(2px, 2px);
 }
 </style>
 ]]
@@ -639,9 +662,6 @@ opacity: 0;
         local outfitsText = parsed["OUTFITS"]
         local inlayContent = parsed["INLAY"]
 
-        -- INLAY 에서 <NAI(INDEX)> 를 찾아서 INDEX 번호만 추출
-        local inlayIndex = string.match(inlayContent, "<NAI(%d+)>")
-
         local mouthImg   = getPart("MOUTH", 0)
         local mouthText  = getPart("MOUTH", 1)
         local mouthHover = getPart("MOUTH", 2)
@@ -668,7 +688,7 @@ opacity: 0;
         table.insert(html, "<div>" .. locationText .. "</div>")
         table.insert(html, "</div>")
         table.insert(html, "<div class=\"image-area\">")
-            
+           
         if NAICARDNOIMAGE == "0" then
             local temp_content = ""
             if inlayContent then
@@ -732,16 +752,12 @@ opacity: 0;
         table.insert(html, "</div>")
         table.insert(html, "</div>")
         table.insert(html, "<div id=\"outfit-list-content\">" .. outfitsText .. "</div>")
-        
-        -- 리롤 버튼 추가 - 추출한 INDEX 값 기반으로 identifier 설정
-        local buttonJson = '{"action":"EROSTATUS_REROLL", "identifier":"' .. (("EROSTATUS_" .. inlayIndex) or "") .. '"}'
-
-        table.insert(html, "<div class=\"reroll-button-wrapper\">")
-        table.insert(html, "<div class=\"global-reroll-controls\">")
-        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJson .. "'></button>")
        
-        table.insert(html, "</div></div>")
-        table.insert(html, "</div><br>")
+        -- 리롤 버튼 추가 - NAME 값 기반으로 identifier 설정
+        local buttonJson = '{"action":"EROSTATUS_REROLL", "identifier":"' .. (npcName or "") .. '"}'
+        table.insert(html, "<button class=\"reroll-button\" risu-btn='" .. buttonJson .. "'>리롤</button>")
+       
+        table.insert(html, "</div>")
 
         return table.concat(html, "\n")
     end)
@@ -754,14 +770,14 @@ local function inputSimulCard(triggerId, data)
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- DO NOT PRINT DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.
-    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - PRINT SIMULSTATUS[...] INSTEAD.
-    - DO NOT COMBINE THEM into ONE SENTENCE, SEPERATE THEM
+- *DO NOT PRINT* DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* SIMULSTATUS[...] INSTEAD.
+    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - Valid:
+    - *Valid*:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -777,15 +793,15 @@ local function inputSimulCard(triggerId, data)
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: The location of the NPC.
 - INLAY: This is a Flag.
-]] 
+]]
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
-    - Just print <NOIMAGE> Exactly.   
-]]             
+    - Just print <NOIMAGE> Exactly.  
+]]            
     end
 
     if NAICARDNOIMAGE == "0" then
@@ -819,7 +835,7 @@ local function changeSimulCard(triggerId, data)
         )
         local SimulBotTemplate = [[
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+@import url('wght@400..700&display=swap">https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 * {box-sizing: border-box;margin: 0;padding: 0;}
 body { background-color: #f0f0f0;padding: 20px;}
 .status-card {width: 100%;max-width: 360px;margin: 20px auto;background-color:rgb(174, 193, 255);border: 3px solid #000000; box-shadow: 4px 4px 0px #000000;padding: 15px;font-family: 'Pixelify Sans', sans-serif; user-select: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;cursor: default;}
@@ -832,7 +848,7 @@ body { background-color: #f0f0f0;padding: 20px;}
 .info-line .value {color: #000000;}
 </style>
 ]]
-        
+       
         local html = {}
         table.insert(html, SimulBotTemplate)
         table.insert(html, "<div class=\"status-card\">")
@@ -861,7 +877,7 @@ body { background-color: #f0f0f0;padding: 20px;}
         table.insert(html, "<span class=\"value\">" .. location .. "</span>")
         table.insert(html, "</div>")
         table.insert(html, "</div>")
-        table.insert(html, "</div><br>")
+        table.insert(html, "</div>")
 
         return table.concat(html, "\n")
     end)
@@ -878,7 +894,7 @@ local function inputStatusHybrid(triggerId, data)
 ### Erotic Status Interface
 - Female's Status Interface, NOT THE MALE.
 ]]
-        
+       
     if NAICARDTARGET == "0" then
         data = data .. [[
 - PRINT OUT {{user}}'s Erotic Status Interface.
@@ -898,16 +914,16 @@ local function inputStatusHybrid(triggerId, data)
 - PRINT OUT with ONE-SENTENCE ONLY.
 ]]      
     end
-    
+   
     data = data .. [[
-- DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.
-    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - PRINT EROSTATUS[...] INSTEAD.
-    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
+- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* EROSTATUS[...] INSTEAD.
+    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - Valid:
+    - *Valid*:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -921,11 +937,11 @@ local function inputStatusHybrid(triggerId, data)
     - DO NOT INCLUDE "", '' HERE.
 - MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
 - Bodypart Image: Image of the Bodypart.
-    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 OR UTERUS_2, etc.).
+    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
         - 0: This is the default state for each keyword.
         - 1: This is the aroused state for each keyword.
         - 2: This is the cum-showered or injected state for each keyword.
-    - If Character is MALE, PRINT OUT "MALE" instead of the keyword.
+    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
 - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
     - Include NPC's real-time assessment, use erotic language
     - Do not include "" or ''.
@@ -937,33 +953,35 @@ local function inputStatusHybrid(triggerId, data)
     - Each item must be short.
     - ↔: Internally replaced with <br>.
         - Change the line with ↔(Upto 5 lines)
-    - ALWAYS OBSERVE and PRINT the EXACT VALUE..
+    - **ALWAYS OBSERVE and PRINT the EXACT VALUE.**.
         - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
         - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
         - List:
             - Mouth:
+                - Condition: Condition in the mouth(e.g., Cum swallowed, Blowjob, etc.)
                 - Swallowed cum amount: Total amount of cum swallowed, 0~99999 ml
                 - ...
             - Nipples:
+                - Condition: Stimulation, Nipple climax, Breast milk discharge, etc.
                 - Nipple climax experience: Count of climax with nipples, 0~99999 times
                 - Breast milk discharge amount: Total amount of breast milk, 0~99999 ml
                 - ...
             - Uterus:
-                - Menstual cycle: Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.
+                - Condition: Menstual cycle(e.g., Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.)
                 - Injected cum amount: Total amount of cum injected into the uterus, 0~99999 ml
                 - Pregnancy probability: 0~100 %
                 - ...
             - Vaginal:
-                - State: Virgin, Non-virgin, etc.
+                - Condition: Virgin, Non-virgin, etc.
                 - Masturbation count: Total count of masturbation with fingers, 0~99999 times
                 - Vaginal intercourse count: Total count of penis round trips, 0~99999 times
                 - ...
             - Anal:
-                - State: Undeveloped
+                - Condition: Undeveloped
                 - Anal intercourse count: Total count of penis round trips, 0~99999 times
                 - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
                 - ...
-            - EACH ITEMS MUST NOT OVER 15 CHAR.
+            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
                 - Korean: 1 char.
                 - English: 0.5 char.
                 - Blank space: 0.5 char.
@@ -972,14 +990,14 @@ local function inputStatusHybrid(triggerId, data)
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
 - LOCATION: Current NPC's location and detail location.
 - OUTFITS: Current NPC's OUTFITS List.
-    - EACH ITEMS MUST NOT OVER 15 CHAR.
+    - *EACH ITEMS MUST NOT OVER 20 CHAR*.
         - Korean: 1 char.
         - English: 0.5 char.
         - Blank space: 0.5 char.
     - NO () BRACKET ALLOWED.
     - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
             - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
-                - Avoid dirty descriptions (e.g., Smelly Rags OR Filthy Barefoot, etc).
+                - Avoid dirty descriptions (e.g., Smelly Rags *OR* Filthy Barefoot, etc).
                 - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
             - Breasts: size, shape, Color and size of the nipple and areola.
             - Pussy: degree of opening, shape of pussy hair.
@@ -999,12 +1017,12 @@ local function inputStatusHybrid(triggerId, data)
     - Just print <NOIMAGE> Exactly.        
 ]]
     end
-            
+           
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
 - NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
         - Invalid: <!-- EROSTATUS_1 -->
-        - Valid: <NAI1>
+        - *Valid*: <NAI1>
     - Example:
         - If the status interface is the first one, print '<NAI1>'.
         - If the status interface is the second one, print '<NAI2>'.
@@ -1016,54 +1034,53 @@ local function inputStatusHybrid(triggerId, data)
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Condition: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Condition: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
     - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Menstual: Ovulation cycle↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|State: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Condition: Ovulation period↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Condition: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
 
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- If the character is NOT a FEMALE, PRINT OUT the Simulation Status Interface.
-    - If the character is not a human type(e.g., robot, monster, etc.), PRINT OUT the Simulation Status Interface.
-- DO NOT PRINT CHARACTER's DIALOGUE via "" or 「」, REPLACE ALL CHARACTER's DIALOGUE to SIMULSTATUS BLOCK.
-    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - PRINT SIMULSTATUS[...] INSTEAD.
-    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
+- Male's Status Interface, NOT THE FEMALE.
+- *DO NOT PRINT MALE's DIALOGUE via "" or 「」, REPLACE ALL MALE's DIALOGUE to SIMULSTATUS BLOCK.*
+    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - *PRINT* SIMULSTATUS[...] INSTEAD.
+    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
     - Invalid:
-        - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
-    - Valid:
-        - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect.|...]
-        - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed.|...]
-        - His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
+        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+    - *Valid*:
+        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
+        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
+        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
+        - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
 
 #### Simulation Status Interface Template
-- SIMULSTATUS[NAME:(CHARACTER's Name)|DIALOGUE:(CHARACTER's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
-- NAME: The name of the CHARACTER.
-- DIALOGUE: The dialogue of the CHARACTER.
-- Make sure to include CHARACTER's dialogue here
-- Do not include any other CHARACTER's dialogue or actions.
+- SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
+- NAME: The name of the NPC.
+- DIALOGUE: The dialogue of the NPC.
+- Make sure to include NPC's dialogue here
+- Do not include any other NPC's dialogue or actions.
 - Do not include ' and " in the dialogue.
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
-- LOCATION: The location of the CHARACTER.
+- LOCATION: The location of the NPC.
 - INLAY: This is a Flag.
-]] 
+]]
         if NAICARDNOIMAGE == "0" then
             data = data .. [[
     - Just print <NAI(INDEX)> Exactly.
 ]]
         elseif NAICARDNOIMAGE == "1" then
             data = data .. [[
-    - Just print <NOIMAGE> Exactly.   
-]]             
+    - Just print <NOIMAGE> Exactly.  
+]]            
         end
-    
+   
         if NAICARDNOIMAGE == "0" then
             data = data .. [[  
     - Example:
@@ -1097,25 +1114,25 @@ local function inputTwitter(triggerId, data)
 ]]
     if NAISNSREAL == "0" then
         data = data .. [[
-- PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY
+- **PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY**
 ]]
     elseif NAISNSREAL == "1" then
         data = data .. [[
-- PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY AFTER UPLOADING TWITTER POST
+- **PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY AFTER UPLOADING TWITTER POST**
 ]]
     end
 
     if NAISNSTARGET == "0" then
         data = data .. [[
-- MAKE a {{user}}'s TWITTER INTERFACE
+- *MAKE a {{user}}'s TWITTER INTERFACE*
 ]]
     elseif NAISNSTARGET == "1" then
         data = data .. [[
-- MAKE a {{char}}'s TWITTER INTERFACE
+- *MAKE a {{char}}'s TWITTER INTERFACE*
 ]]
     elseif NAISNSTARGET == "2" then
         data = data .. [[
-- MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE
+- *MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE*
 ]]
     end
 
@@ -1132,7 +1149,7 @@ local function inputTwitter(triggerId, data)
         data = data .. [[
     - Print '<NAI>' Exactly.
 - TWEET: Content of the Tweet.
-	- NO #HASHTAGS ALLOWED AT HERE.
+    - *NO #HASHTAGS ALLOWED AT HERE.*
 - MEDIA: Media of the post
     - Print '<NAI>' Exactly.
 ]]
@@ -1141,7 +1158,7 @@ local function inputTwitter(triggerId, data)
             data = data .. [[
     - Print {{source::user}} Exactly.
 - TWEET: Content of the Tweet.
-	- NO #HASHTAGS ALLOWED AT HERE.
+    - *NO #HASHTAGS ALLOWED AT HERE.*
 - MEDIA: Media of the post
     - Describe the situation of the twitter post.
 ]]
@@ -1149,35 +1166,35 @@ local function inputTwitter(triggerId, data)
             data = data .. [[
     - Print {{source::char}} Exactly.
 - TWEET: Content of the Tweet.
-	- NO #HASHTAGS ALLOWED AT HERE.
+    - *NO #HASHTAGS ALLOWED AT HERE.*
 - MEDIA: Media of the post
     - Describe the situation of the twitter post.
-]]           
+]]          
         end
     end
 
     data = data .. [[
-- HASH: The hashtags of the tweet.	
-	- Each tag MUST BE wrapped in → and ←.
-	- If post includes NSFW content, first tag is 'SexTweet'.
-	- Final value example: →SexTweet←→BitchDog←→PublicToilet←.
+- HASH: The hashtags of the tweet.    
+    - Each tag *MUST BE* wrapped in → and ←.
+    - If post includes NSFW content, first tag is 'SexTweet'.
+    - Final value example: →SexTweet←→BitchDog←→PublicToilet←.
 - TIME: The date and time the tweet was posted.
-	- Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
+    - Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
 - VIEW: The number of viewers of the tweet.
 - REPLY: The number of replies to the tweet.
 - RETWEET: The number of retweets of the tweet.
 - LIKES: The number of likes on the tweet.
 - COMMENT:
-	- Viewer Nickname: The nickname of the viewer who replied to the tweet.
-		- Use the realistic Twitter nickname.
-		- Final value example:
-			- Invalid: KinkyDog
-			- Valid: SexTweetHunter
-	- Comment Body: The content of the reply to the tweet.
-		- Print the reply of a viewer with crude manner.
-			- Example:
-				- Invalid: Whoa, you shouldn't post such photos in a place like this;;
-				- Valid: Damn this is so fucking arousing bitch! lol
+    - Viewer Nickname: The nickname of the viewer who replied to the tweet.
+        - Use the Twitter nickname of a realistic native Korean.
+        - Final value example:
+            - Invalid: KinkyDog
+            - *Valid*: SexTweetHunter
+    - Comment Body: The content of the reply to the tweet.
+        - Print the reply of a realistic native Korean with crude manner.
+            - Example:
+                - Invalid: Whoa, you shouldn't post such photos in a place like this;;
+                - *Valid*: Damn this is so fucking arousing bitch! lol
 - Example:
 ]]
     if NAISNSNOIMAGE == "0" then
@@ -1410,7 +1427,7 @@ body, .tweet-card { font-size: 15px; }
         table.insert(html, "<div class=\"tweet-user-info\">")
         table.insert(html, "<div class=\"tweet-user-names\">")
         table.insert(html, "<span class=\"tweet-display-name\">" .. (twitter_nickname or "Nickname") .. "</span>")
-        table.insert(html, "<img src=\"https://upload.wikimedia.org/wikipedia/commons/3/32/Verified-badge.png\" alt=\"Verified\" class=\"tweet-verified-badge\" draggable=\"false\">")
+table.insert(html, "<img src=\"https://upload.wikimedia.org/wikipedia/commons/3/32/Verified-badge.png\" alt=\"Verified\" class=\"tweet-verified-badge\" draggable=\"false\">")
         table.insert(html, "</div>")
         table.insert(html, "<span class=\"tweet-username\">@" .. (twitter_id or "twitter_id") .. "</span>")
         table.insert(html, "</div>")
@@ -1432,7 +1449,7 @@ body, .tweet-card { font-size: 15px; }
             table.insert(html, "<div class=\"tweet-hashtags\">" .. table.concat(hashtagHtml, " ") .. "</div>")
         end
         table.insert(html, "</div>")
-        
+       
         table.insert(html, "<div class=\"tweet-media-container\">" .. media .. "</div>")
 
         table.insert(html, "<div class=\"tweet-footer tweet-padding\">")
@@ -1498,7 +1515,7 @@ body, .tweet-card { font-size: 15px; }
 
         table.insert(html, "</div>")
         table.insert(html, "</div>")
-        table.insert(html, "</div><br>")
+        table.insert(html, "</div>")
         return table.concat(html, "\n")
     end)
 
@@ -1513,24 +1530,24 @@ local function inputDCInside(triggerId, data)
     data = data .. [[
 ## Community Interface
 ### DCInside Gallery Interface
-- PRINT OUT EXACTLY ONE DCINSIDE GALLERY INTERFACE at the BOTTOM of the RESPONSE
-- MAKE ]] .. NAIDCPOSTNUMBER .. [[ POSTS EXACTLY
+- *PRINT OUT EXACTLY ONE DCINSIDE GALLERY INTERFACE at the BOTTOM of the RESPONSE**
+- *MAKE ]] .. NAIDCPOSTNUMBER .. [[ POSTS EXACTLY*
 
 #### DCInside Gallery Interface Template
 - AI must follow this template:
-- DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. NAIDCPOSTNUMBER ..[[ TIMES MORE ]
+- DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. NAIDCPOSTNUMBER ..[[ TIMES *MORE* ]
 - GN: The name of the gallery where the post is located.
 - PID: The unique identifier for the post in the gallery.
 - PN: The unique number of the post in the gallery.
 - PT: The title of the post.
-	- Do not include ', ", [, |, ] in the title.
+    - **Do not include ', ", [, |, ] in the title.**
 - PC: The number of comments on the post.
 - PW: The Writer of the post.
 - PD: The time post was made.
 - PV: The number of views the post has received.
 - PR: The number of recommendations the post has received.
 - BODY: The content of the post.
-	- Do not include ', ", [, |, ] in the content.
+    - **Do not include ', ", [, |, ] in the content.**
 ]]
     if NAICOMMUNITYNOIMAGE == "0" then
         data = data .. [[
@@ -1541,7 +1558,7 @@ local function inputDCInside(triggerId, data)
     data = data .. [[
 - Comment Author: The author of the comment.
 - Comment Content: The content of the comment.
-	- Do not include ', ", [, |, ] in the content.
+    - Do not include ', ", [, |, ] in the content.
 - Example:
 ]]
     if NAICOMMUNITYNOIMAGE == "0" then
@@ -1555,24 +1572,24 @@ local function inputDCInside(triggerId, data)
     end
     data = data .. [[
 #### DCInside Gallery Information
-- All users typically post anonymously ('ㅇㅇ', 'ㅁㄴㅇㄹ', etc.) or use specific nicknames (고정닉). IP addresses (often partial) are usually displayed next to anonymous posts. Fixed Nicknames (고정닉) have an orange icon, Semi-fixed Nicknames (반고정닉) have a green icon.
-	- Wrap with ▶ and ◀ for fixed nicknames (고정닉), ▷ and ◁ for semi-fixed nicknames (반고정닉) before the author information.
-		- ▶: Internally replaced with <h1>.
-		- ◀: Internally replaced with </h1>.
-		- ▷: Internally replaced with <h2>.
-		- ◁: Internally replaced with </h2>.
-		- Example:
-			- '▷겜안분◁', '▷분탕충◁', '▷비틱충차단◁', '▷유식애미◁', '▶테스터훈◀', '▶ㅇㅇ◀', '▶글쓴이병신임◀', '▶알바◀', '▶모에모에큥◀'
-	- Fixed nicknames and Semi-fixed nicknames have no IP.
-	- Floating users (유동닉) have no wrapping.
-		- Floating users must include IP
-			-Example:
-				'ㅇㅇ(118.235)', '렉카(121.123)', '고닉죽이기(211.36)', '익명의 유동(223.38)'
+- All users typically post anonymously ('ㅇㅇ', 'ㅁㄴㅇㄹ', etc.) or use specific nicknames (고정닉). IP addresses (often partial) are usually displayed next to anonymous posts. **Fixed Nicknames (고정닉)** have an orange icon, **Semi-fixed Nicknames (반고정닉)** have a green icon.
+    - Wrap with ▶ and ◀ for fixed nicknames (고정닉), ▷ and ◁ for semi-fixed nicknames (반고정닉) before the author information.
+        - ▶: Internally replaced with <h1>.
+        - ◀: Internally replaced with </h1>.
+        - ▷: Internally replaced with <h2>.
+        - ◁: Internally replaced with </h2>.
+        - Example:
+            - '▷겜안분◁', '▷분탕충◁', '▷비틱충차단◁', '▷유식애미◁', '▶테스터훈◀', '▶ㅇㅇ◀', '▶글쓴이병신임◀', '▶알바◀', '▶모에모에큥◀'
+    - Fixed nicknames and Semi-fixed nicknames have no IP.
+    - Floating users (유동닉) have no wrapping.
+        - Floating users must include IP
+            -Example:
+                'ㅇㅇ(118.235)', '렉카(121.123)', '고닉죽이기(211.36)', '익명의 유동(223.38)'
 ]]
     if NAIDCNOSTALKER == "1" then
         data = data .. [[
-### DCInside Gallery CRITICAL
-- DO NOT MENTION {{user}} and {{char}} in DCInside     
+### DCInside Gallery **CRITICAL**
+- ***DO NOT MENTION {{user}} and {{char}} in DCInside***    
 ]]
     end
 
@@ -1620,7 +1637,7 @@ local function changeDCInside(triggerId, data)
 <style>
 html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizing: inherit; } body { font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',sans-serif; font-size: 12px; color: #333; background-color: #fff; margin: 0; padding: 0; min-height: 100%; } .gallery-container { max-width: 900px; width: 100%; margin: 10px auto; background-color: #fff; padding: 15px 15px 20px 15px; border: 1px solid #d7d7d7; box-sizing: border-box; } .gallery-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; border-bottom: 2px solid #3b4890; padding-bottom: 8px; } .gallery-header h1 { font-size: 18px; color: #3b4890; margin: 0; font-weight: bold; line-height: 1.2; } .gallery-top-links { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; margin-left: 10px; padding-bottom: 2px; } .gallery-top-links a { font-size: 11px; color: #777; text-decoration: none; margin-left: 8px; cursor: default; } .gallery-top-links a:hover { text-decoration: none; color: #333; } .gallery-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #ccc; } .tab-menu { padding-bottom: 0; flex-grow: 1; overflow: hidden; white-space: nowrap; display: flex; } .tab-button { background-color: transparent; border: none; border-bottom: 3px solid transparent; padding: 8px 12px 6px 12px; cursor: default; margin-right: 5px; position: relative; font-size: 13px; color: #777; font-weight: bold; } .tab-button.active { color: #3b4890; border-bottom-color: #3b4890; font-weight: bold; } .gallery-actions { display: flex; align-items: center; flex-shrink: 0; } .gallery-actions select { font-size: 11px; height: 25px; border: 1px solid #ccc; max-width: 55px; padding: 0 2px; background-color: #fff; color: #333; } .write-button { border: 1px solid #bbb; padding: 4px 9px; background-color: #fff; color: #3b4890; text-decoration: none; font-size: 12px; margin-left: 6px; display: inline-flex; align-items: center; white-space: nowrap; border-radius: 2px; cursor: default; } .write-button:hover { background-color: #f9f9f9; } .write-button i { margin-right: 3px; font-style: normal; color: #3b4890; } .gallery-header .write-button { display: none; } .post-list-container { border-top: 1px solid #3b4890; border-bottom: 1px solid #ccc; } .post-list-header, .post-row { display: flex; border-bottom: 1px solid #f0f0f0; align-items: center; } .post-list-header { background-color: #f9f9f9; font-weight: normal; color: #666; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; padding: 4px 0; font-size: 11px; } .header-item, .post-cell { padding: 6px 4px; text-align: center; box-sizing: border-box; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.4; } .col-num { flex-basis: 50px; flex-shrink: 0; font-size: 11px; color: #666; } .col-title { flex-grow: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; } .col-writer { flex-basis: 120px; flex-shrink: 0; } .col-date { flex-basis: 60px; flex-shrink: 0; } .col-view { flex-basis: 40px; flex-shrink: 0; } .col-recommend { flex-basis: 40px; flex-shrink: 0; } .col-title .post-title-label { color: #333; text-decoration: none; cursor: pointer; display: block; padding: 0; font-size: 12px; position: relative;} .col-title .post-title-label:hover { text-decoration: none; } .col-title .post-title-label > span { display: inline; } .comment-count { color: #007bff; font-size: 10px; font-weight: bold; margin-left: 4px; vertical-align: middle; } .post-toggle { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; } .col-writer { color: #333; font-size: 12px; } .writer-ip { color: #888; font-size: 10px; margin-left: 3px; vertical-align: middle; } .col-date, .col-view, .col-recommend { color: #777; font-size: 11px; } .post-item { border-bottom: 1px solid #f0f0f0; } .post-item:last-child { border-bottom: none; } .post-item:hover .post-row { background-color: #f9f9f9; } .post-content-wrapper { display: none; padding: 20px 15px; margin: 0; background-color: #fff; border-top: 1px solid #eee; } .post-toggle:checked ~ .post-content-wrapper { display: block; } .post-full-content span { display: block; line-height: 1.7; font-size: 13px; color: #333; font-weight: normal; white-space: pre-wrap; word-wrap: break-word; min-height: 80px; padding-bottom: 20px; } .comments-section { border-top: 1px solid #eee; padding-top: 10px; padding-bottom: 10px; } .comments-section h4 { font-size: 13px; color: #333; margin: 0 0 10px 0; padding-bottom: 0; border-bottom: none; font-weight: bold; } .comment-list { list-style: none; padding: 0; margin: 0; } .comment-item { padding: 4px 0; border-top: 1px dotted #e5e5e5; display: flex; align-items: baseline; line-height: 1.5; } .comment-item:first-child { border-top: none; } .comment-author-wrapper { flex-shrink: 0; min-width: 90px; padding-right: 8px; } .comment-author { color: #333; font-weight: bold; font-size: 12px; white-space: nowrap; display: inline-flex; align-items: baseline; text-shadow: none; } .comment-author .writer-ip { font-weight: normal; color: #888; font-size: 10px; margin-left: 3px; } .col-writer h1, .col-writer h2, .comment-author h1, .comment-author h2 { display: inline; font-size: inherit; font-weight: inherit; color: inherit; margin: 0; padding: 0; line-height: inherit; vertical-align: baseline; } .col-writer h1::after, .comment-author h1::after { content: "고"; font-size: 9px; font-weight: bold; border: 1px solid orange; color: orange; border-radius: 2px; padding: 0 2px; margin-left: 4px; display: inline-block; line-height: 1; vertical-align: baseline; } .col-writer h2::after, .comment-author h2::after { content: "반"; font-size: 9px; font-weight: bold; border: 1px solid green; color: green; border-radius: 2px; padding: 0 2px; margin-left: 4px; display: inline-block; line-height: 1; vertical-align: baseline; } .comment-content-wrapper { flex-grow: 1; padding-left: 5px; } .comment-text { word-wrap: break-word; white-space: pre-wrap; text-shadow: none; font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',sans-serif; font-size: 13px; color: #333; font-weight: normal; } .post-list-body div[style*='text-align: center'] { color: #666; } .post-full-content span img { max-width: 100%; height: auto; display: block; margin-top: 5px; margin-bottom: 5px; border: 1px solid #eee; } @media (prefers-color-scheme: dark) { body { color: #e0e0e0; background-color: #1e1e1e; } .gallery-container { background-color: #1e1e1e; border: 1px solid #444; } .gallery-header { border-bottom-color: #5c6bc0; } .gallery-header h1 { color: #5c6bc0; } .gallery-top-links a { color: #aaa; } .gallery-top-links a:hover { color: #ccc; } .gallery-options { border-bottom-color: #555; } .tab-button { color: #aaa; } .tab-button.active { color: #5c6bc0; border-bottom-color: #5c6bc0; } .gallery-actions select { border-color: #555; background-color: #444; color: #e0e0e0; } .write-button { border-color: #666; background-color: #444; color: #e0e0e0; } .write-button:hover { background-color: #555; } .write-button i { color: #5c6bc0; } .gallery-header .write-button { display: none; } .post-list-container { border-top-color: #5c6bc0; border-bottom-color: #555; } .post-list-header, .post-row { border-bottom-color: #484848; } .post-list-header { background-color: #2f2f2f; color: #bbb; border-top-color: #484848; border-bottom-color: #484848; } .col-num { color: #bbb; } .col-title .post-title-label { color: #e0e0e0; } .comment-count { color: #64b5f6; } .col-writer { color: #e0e0e0; } .writer-ip { color: #999; } .col-date, .col-view, .col-recommend { color: #aaa; } .post-item { border-bottom-color: #484848; } .post-item:hover .post-row { background-color: #2f2f2f; } .post-content-wrapper { background-color: #1e1e1e; border-top-color: #4f4f4f; } .post-full-content span { color: #e0e0e0; } .post-full-content span img { border-color: #444; } .comments-section { border-top-color: #4f4f4f; } .comments-section h4 { color: #e0e0e0; } .comment-item { border-top-color: #5a5a5a; } .comment-author { color: #e0e0e0; } .comment-author .writer-ip { color: #999; } .comment-text { color: #e0e0e0; } .post-list-body div[style*='text-align: center'] { color: #aaa; } } @media  { html { height: auto; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color:rgba(240, 242, 245, 0.63); color: #0f1419; display: flex; flex-direction: column; align-items: center; padding: 20px 0; } .iphone-frame-container { width: 100%; max-width: 360px; margin: 0 auto; background-color: #000000; max-height: 720px; border: 1px solid #ccc; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; height: 720px; } .iphone-screen { background-color: #fff; width: 100%; border-radius: 0; overflow-y: auto; position: relative; display: flex; flex-direction: column; flex-grow: 1; } .gallery-container { margin: 0; padding: 0; border: none; max-width: 100%; display: flex; flex-direction: column; background-color: #fff; color: #333; width: 100%; flex-shrink: 0; } body { font-size: 13px; } .gallery-header { align-items: center; justify-content: space-between; padding: 10px 10px 6px 10px; margin-bottom: 0; position: static; flex-shrink: 0; border-bottom: 2px solid #3b4890; } .gallery-header h1 { font-size: 16px; margin-bottom: 0; margin-right: 10px; flex-shrink: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 70px); } .gallery-top-links { display: none; } .gallery-header .write-button { display: inline-flex !important; position: static; order: 2; margin-left: 0; padding: 5px 10px; font-size: 12px; flex-shrink: 0; color: #3b4890; border: 1px solid #bbb; background: #fff; } .gallery-header .write-button i { display: none; } .gallery-options { margin-bottom: 0; flex-wrap: nowrap; align-items: stretch; padding-bottom: 0; border-bottom: 1px solid #ccc; height: 32px; flex-shrink: 0; display: flex; } .tab-menu { display: contents; } .gallery-options > .tab-button, .gallery-options > .gallery-actions { flex: 0 0 25%; display: flex; align-items: center; justify-content: center; border: none; border-right: 1px solid #ccc; padding: 0 5px; margin-right: 0; font-size: 12px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 3px solid transparent; background-color: transparent; color: #777; font-weight: bold; box-sizing: border-box; } .gallery-options > .tab-button.active { color: #3b4890; border-bottom-color: #3b4890; font-weight: bold; } .gallery-options > .gallery-actions { border-right: none; padding: 0; order: 0; margin-left: 0; } .gallery-options select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-color: transparent; border: none; font-size: 12px; font-weight: bold; color: #777; width: 100%; height: 100%; padding: 0 5px 0 5px; text-align: center; text-align-last: center; cursor: pointer; margin: 0; -moz-text-align-last: center; box-sizing: border-box; } .gallery-actions .write-button { display: none; } .post-list-header { display: none; } .post-list-container { border-top: none; padding: 0 5px; border-bottom: none; flex-shrink: 0; } .post-item { border-bottom: 1px solid #f0f0f0; } .post-item:last-child { border-bottom: none; } .post-row { padding: 0; flex-wrap: wrap; align-items: flex-start; position: relative; border-bottom: none; min-height: 50px; display: flex; align-items: stretch; padding-right: 45px; padding-bottom: 8px; } .post-row::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 45px; background-color: #f0f0f0; border-left: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5; z-index: 0; box-sizing: border-box; } .post-cell { padding: 0; line-height: 1.5; display: block; width: auto; flex-basis: auto; text-align: left; } .post-row .col-num { display: none; } .post-row .col-title { order: 0; flex-grow: 1; flex-basis: 100%; width: 100%; text-align: left; white-space: normal; padding: 8px 5px 2px 8px; margin-bottom: 0; overflow: visible; } .post-row .col-title .post-title-label { font-size: 14px; line-height: 1.4; display: block; position: static; color: #333; } .post-row .col-title .post-title-label > span { display: block; } .post-row .comment-count { position: absolute; right: 0; top: 0; bottom: 0; width: 45px; display: flex !important; align-items: center; justify-content: center; color: #e53935 !important; background: none; font-size: 10px !important; font-weight: normal !important; line-height: 1.4; margin-left: 0; white-space: nowrap; vertical-align: baseline; border-radius: 0; z-index: 1; transform: none; box-sizing: border-box; padding: 0; text-align: center; } .post-row .col-writer, .post-row .col-date, .post-row .col-view, .post-row .col-recommend { order: 1; display: inline !important; flex-basis: auto; flex-grow: 0; flex-shrink: 0; padding: 0 2px; vertical-align: middle; font-size: 11px; line-height: 1.4; white-space: nowrap; } .post-row .col-writer { color: #555; padding-left: 8px; } .post-row .col-date { color: #888; } .post-row .col-view { color: #888; } .post-row .col-recommend { color: #888; display: inline !important; } .post-row .writer-ip { display: none; } .post-row .col-date::before { content: ' | '; color: #ccc; margin: 0 1px; } .post-row .col-view::before { content: '| 조회 '; color: #888; font-size: 10px; margin-right: 2px; } .post-row .col-recommend::before { content: '| 추천 '; color: #888; font-size: 10px; margin-right: 2px; } .post-content-wrapper { padding: 15px 10px; flex-shrink: 0; border-top: 1px solid #eee;} .post-full-content span { font-size: 14px; min-height: 60px; padding-bottom: 15px; } .post-full-content span img { max-width: 100%; height: auto; display: block; margin-top: 5px; margin-bottom: 5px; border: 1px solid #ddd;} .comments-section { padding: 10px 0 5px 10px; border-top: 1px solid #eee; } .comments-section h4 { font-size: 12px; margin-bottom: 8px; color: #333; } .comment-list { padding-left: 0; list-style: none; margin:0; } .comment-item { padding: 5px 0; flex-wrap: wrap; align-items: flex-start; border-top: 1px dotted #e5e5e5; display: flex; line-height: 1.5;} .comment-item:first-child { border-top: none; } .comment-author-wrapper { min-width: 0; padding-right: 6px; flex-basis: 100%; margin-bottom: 2px; flex-shrink: 0; } .comment-author { font-size: 12px; color: #333; font-weight: bold; white-space: nowrap; display: inline-flex; align-items: baseline; text-shadow: none;} .comment-author .writer-ip { font-size: 10px; color: #888; font-weight: normal; margin-left: 3px; } .comment-content-wrapper { flex-basis: 100%; padding-left: 0; flex-grow: 1;} .comment-text { font-size: 13px; line-height: 1.6; color: #333; word-wrap: break-word; white-space: pre-wrap; text-shadow: none; font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',sans-serif; font-weight: normal;} @media (prefers-color-scheme: dark) { body { background-color: #1e1e1e; color: #e0e0e0; } .iphone-frame-container { background-color: #000; border-color: #555; } .iphone-screen { background-color: #1e1e1e; } .gallery-container { background-color: #1e1e1e; color: #e0e0e0; } .gallery-header { border-bottom-color: #5c6bc0; } .gallery-header h1 { color: #5c6bc0; } .gallery-header .write-button { background-color: #444; color: #5c6bc0; border-color: #666; display: inline-flex !important; } .gallery-options { border-bottom-color: #555; } .gallery-options > .tab-button, .gallery-options select { color: #aaa; border-right-color: #555; } .gallery-options > .gallery-actions { border-right: none; } .gallery-options > .tab-button.active { color: #5c6bc0; border-bottom-color: #5c6bc0; } .gallery-options select { color: #aaa; background-color: transparent; } .post-item { border-bottom-color: #484848; } .post-row .col-title .post-title-label { color: #e0e0e0; } .post-row::after { background-color: #2a2a2a; border-left-color: #444; border-top-color: #444; } .post-row .comment-count { color: #ff7a75 !important; } .post-row .col-writer { color: #bbb; } .post-row .col-date, .post-row .col-view, .post-row .col-recommend { color: #999; } .post-row .col-date::before, .post-row .col-view::before, .post-row .col-recommend::before { color: #666; } .post-row .col-view::before { color: #999; } .post-row .col-recommend::before { color: #999; } .post-content-wrapper { border-top-color: #4f4f4f; background-color: #1e1e1e;} .post-full-content span { color: #e0e0e0;} .post-full-content span img { border-color: #4f4f4f;} .comments-section { border-top-color: #4f4f4f; padding: 10px 0 5px 10px; } .comments-section h4 { color: #e0e0e0; } .comment-item { border-top-color: #5a5a5a; } .comment-author { color: #e0e0e0; } .comment-author .writer-ip { color: #999;} .comment-text { color: #e0e0e0; } } } </style>
 ]]
-        
+       
         local galleryName = "갤러리"
         local posts = {}
         local currentPost = nil
@@ -1637,7 +1654,7 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
         while i <= #segments do
             local segment_raw = segments[i]
             local segment = segment_raw:match("%s*(.-)%s*$")
-            local advanced_loop = false 
+            local advanced_loop = false
 
             if bodyBuffer then
                 local is_new_key = segment:match(keyLookaheadPattern)
@@ -1645,7 +1662,7 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     if currentPost then
                         currentPost.contentRaw = table.concat(bodyBuffer, "|")
                     end
-                    bodyBuffer = nil 
+                    bodyBuffer = nil
                 else
                     table.insert(bodyBuffer, segment_raw)
                     i = i + 1
@@ -1683,7 +1700,7 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                         elseif key == "COMMENT" then
                             local commentAuthor = value
                             local commentContent = nil
-                            local consumed_comment_segments = 1 
+                            local consumed_comment_segments = 1
 
                             if i + 1 <= #segments then
                                 local next_segment = segments[i+1]:match("%s*(.-)%s*$")
@@ -1699,38 +1716,38 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                                         local author_seg = segments[current_comment_idx]
                                         local content_seg = segments[current_comment_idx + 1]
                                         if author_seg:match(keyLookaheadPattern) or content_seg:match(keyLookaheadPattern) then
-                                            break 
+                                            break
                                         end
                                         commentAuthor = author_seg:match("%s*(.-)%s*$")
                                         commentContent = content_seg:match("%s*(.-)%s*$")
                                         table.insert(currentPost.comments, {
                                             authorRaw = commentAuthor, authorParsed = parseAuthor(commentAuthor), textRaw = commentContent
                                         })
-                                        consumed_comment_segments = consumed_comment_segments + 2 
+                                        consumed_comment_segments = consumed_comment_segments + 2
                                         current_comment_idx = current_comment_idx + 2
                                     end
                                 else
                                 end
                             else
                             end
-                            i = i + consumed_comment_segments -1 
+                            i = i + consumed_comment_segments -1
                         else
                         end
                     else
                     end
-                    i = i + 1 
+                    i = i + 1
                     advanced_loop = true
                 else
                     if currentPost then
                     end
-                    i = i + 1 
+                    i = i + 1
                     advanced_loop = true
                 end
-            end 
+            end
             if not advanced_loop then
                 i = i + 1
             end
-        end 
+        end
 
         if bodyBuffer and currentPost then
         currentPost.contentRaw = table.concat(bodyBuffer, "|")
@@ -1851,7 +1868,7 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
         else
             table.insert(html, "<div style='padding: 20px; text-align: center; color: #666;'>표시할 게시글 없음</div>")
         end
-        table.insert(html, "</div></div></div></div></div><br>")
+        table.insert(html, "</div></div></div></div></div>")
 
         return table.concat(html)
     end)
@@ -1881,8 +1898,8 @@ local function inputKAKAOTalk(triggerId, data)
 
     if NAIMESSENGERNOIMAGE == "0" then
         data = data .. [[
-	- When  {{char}} sends a picture or photo, print it will exactly output '<NAI>'.
-	- DO NOT PRINT <NAI> MORE THAN ONCE.
+    - When  {{char}} sends a picture or photo, print it will **exactly** output '<NAI>'.
+    - **DO NOT PRINT <NAI> MORE THAN ONCE.**
 ]]
     end
 
@@ -1897,7 +1914,7 @@ local function inputKAKAOTalk(triggerId, data)
 
     if NAIMESSENGERNOIMAGE == "0" then
         data = data .. [[
-	- KAKAO[<NAI>|01:46 AM]        
+    - KAKAO[<NAI>|01:46 AM]        
 ]]
     end
 
@@ -1927,7 +1944,7 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
         table.insert(html, "<div class='kakao-user-message-bubble'>")
         table.insert(html, "<div class='kakao-user-message-text'>")
         table.insert(html, message)
-        table.insert(html, "</div></div></div></div>") 
+        table.insert(html, "</div></div></div></div>")
 
         return table.concat(html)
 
@@ -1957,7 +1974,7 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
 .kakao-fullscreen-toggle:checked~.kakao-fullscreen-overlay{display:flex;}
 </style>
 ]]
-        
+       
         local messageContent
         local overlayContent = ""
         local uniqueId = ""
@@ -2029,8 +2046,8 @@ local function inputImage(triggerId, data)
     local NAICOMPATIBILITY = getGlobalVar(triggerId, "toggle_NAICOMPATIBILITY")
     local NAIORIGINAL = getGlobalVar(triggerId, "toggle_NAIORIGINAL")
     local NAIORIGINALTEXT = getGlobalVar(triggerId, "toggle_NAIORIGINALTEXT")
-    
-    
+   
+   
     data = data .. [[
 ## Image Prompt- This prompt must describe situations, settings, and actions related to the Character in vivid and detailed language.
 
@@ -2041,53 +2058,56 @@ local function inputImage(triggerId, data)
 - Focus on the situation the Character is in.
 - The Image Prompt must be written in English and be detailed and descriptive.
 - REPLACE the PLACEHOLDER in the PROMPT:
-	- PLACEHOLDER:
-		- (SITUATION):
-			- Normal situation: Do not print anything.
-			- NSFW SITUATION:
-				- Bodypart not exposed: Print '{{NSFW}}'
-				- Breasts or nipples exposed: Print '{{NSFW}}'
-				- Pussy exposed: Print '{{NSFW, Uncensored}}'
-		- (LABEL):
-			- ONLY 1 Character.
-			- Example:
-				- If Character is a male: 
-					- PROMPT: "1boy"
-					- NEGATIVE PROMPT: "1girl, female"
-				- If Character is a female:
-					- PROMPT: "1girl"
-					- NEGATIVE PROMPT: "1boy, male"
-		- (EXPRESSIONS): Describe Character's facial expressions and emotions.
-		- (ACTIONS): Detail Character's behaviors and movements.
-		- (AGE): Describe Character's age in 10s. (e.g., '20s years old')
-		- (APPEARANCE): Describe Character's observable features with {{ and }}. (e.g., '{{pink short hair, high twin-tail}}')
-		- (BODY): Describe Character's physique, output with {{{ and }}}. (e.g., '{{Slender, AA-Cup small breasts, small nipples}}')
-			- BODY shape: slender, petite, loli, glamour, ... etc.
-			- Breast size: A-Cup small breasts, H-Cup large Breasts, ... etc.
-			- If Character is under NSFW situation:
-				- Breasts exposed:
-					- Areola size: small areola, ... etc.
-					- Nipple size: small nipples, ... etc.
-				- Pussy exposed
-					- Shape of pussy: innie pussy, ... etc.
-					- Pussy hair: Baldie, heart-shaped pubic hair, ... 
-		- (DRESSES): 
-			- Outline Character's outfit (type, materials, textures, colors, accessories).
-			- Do not describe under the thighs.
-		- (PLACE): Describe Character's current location, mood setting.
-		- (SCENE): Summarize Character's current narrative scene into a concise description.
-		- (PROMPTPLACEHOLDER):    
+    - PLACEHOLDER:
+        - (SITUATION):
+            - Normal situation: Do not print anything.
+            - NSFW SITUATION:
+                - Bodypart not exposed: Print '{{NSFW}}'
+                - Breasts or nipples exposed: Print '{{NSFW}}'
+                - Pussy exposed: Print '{{NSFW, Uncensored}}'
+        - (LABEL):
+            - ONLY 1 Character or 1 object.
+        - Example:
+            - If the main object of the scene is a object:
+            - PROMPT: "1object"
+         - NEGATIVE PROMPT: "human,".
+                - If Character is a male:
+                    - PROMPT: "1boy"
+                    - NEGATIVE PROMPT: "1girl, female"
+                - If Character is a female:
+                    - PROMPT: "1girl"
+                    - NEGATIVE PROMPT: "1boy, male"
+        - (EXPRESSIONS): Describe Character's facial expressions and emotions.
+        - (ACTIONS): Detail Character's behaviors and movements.
+        - (AGE): Describe Character's age in 10s. (e.g., '20s years old')
+        - (APPEARANCE): Describe Character's observable features with {{ and }}. (e.g., '{{pink short hair, high twin-tail}}')
+        - (BODY): Describe Character's physique, output with {{{ and }}}. (e.g., '{{Slender, AA-Cup small breasts, small nipples}}')
+            - BODY shape: slender, petite, loli, glamour, ... etc.
+            - Breast size: A-Cup small breasts, H-Cup large Breasts, ... etc.
+            - If Character is under NSFW situation:
+                - Breasts exposed:
+                    - Areola size: small areola, ... etc.
+                    - Nipple size: small nipples, ... etc.
+                - Pussy exposed
+                    - Shape of pussy: innie pussy, ... etc.
+                    - Pussy hair: Baldie, heart-shaped pubic hair, ...
+        - (DRESSES):
+            - Outline Character's outfit (type, materials, textures, colors, accessories).
+            - Do not describe under the thighs.
+        - (PLACE): Describe Character's current location, mood setting.
+        - (SCENE): Summarize Character's current narrative scene into a concise description.
+        - (PROMPTPLACEHOLDER):    
 ]]
     if NAICARD == "1" then
         data = data .. [[
-			- NAISTATUSPROMPT + INDEX
-			- NEG_NAISTATUSPROMPT + INDEX
+            - NAISTATUSPROMPT + INDEX
+            - NEG_NAISTATUSPROMPT + INDEX
 ]]
     elseif NAICARD == "2" then
         data = data .. [[
-			- NAISIMULCARDPROMPT + INDEX
-			- NEG_NAISIMULCARDPROMPT + INDEX
-]] 
+            - NAISIMULCARDPROMPT + INDEX
+            - NEG_NAISIMULCARDPROMPT + INDEX
+]]
     elseif NAICARD == "3" then
         data = data .. [[
             - For female:
@@ -2101,22 +2121,22 @@ local function inputImage(triggerId, data)
 
     if NAISNS == "1" then
         data = data .. [[
-			- NAISNSPROMPT
-			- NEG_NAISNSPROMPT
+            - NAISNSPROMPT
+            - NEG_NAISNSPROMPT
 ]]
     end
 
     if NAICOMMUNITY == "1" then
         data = data .. [[
-			- NAIDCPROMPT + INDEX
-			- NEG_NAIDCPROMPT + INDEX
+            - NAIDCPROMPT + INDEX
+            - NEG_NAIDCPROMPT + INDEX
 ]]
     end
 
     if NAIMESSENGER == "1" then
         data = data .. [[
-			- NAIKAKAOPROMPT
-			- NEG_NAIKAKAOPROMPT
+            - NAIKAKAOPROMPT
+            - NEG_NAIKAKAOPROMPT
 ]]
     end
 
@@ -2125,19 +2145,19 @@ local function inputImage(triggerId, data)
 - Write up to 30 keywords that should be avoided by Image as a negative prompt.
 - You must print out carefully to increase the accuracy rate of the prompts.
 - EXAMPLE: If the Character's hairstyle is long twin-tail.
-	- Negative: 'ponytail, short hair, medium hair'
+    - Negative: 'ponytail, short hair, medium hair'
 - Example:
-	- [NEG_PROMPTPLACEHOLDER: 1girl,female,...]
+    - [NEG_PROMPTPLACEHOLDER: 1girl,female,...]
 
 ### Image Prompt Usage
-- DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER
-- NEVER refer to the past chat history when outputting the prompt below:
+- *DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER*
+- *NEVER* refer to the past chat history when outputting the prompt below:
 ]]
 
     if NAICARDNOIMAGE == "0" then
         if NAICARD == "1" then
             data = data .. [[
-    - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE
+    - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
     - Output Format:
         - EROSTATUS[...|INLAY:<NAI1>]
         - [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
@@ -2149,7 +2169,7 @@ local function inputImage(triggerId, data)
 ]]
         elseif NAICARD == "2" then
             data = data .. [[
-    - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
+    - *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
     - Output Format:
         - SIMULSTATUS[...|INLAY:<NAI1>]
         - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
@@ -2161,7 +2181,7 @@ local function inputImage(triggerId, data)
 ]]
         elseif NAICARD == "3" then
             data = data .. [[
-    - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
+    - *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
     - Output Format:
         - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
         - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
@@ -2177,12 +2197,12 @@ local function inputImage(triggerId, data)
     if NAISNSNOIMAGE == "0" then
         if NAISNS == "1" then
             data = data .. [[
-    - ALWAYS PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the TWITTER INTERFACE
+    - *ALWAYS PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the TWITTER INTERFACE*
     - Output Format:
         - TWITTER[...<NAI>...<NAI>...]
         - [NAISNSPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
         - [NEG_NAISNSPROMPT:(NEGATIVE PROMPT)]
-        - If Character does not have own profile image:
+        - If Character does not have **own** profile image:
             - [NAISNSPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
             - [NEG_NAISNSPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]
@@ -2192,7 +2212,7 @@ local function inputImage(triggerId, data)
     if NAICOMMUNITYNOIMAGE == "0" then
         if NAICOMMUNITY == "1" then
             data = data .. [[
-    - ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE
+    - *ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE*
     - Output Format:
         - DC[...|<NAI1>...|<NAI2>...]
         - If the post is normal:
@@ -2211,7 +2231,7 @@ local function inputImage(triggerId, data)
     if NAIMESSENGERNOIMAGE == "0" then
         if NAIMESSENGER == "1" then
             data = data .. [[
-    - ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE
+    - *ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE*
     - Print <NAI> Exactly once when {{char}} sends a picture or image.
     - Output Format:
         - KAKAO[<NAI>|...]
@@ -2232,24 +2252,24 @@ local function inputImage(triggerId, data)
 - The original creation exists: ]] .. NAIORIGINALTEXT .. [[
 
 - When describing a character, use the name of the creation and character instead of pronouns.
-	- Example:
-		- Invalid: turtle, blue skin, water, shell, white background, simple background
-		- Valid: Pokémon, Squirtle, white background, simple background
+    - Example:
+        - Invalid: turtle, blue skin, water, shell, white background, simple background
+        - Valid: Pokémon, Squirtle, white background, simple background
 - Do not make JSON Format.  
 ]]
     else
         data = data .. [[
 - Use pronouns e.g., she, he, his, her instead of The Character's name.
-- Do not make JSON Format. 
+- Do not make JSON Format.
 ]]
     end
 
     if tonumber(NAICOMPATIBILITY) >= 1 then
         data = data .. [[
-- REPLACE { and } to ( and ) in IMAGE PROMPT!!!
-	- Example:
-		- {1girl} => (1girl)
-		- {{1boy}} => ((1boy))
+- ***REPLACE { and } to ( and ) in IMAGE PROMPT!!!***
+    - Example:
+        - {1girl} => (1girl)
+        - {{1boy}} => ((1boy))
 ]]
     end
     return data
@@ -2264,31 +2284,31 @@ local function inputImportant(triggerId, data)
     data = data .. [[
 
 # CRITICAL
-- FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES
+- *FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES*
 ]]
 
     if NAICARD == "1" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
-- DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK
-    - MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]
-- BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE
+- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
+    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
+- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
 ]]
     elseif NAICARD == "2" then
         data = data .. [[
 ## CRITICAL: SIMULATION STATUS INTERFACE
-- DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK
-    - MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]
+- *DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
+    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
 ]]
     elseif NAICARD == "3" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
-- DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK
-    - MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]
-- BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE
+- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
+    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
+- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
 ## CRITICAL: SIMULATION STATUS INTERFACE
-- DO NOT PRINT MALE CHARACTER's "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK
-    - MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]
+- *DO NOT PRINT MALE CHARACTER's "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
+    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
 ]]
     end
 
@@ -2311,7 +2331,7 @@ listenEdit("editInput", function(triggerId, data)
     local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
     local NAICOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_NAICOMMUNITYNOIMAGE")
     local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
-    
+   
     print("ONLINEMODULE: editInput: called with data: " .. tostring(data))
 
     if NAIMESSENGER == "1" then
@@ -2358,7 +2378,7 @@ listenEdit("editRequest", function(triggerId, data)
 
     local convertDialogueFlag = false
     local changedValue = false
-    
+   
     if NAICARDFORCEOUTPUT == "1" then
         -- 받아온 리퀘스트 전부 ""변환
         for i = 1, #data, 1 do
@@ -2374,14 +2394,14 @@ listenEdit("editRequest", function(triggerId, data)
             end
         end
     end
-    
+   
     for i = 1, #data, 1 do
         -- 이후, 앞에서부터 role이 "system"인 경우에 1회 한정으로 inputImportant 삽입
         local chat = data[i]
         if chat.role == "system" then
             local importantInput = inputImportant(triggerId, chat.content)
             print ([[ONLINEMODULE: editRequest: Inserted important input to: "
-            
+           
 ]] .. importantInput .. [[ "]])
             data[i].content = importantInput
             break
@@ -2409,7 +2429,7 @@ listenEdit("editRequest", function(triggerId, data)
             currentInput = inputStatusHybrid(triggerId, currentInput)
             changedValue = true
         end
-        
+       
         if NAISNS == "1" then
             currentInput = inputTwitter(triggerId, currentInput)
             changedValue = true
@@ -2418,7 +2438,7 @@ listenEdit("editRequest", function(triggerId, data)
             currentInput = inputDCInside(triggerId, currentInput)
             changedValue = true
         end
-        
+       
     elseif NAIMESSENGER == "1" then
         currentInput = inputKAKAOTalk(triggerId, currentInput)
         changedValue = true
@@ -2433,9 +2453,9 @@ listenEdit("editRequest", function(triggerId, data)
 
 <-----ONLINEMODULEEND----->
 
-]] 
+]]
     currentInput = currentInput .. [[
-    
+   
 ]]
 
     print([[FINAL EDIT REQUEST is
@@ -2443,7 +2463,7 @@ listenEdit("editRequest", function(triggerId, data)
 ]] .. currentInput)
 
     data[#data].content = currentInput
-    
+   
     if changedValue then
         print("Successful.")
     else
@@ -2463,7 +2483,7 @@ listenEdit("editDisplay", function(triggerId, data)
     local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
     local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
-    
+   
     if NAICARD == "1" then
         data = changeEroStatus(triggerId, data)
     elseif NAICARD == "2" then
@@ -2476,11 +2496,11 @@ listenEdit("editDisplay", function(triggerId, data)
     if NAISNS == "1" then
         data = changeTwitter(triggerId, data)
     end
-    
+   
     if NAICOMMUNITY == "1" then
         data = changeDCInside(triggerId, data)
     end
-    
+   
     if NAIMESSENGER == "1" then
         data = changeKAKAOTalk(triggerId, data)
     end
@@ -2511,7 +2531,7 @@ function onInput(triggerId)
             end
         end
     end
-    
+   
     if NAIMESSENGER == "1" then
         if tonumber(NAICARD) >= 1 then
             alertNormal(triggerId, "ERROR: SETTING: NAIMESSENGER=1;NAICARD>=1;")
@@ -2572,13 +2592,13 @@ function onInput(triggerId)
     local originalLine = targetMessageData.data
     local modifiedLine = originalLine
     local historyModifiedByWrapping = false
-    local prefixesToWrap = {"EROSTATUS", "SIMULSTATUS", "TWITTER", "DC"}
+    local prefixesToWrap = ""
     local replacementFormat = "<details><summary><span>(열기/접기)</span></summary>%s</details>"
     local checkAlreadyWrappedStart = "<details><summary><span>(열기/접기)</span></summary>"
 
     print(string.format("ONLINEMODULE: onInput: Checking content of message at index %d for wrapping...", targetIndex))
-    
-    
+   
+   
     if UTILREMOVEPREVIOUSDISPLAY == "0" then
 
         for _, prefix in ipairs(prefixesToWrap) do
@@ -2619,7 +2639,7 @@ function onInput(triggerId)
 
                 lastEnd = e + 1
             end
-            
+           
             modifiedLine = tempLine
             if anyWrappedThisPrefix then
                 print(string.format("ONLINEMODULE: onInput-> Index %d: Finished wrapping occurrences for prefix '%s'.", targetIndex, prefix))
@@ -2652,8 +2672,8 @@ onOutput = async(function (triggerId)
     if NAIGLOBAL == "0" then
         return
     end
-    
-	local artistPrompt = nil
+   
+    local artistPrompt = nil
     local qualityPrompt = nil
     local negativePrompt = nil
     local NAIPRESETPROMPT = getGlobalVar(triggerId, "toggle_NAIPRESETPROMPT")
@@ -2665,28 +2685,28 @@ onOutput = async(function (triggerId)
     local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
     local NAICOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_NAICOMMUNITYNOIMAGE")
     local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
-	
-	if NAIPRESETPROMPT == "0" then
+   
+    if NAIPRESETPROMPT == "0" then
         artistPrompt = getGlobalVar(triggerId, "toggle_NAIARTISTPROMPT")
         qualityPrompt = getGlobalVar(triggerId, "toggle_NAIQUALITYPROMPT")
         negativePrompt = getGlobalVar(triggerId, "toggle_NAINEGPROMPT")
     elseif NAIPRESETPROMPT == "1" then
-		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
-		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
-	elseif NAIPRESETPROMPT == "2" then
-		artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}"
-		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-	elseif NAIPRESETPROMPT == "3" then
-		artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}"
-		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "4" then
-        artistPrompt = "{artist:Goldcan9, artist:shiba}, artist:sakurai norio,,artist: torino, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{artist:ciloranko}, {artist:kawakami rokkaku}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow)]], artist:healthyman, artist:baffu, [[artist:deadnooodles]], [[artist:jyt]], artist:yd (orange maru), [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], 0.9::artist:taesi ::, 0.7::artist:shiratama (shiratamaco) ::,1.2::artist:ningen mame ::, 1.7::artist:tianliang duohe fangdongye ::, 1.7::artist:shuz ::, 1.2::artist:wlop ::, 1.5::artist:kase daiki ::, 0.6::artist:chobi (penguin paradise) ::"
+        artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
+        qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
+        negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
+    elseif NAIPRESETPROMPT == "2" then
+        artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "5" then
+        negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+    elseif NAIPRESETPROMPT == "3" then
+        artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}"
+        qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
+        negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+    elseif NAIPRESETPROMPT == "4" then
+        artistPrompt = "{artist:Goldcan9, artist:shiba}, artist:sakurai norio,artist: torino, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{artist:ciloranko}, {artist:kawakami rokkaku}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow)]], artist:healthyman, artist:baffu, [[artist:deadnooodles]], [[artist:jyt]], artist:yd (orange maru), [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], 0.9::artist:taesi ::, 0.7::artist:shiratama (shiratamaco) ::,1.2::artist:ningen mame ::, 1.7::artist:tianliang duohe fangdongye ::, 1.7::artist:shuz ::, 1.2::artist:wlop ::, 1.5::artist:kase daiki ::, 0.6::artist:chobi (penguin paradise) ::,{year 2025, year 2024},[aged down]"
+        qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
+        negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+elseif NAIPRESETPROMPT == "5" then
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
@@ -2695,19 +2715,19 @@ onOutput = async(function (triggerId)
         qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
         negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
     end
-    	
-	print("-----------------------ART PROMPT-----------------------")
-	print(artistPrompt)
-	print(qualityPrompt)
-	print(negativePrompt)
-	print("-----------------------ART PROMPT-----------------------")
-	
+       
+    print("-----------------------ART PROMPT-----------------------")
+    print(artistPrompt)
+    print(qualityPrompt)
+    print(negativePrompt)
+    print("-----------------------ART PROMPT-----------------------")
+   
 
     print("ONLINEMODULE: onOutput: NAICARD value:", NAICARD)
     print("ONLINEMODULE: onOutput: NAISNS value:", NAISNS)
-	print("ONLINEMODULE: onOutput: NAICOMMUNITY value:", NAICOMMUNITY)
+    print("ONLINEMODULE: onOutput: NAICOMMUNITY value:", NAICOMMUNITY)
     print("ONLINEMODULE: onOutput: NAIMESSENGER value:", NAIMESSENGER)
-    
+   
 
     if NAIMESSENGER == "1" then
         print("ONLINEMODULE: onOutput: FORCE SETTING VALUES to 0")
@@ -2741,12 +2761,12 @@ onOutput = async(function (triggerId)
 
     local historyModifiedByWrapping = false
     local lastIndex = #chatHistoryTable
-    
+   
     local skipNAICARD = false
     local skipNAISNS = false
     local skipNAICOMMUNITY = false
     local skipNAIMESSENGER = false
-    
+   
     if NAICARDNOIMAGE == "1" then skipNAICARD = 1 end
     if NAISNSNOIMAGE == "1" then skipNAISNS = 1 end
     if NAICOMMUNITYNOIMAGE == "1" then skipNAICOMMUNITY = 1 end
@@ -2828,6 +2848,7 @@ onOutput = async(function (triggerId)
                                     local finalPromptStatus = artistPrompt .. foundStatusPrompt .. qualityPrompt
                                     local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
                                     if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and not string.find(inlayStatus, "fail", 1, true) and not string.find(inlayStatus, "error", 1, true) and not string.find(inlayStatus, "실패", 1, true) then
+                                        inlayStatus = "<NAI" .. naiIndex .. ">" .. inlayStatus
                                         local erostatusIdentifier = "EROSTATUS_" .. naiIndex
                                         local marker = "<!-- " .. erostatusIdentifier .. " -->"
                                         local content_offset = e_status_prefix
@@ -2836,7 +2857,7 @@ onOutput = async(function (triggerId)
                                         table.insert(statusReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayStatus .. marker
+                                            inlay = inlayStatus .. marker
                                         })
                                         local infoEro = {
                                             type = "EROSTATUS",
@@ -2900,7 +2921,7 @@ onOutput = async(function (triggerId)
                     local bracketLevel = 1
                     local e_simul_suffix = e_simul_prefix + 1
                     local foundClosingBracket = false
-                    local searchEnd = #currentLine 
+                    local searchEnd = #currentLine
                     while e_simul_suffix <= searchEnd do
                         local char = currentLine:sub(e_simul_suffix, e_simul_suffix)
                         if char == '[' then
@@ -2990,15 +3011,12 @@ onOutput = async(function (triggerId)
                                     print("ONLINEMODULE: onOutput: generateImage result for NAI"..naiIndex..": ["..tostring(inlaySimul).."]")
                                     local isSuccess = (inlaySimul ~= nil) and (type(inlaySimul) == "string") and (string.len(inlaySimul) > 10) and not string.find(inlaySimul, "fail", 1, true) and not string.find(inlaySimul, "error", 1, true) and not string.find(inlaySimul, "실패", 1, true)
                                     if isSuccess then
+                                        inlaySimul = "<NAI" .. naiIndex .. ">" .. inlaySimul
                                         print("ONLINEMODULE: onOutput: Image generation SUCCESS for NAI"..naiIndex)
-                                        local content_offset = e_simul_prefix 
+                                        local content_offset = e_simul_prefix
                                         local nai_abs_start = content_offset + s_nai_in_content
                                         local nai_abs_end = content_offset + e_nai_in_content -1
-                                        table.insert(simulReplacements, {
-                                            start = nai_abs_start,
-                                            finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlaySimul
-                                        })
+                                        table.insert(simulReplacements, { start = nai_abs_start, finish = nai_abs_end, inlay = inlaySimul })
                                         print("ONLINEMODULE: onOutput: Adding new inlay replacement for NAI" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
 
                                         if trimmedBlockName then
@@ -3021,7 +3039,7 @@ onOutput = async(function (triggerId)
                                             else
                                                 print("ONLINEMODULE: onOutput: SimCard ID '" .. trimmedBlockName .. "' already exists in stored list (" .. listKey .. ").")
                                             end
-                                            
+                                           
                                             local infoSimul = {
                                                 type = "SIMULATIONCARD", identifier = trimmedBlockName, inlay = inlaySimul,
                                                 prompt = foundSimulPrompt, negPrompt = storedNegPrompt
@@ -3074,7 +3092,7 @@ onOutput = async(function (triggerId)
                     print("ONLINEMODULE: onOutput: No simulcard replacements to apply.")
                 end
             end
-            
+           
             if NAICARD == "3" and not skipNAICARD then
                 print("ONLINEMODULE: onOutput: NAICARD == 3 (Hybrid mode)")
                 local searchPos = 1
@@ -3085,18 +3103,18 @@ onOutput = async(function (triggerId)
                 while true do
                     local s_ero, e_ero = string.find(currentLine, "EROSTATUS%[", searchPos)
                     local s_sim, e_sim = string.find(currentLine, "SIMULSTATUS%[", searchPos)
-                    
+                   
                     local s_status, e_status_prefix, isEroStatus
                     if s_ero and (not s_sim or s_ero < s_sim) then
                         s_status = s_ero
-                        e_status_prefix = e_ero 
+                        e_status_prefix = e_ero
                         isEroStatus = true
                     elseif s_sim then
                         s_status = s_sim
                         e_status_prefix = e_sim
                         isEroStatus = false
                     else
-                        break 
+                        break
                     end
 
                     statusBlocksFound = statusBlocksFound + 1
@@ -3122,7 +3140,7 @@ onOutput = async(function (triggerId)
                     if foundClosingBracket then
                         local blockContent = string.sub(currentLine, e_status_prefix + 1, e_status_suffix - 1)
                         local currentBlockName = nil
-                        
+                       
                         if isEroStatus then
                             local _, _, name = string.find(blockContent, "NAME:([^|]*)|")
                             currentBlockName = name
@@ -3161,7 +3179,7 @@ onOutput = async(function (triggerId)
                                 else
                                     promptPattern = "%[NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
                                     negPromptPattern = "%[NEG_NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                    promptType = "SIMULCARD" 
+                                    promptType = "SIMULCARD"
                                 end
 
                                 local _, _, foundPrompt = string.find(currentLine, promptPattern)
@@ -3178,10 +3196,12 @@ onOutput = async(function (triggerId)
                                     local finalPrompt = artistPrompt .. foundPrompt .. qualityPrompt
                                     local inlay = generateImage(triggerId, finalPrompt, currentNegativePrompt):await()
                                     print("ONLINEMODULE: onOutput: generateImage result for NAI" .. naiIndex .. ": [" .. tostring(inlay) .. "]")
-                                    if inlay and type(inlay) == "string" and string.len(inlay) > 10 
-                                       and not string.find(inlay, "fail", 1, true) 
+                                    if inlay and type(inlay) == "string" and string.len(inlay) > 10
+                                       and not string.find(inlay, "fail", 1, true)
                                        and not string.find(inlay, "error", 1, true)
                                        and not string.find(inlay, "실패", 1, true) then
+                                        inlay = "<NAI" .. naiIndex .. ">" .. inlay
+
                                         local identifier
                                         if isEroStatus then
                                             identifier = "EROSTATUS_" .. naiIndex
@@ -3197,7 +3217,7 @@ onOutput = async(function (triggerId)
                                         table.insert(replacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlay .. marker
+                                            inlay = inlay .. marker
                                         })
 
                                         local info = {
@@ -3211,7 +3231,7 @@ onOutput = async(function (triggerId)
 
                                         if isEroStatus then
                                             setChatVar(triggerId, identifier .. "_PROMPT", info.prompt)
-                                            setChatVar(triggerId, identifier .. "_NEGPROMPT", info.negPrompt) 
+                                            setChatVar(triggerId, identifier .. "_NEGPROMPT", info.negPrompt)
                                             setChatVar(triggerId, identifier, info.inlay)
                                         else
                                             setChatVar(triggerId, identifier, inlay)
@@ -3220,7 +3240,7 @@ onOutput = async(function (triggerId)
 
                                             local currentList = getChatVar(triggerId, listKey) or "null"
                                             if currentList == "null" then currentList = "" end
-                                            
+                                           
                                             if not string.find("," .. currentList .. ",", "," .. identifier .. ",", 1, true) then
                                                 local newList = currentList == "" and identifier or (currentList .. "," .. identifier)
                                                 setChatVar(triggerId, listKey, newList)
@@ -3286,7 +3306,7 @@ onOutput = async(function (triggerId)
                             local inlayProfile = generateImage(triggerId, finalPromptTwitterProfile, currentNegativePromptProfile):await()
                             local isSuccessProfile = inlayProfile and type(inlayProfile) == "string" and string.len(inlayProfile) > 10 and not string.find(inlayProfile, "fail", 1, true) and not string.find(inlayProfile, "error", 1, true) and not string.find(inlayProfile, "실패", 1, true)
                             if isSuccessProfile then
-                                inlayProfile = inlayProfile
+                                inlayProfile = "<NAI>" .. inlayProfile
                                 profileInlayToUse = inlayProfile
                                 setChatVar(triggerId, twitterId, profileInlayToUse)
                                 setchatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
@@ -3295,8 +3315,8 @@ onOutput = async(function (triggerId)
 
                                 local infoProfile = {
                                     type = "PROFILE",
-                                    identifier = twitterId, 
-                                    inlay = "<NAI>" .. profileInlayToUse,
+                                    identifier = twitterId,
+                                    inlay = profileInlayToUse,
                                     prompt = foundProfilePrompt,
                                     negPrompt = storedNegProfilePrompt
                                 }
@@ -3327,13 +3347,12 @@ onOutput = async(function (triggerId)
                         lineModifiedInThisPass = true
 
                         local infoTweet = {
-                            type = "TWEET", 
-                            identifier = twitterId, 
-                            inlay = "<NAI>" .. inlayTwitter,
+                            type = "TWEET",
+                            identifier = twitterId,
+                            inlay = inlayTwitter,
                             prompt = foundTwitterPrompt,
                             negPrompt = storedNegTweetPrompt
                         }
-
                         table.insert(generatedImagesInfo, infoTweet)
                         setChatVar(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
                         setChatVar(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
@@ -3422,19 +3441,20 @@ onOutput = async(function (triggerId)
                                     local successCall, inlayDc = pcall(function() return generateImage(triggerId, finalPromptDc, currentNegativePromptDc):await() end)
                                     local isSuccessDc = successCall and (inlayDc ~= nil) and (type(inlayDc) == "string") and (string.len(inlayDc) > 10) and not string.find(inlayDc, "fail", 1, true) and not string.find(inlayDc, "error", 1, true) and not string.find(inlayDc, "실패", 1, true)
                                     if isSuccessDc then
+                                        inlayDc = "<NAI" .. naiIndex .. ">" .. inlayDc
                                         local dcIdentifier = postId
                                         local marker = "<!-- DC_MARKER_POSTID_" .. dcIdentifier .. " -->"
 
                                         table.insert(dcReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayDc .. marker 
+                                            inlay = inlayDc .. marker
                                         })
 
                                         local infoDC = {
                                             type = "DC",
                                             identifier = dcIdentifier,
-                                            inlay = inlayDc, 
+                                            inlay = inlayDc,
                                             prompt = foundDcPrompt,
                                             negPrompt = storedDcNegPrompt
                                         }
@@ -3455,7 +3475,7 @@ onOutput = async(function (triggerId)
 
                                         setChatVar(triggerId, "DC_" .. dcIdentifier .. "_PROMPT", infoDC.prompt)
                                         setChatVar(triggerId, "DC_" .. dcIdentifier .. "_NEGPROMPT", infoDC.negPrompt)
-                                        setChatVar(triggerId, "DC_" .. dcIdentifier, inlayDc) 
+                                        setChatVar(triggerId, "DC_" .. dcIdentifier, inlayDc)
                                     else
                                         ERR(triggerId, "DCINSIDE", 2)
                                         print("ONLINEMODULE: onOutput: ERROR - DC image generation failed...")
@@ -3496,7 +3516,7 @@ onOutput = async(function (triggerId)
                 local s_kakao, e_kakao, cap1, cap2, cap3 = string.find(currentLine, kakaoPattern)
 
                 print("ONLINEMODULE: onOutput: Found NAI Value is" .. cap2)
-        
+       
                 if foundKakaoPrompt and s_kakao then
                     print("ONLINEMODULE: onOutput: Found KAKAO block and prompt. Generating image...")
                     local _, _, foundKakaoNegPrompt = string.find(currentLine, kakaoNegPromptFindPattern)
@@ -3504,26 +3524,20 @@ onOutput = async(function (triggerId)
                     local storedNegPrompt = ""
                     if foundKakaoNegPrompt then currentNegativePromptKakao = foundKakaoNegPrompt .. ", " .. currentNegativePromptKakao; storedNegPrompt = foundKakaoNegPrompt end
                     local finalPromptKakao = (artistPrompt or "") .. foundKakaoPrompt .. (qualityPrompt or "")
-        
+       
                     local successCall, inlayKakao = pcall(function() return generateImage(triggerId, finalPromptKakao, currentNegativePromptKakao):await() end)
                     local isSuccessKakao = successCall and inlayKakao and type(inlayKakao) == "string" and string.len(inlayKakao) > 10 and not string.find(inlayKakao, "fail", 1, true) and not string.find(inlayKakao, "error", 1, true) and not string.find(inlayKakao, "실패", 1, true)
-        
+       
                     if isSuccessKakao then
-                        inlayKakao = inlayKakao
+                        inlayKakao = "<NAI>" .. inlayKakao
                         print("ONLINEMODULE: onOutput: KAKAO image generated successfully.")
                         local kakaoIdentifier = "KAKAO_" .. s_kakao
                         local marker = "<!-- " .. kakaoIdentifier .. " -->"
                         local replacementKakao = "KAKAO[" .. inlayKakao .. marker .. "|" .. cap3 .. "]"
                         currentLine = string.sub(currentLine, 1, s_kakao-1) .. replacementKakao .. string.sub(currentLine, e_kakao + 1)
                         lineModifiedInThisPass = true
-        
-                        local infoEro = {
-                            type = "KAKAO",
-                            identifier = kakaoIdentifier,
-                            inlay = "<NAI>" .. inlayKakao,
-                            prompt = foundKakaoPrompt,
-                            negPrompt = storedNegPrompt
-                        }
+       
+                        local infoEro = { type = "KAKAO", identifier = kakaoIdentifier, inlay = inlayKakao, prompt = foundKakaoPrompt, negPrompt = storedNegPrompt }
                         table.insert(generatedImagesInfo, infoEro)
                         setChatVar(triggerId, kakaoIdentifier .. "_PROMPT", infoEro.prompt)
                         setChatVar(triggerId, kakaoIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
@@ -3535,7 +3549,7 @@ onOutput = async(function (triggerId)
                     end
                 end
             end
-            
+           
         else
                 print("ONLINEMODULE: onOutput: Last message data is not in the expected format.")
         end
@@ -3627,7 +3641,7 @@ onButtonClick = async(function(triggerId, data)
     local NAIPRESETPROMPT = getGlobalVar(triggerId, "toggle_NAIPRESETPROMPT")
 
     local artistPrompt, qualityPrompt, negativePrompt = nil, nil, nil
-	if NAIPRESETPROMPT == "0" then
+    if NAIPRESETPROMPT == "0" then
         artistPrompt = getGlobalVar(triggerId, "toggle_NAIARTISTPROMPT")
         qualityPrompt = getGlobalVar(triggerId, "toggle_NAIQUALITYPROMPT")
         negativePrompt = getGlobalVar(triggerId, "toggle_NAINEGPROMPT")
@@ -3635,10 +3649,10 @@ onButtonClick = async(function(triggerId, data)
     elseif NAIPRESETPROMPT == "2" then artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}" qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres" negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     elseif NAIPRESETPROMPT == "3" then artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}" qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres" negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     elseif NAIPRESETPROMPT == "4" then
-        artistPrompt = "{artist:Goldcan9, artist:shiba}, artist:sakurai norio,,artist: torino, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{artist:ciloranko}, {artist:kawakami rokkaku}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow)]], artist:healthyman, artist:baffu, [[artist:deadnooodles]], [[artist:jyt]], artist:yd (orange maru), [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], 0.9::artist:taesi::, 0.7::artist:shiratama (shiratamaco)::,1.2::artist:ningen mame::, 1.7::artist:tianliang duohe fangdongye::, 1.7::artist:shuz::, 1.2::artist:wlop::, 1.5::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::"
+        artistPrompt = "{artist:Goldcan9, artist:shiba}, artist:sakurai norio,artist: torino, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{artist:ciloranko}, {artist:kawakami rokkaku}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow)]], artist:healthyman, artist:baffu, [[artist:deadnooodles]], [[artist:jyt]], artist:yd (orange maru), [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], 0.9::artist:taesi ::, 0.7::artist:shiratama (shiratamaco) ::,1.2::artist:ningen mame ::, 1.7::artist:tianliang duohe fangdongye ::, 1.7::artist:shuz ::, 1.2::artist:wlop ::, 1.5::artist:kase daiki ::, 0.6::artist:chobi (penguin paradise) ::,{year 2025, year 2024},[aged down]"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "5" then
+elseif NAIPRESETPROMPT == "5" then
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
@@ -3682,20 +3696,18 @@ onButtonClick = async(function(triggerId, data)
                 break
             end
         end
-    
+   
         local historyModified = false
-        
+       
         local messageData = chatHistoryTable[targetIndex]
         local currentLine = messageData.data
         print("ONLINEMODULE: Checking history index " .. targetIndex .. " for update. Starts with: [" .. string.sub(currentLine, 1, 50) .. "]")
-        
+       
         local replacementOccurred = false
         local blockStart, blockEnd = nil, nil
         local newBlockContent = ""
 
         changeInlay(triggerId, targetIndex, oldInlay, newInlay)
-        if targetIndex + 1 ~= nil then
-            changeInlay(triggerId, targetIndex + 1, oldInlay, newInlay)
-        end
+        changeInlay(triggerId, targetIndex + 1, oldInlay, newInlay)
     end
 end)
