@@ -1015,29 +1015,29 @@ local function inputStatusHybrid(triggerId, data)
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- Male's Status Interface, NOT THE FEMALE.
-- *DO NOT PRINT MALE's DIALOGUE via "" or 「」, REPLACE ALL MALE's DIALOGUE to SIMULSTATUS BLOCK.*
+- If the character is NOT a FEMALE, PRINT OUT the Simulation Status Interface.
+- *DO NOT PRINT CHARACTER's DIALOGUE via "" or 「」, REPLACE ALL CHARACTER's DIALOGUE to SIMULSTATUS BLOCK.*
     - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - *PRINT* SIMULSTATUS[...] INSTEAD.
     - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
 - Example:
     - Invalid:
-        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+        - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
     - *Valid*:
-        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
-        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
-        - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+        - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
+        - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect.|...]
+        - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed.|...]
+        - His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
 
 #### Simulation Status Interface Template
-- SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
-- NAME: The name of the NPC.
-- DIALOGUE: The dialogue of the NPC.
-- Make sure to include NPC's dialogue here
-- Do not include any other NPC's dialogue or actions.
+- SIMULSTATUS[NAME:(CHARACTER's Name)|DIALOGUE:(CHARACTER's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
+- NAME: The name of the CHARACTER.
+- DIALOGUE: The dialogue of the CHARACTER.
+- Make sure to include CHARACTER's dialogue here
+- Do not include any other CHARACTER's dialogue or actions.
 - Do not include ' and " in the dialogue.
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
-- LOCATION: The location of the NPC.
+- LOCATION: The location of the CHARACTER.
 - INLAY: This is a Flag.
 ]] 
         if NAICARDNOIMAGE == "0" then
