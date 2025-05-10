@@ -1647,7 +1647,7 @@ local function changeInsta(triggerId, data)
 
     local InstaTemplate = [[
 <style>
-html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.4;background-color:#fff;color:#262626;margin:0;padding:0;min-height:100%}.iphone-frame-container{display:none}@media (min-width:400px) {body{background-color:#1c1c1e}.iphone-frame-container{display:block;width:100%;max-width:375px;height:calc(100vh - 40px);max-height:812px;margin:20px auto;background-color:#111;border:8px solid #000;border-radius:40px;box-shadow:0 10px 30px rgba(0,0,0,0.3);overflow:hidden;position:relative}.iphone-frame-container::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:40%;height:22px;background:#000;border-bottom-left-radius:12px;border-bottom-right-radius:12px;z-index:10}.iphone-screen{background-color:#fff;width:100%;height:100%;overflow:hidden;position:relative;padding-top:0;border-radius:32px}}.instagram-app{background-color:#fff;height:100%;display:flex;flex-direction:column;overflow:hidden;color:#262626}.insta-header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #dbdbdb;background-color:#fff;flex-shrink:0;height:44px}.insta-header .header-left{display:flex;align-items:center;margin-bottom:-10px}.insta-header .logo-text{margin-left:10px;color:#262626}.insta-header .actions{display:flex;align-items:center}.insta-header .actions .icon{margin-left:20px;cursor:pointer}.insta-stories{display:flex;padding:10px 0 10px 12px;border-bottom:1px solid #dbdbdb;overflow-x:auto;background-color:#fff;flex-shrink:0;-ms-overflow-style:none;scrollbar-width:none}.insta-stories::-webkit-scrollbar{display:none}.story-item{text-align:center;margin-right:12px;flex-shrink:0;position:relative}
+html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.4;background-color:#fff;color:#262626;margin:0;padding:0;min-height:100%}.iphone-frame-container{display:none}@media {body{background-color:#1c1c1e}.iphone-frame-container{display:block;width:100%;max-width:375px;height:calc(100vh - 40px);max-height:812px;margin:20px auto;background-color:#111;border:8px solid #000;border-radius:40px;box-shadow:0 10px 30px rgba(0,0,0,0.3);overflow:hidden;position:relative}.iphone-frame-container::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:40%;height:22px;background:#000;border-bottom-left-radius:12px;border-bottom-right-radius:12px;z-index:10}.iphone-screen{background-color:#fff;width:100%;height:100%;overflow:hidden;position:relative;padding-top:0;border-radius:32px}}.instagram-app{background-color:#fff;height:100%;display:flex;flex-direction:column;overflow:hidden;color:#262626}.insta-header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #dbdbdb;background-color:#fff;flex-shrink:0;height:44px}.insta-header .header-left{display:flex;align-items:center;margin-bottom:-10px}.insta-header .logo-text{margin-left:10px;color:#262626}.insta-header .actions{display:flex;align-items:center}.insta-header .actions .icon{margin-left:20px;cursor:pointer}.insta-stories{display:flex;padding:10px 0 10px 12px;border-bottom:1px solid #dbdbdb;overflow-x:auto;background-color:#fff;flex-shrink:0;-ms-overflow-style:none;scrollbar-width:none}.insta-stories::-webkit-scrollbar{display:none}.story-item{text-align:center;margin-right:12px;flex-shrink:0;position:relative}
 .story-image-wrapper { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0.25px; position: relative; z-index: 1; background-color: #fff; }
 .story-image-wrapper::before { content: ""; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 50%; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); z-index: -1; }
 .story-item img { width: 100%; height: 100%; border-radius: 50%; display: block; background-color: #efefef; }
@@ -2082,7 +2082,7 @@ end
 local function changeSNSHybrid(triggerId, data)
     local originalData = data
 
-    -- Patterns to find the full SNS tags
+    -- 패턴을 사용해 SNS 패턴을 찾기
     local fullTwitterTagPattern = "(TWITTER%[([^%]]*)%])"
     local fullInstaTagPattern = "(INSTA%[([^%]]*)%])"
 
@@ -2092,22 +2092,22 @@ local function changeSNSHybrid(triggerId, data)
     local twitterFullHtmlOutput = nil
     local instaFullHtmlOutput = nil
 
-    -- Generate HTML for Twitter if tag exists
+    -- 트위터 존재 시 changeTwitter 호출
     if twitterTagFound then
         -- Pass only the matched tag to changeTwitter to get its specific HTML output
         twitterFullHtmlOutput = changeTwitter(triggerId, twitterTagFound)
     end
 
-    -- Generate HTML for Instagram if tag exists
+    -- 인스타 존재시 changeInsta 호출
     if instaTagFound then
         instaFullHtmlOutput = changeInsta(triggerId, instaTagFound)
     end
 
     local finalTwitterBody = nil
     local finalInstaBody = nil
-    local styleBlocks = {} -- Use a table to store unique style blocks
+    local styleBlocks = {} -- 유니크 스타일 블록 추가
 
-    -- Helper to add unique style content
+    -- 헬퍼 함수
     local function addUniqueStyle(styleContent)
         if styleContent and styleContent ~= "" then
             local found = false
@@ -2126,7 +2126,7 @@ local function changeSNSHybrid(triggerId, data)
     if twitterFullHtmlOutput then
         local styleContent = twitterFullHtmlOutput:match("<style>(.-)</style>")
         addUniqueStyle(styleContent)
-        -- Remove style block and the trailing <br> specific to changeTwitter's output
+        -- <style> 태그를 제거하고 changeTwitter의 출력에 특정한 <br> 태그를 제거
         finalTwitterBody = twitterFullHtmlOutput:gsub("<style>.-</style>", ""):gsub("<br%s*/?%s*>$", "")
     end
 
@@ -2141,7 +2141,7 @@ local function changeSNSHybrid(triggerId, data)
         combinedStyles = "<style>\n" .. table.concat(styleBlocks, "\n\n") .. "\n</style>\n"
     end
 
-    -- Remove original tags from the main data stream (only the first occurrence of each)
+    -- 데이터에서 태그 제거
     local cleanedData = originalData
     if twitterTagFound then
         cleanedData = string.gsub(cleanedData, fullTwitterTagPattern, "", 1)
@@ -2150,63 +2150,66 @@ local function changeSNSHybrid(triggerId, data)
         cleanedData = string.gsub(cleanedData, fullInstaTagPattern, "", 1)
     end
     
-    -- Trim whitespace and remove common empty tags that might be left after tag removal
+    -- 사이의 빈 메시지 제거
     cleanedData = cleanedData:gsub("<p>%s*</p>", ""):gsub("^(%s*<br%s*/?%s*>)*%s*", ""):gsub("(%s*<br%s*/?%s*>)*%s*$", "")
     cleanedData = cleanedData:match("^%s*(.-)%s*$") or "" -- Final trim
 
-    -- Case 1: Both Twitter and Instagram content are available
+    -- 상황1, 성공적일 경우
     if finalTwitterBody and finalInstaBody then
         local hybridSpecificCss = [[
 <style>
 .sns-hybrid-container {
     display: flex;
-    justify-content: center; 
-    align-items: flex-start; 
-    gap: 20px; 
-    padding: 20px 0; 
-    max-width: 800px; 
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+    max-width: 800px;
     margin: 0 auto;
-    flex-wrap: nowrap; 
+    flex-wrap: wrap; /* Changed to wrap */
 }
 
 .sns-column {
-    flex: 1 1 360px; 
-    min-width: 300px; 
-    max-width: 380px; 
-    display: flex; 
-    justify-content: center; 
+    flex: 0 1 360px; /* Changed flex-grow to 0 to prevent stretching */
+    width: 100%; /* Added full width */
+    max-width: 375px;
+    display: flex;
+    justify-content: center;
 }
 
 .sns-column .iphone-frame-container {
-    margin: 0 !important; /* Override individual template margins */
-    width: 100% !important; /* Take width of sns-column */
-    max-width: 375px !important; /* Standardized max width for the phone frame itself */
-    /* height will be auto or set by individual templates */
-}
-/* Ensure the body styling from templates doesn't make hybrid page too dark by default */
-/* This is a general override, specific dark mode classes within components are fine */
-body.hybrid-sns-active { 
-    background-color: #fafafa; /* A light neutral background for the page */
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 375px !important;
 }
 
+body.hybrid-sns-active {
+    background-color: #fafafa;
+}
 
-@media (max-width: 799px) { 
+@media screen and (max-width: 799px) {
     .sns-hybrid-container {
-        flex-direction: column; 
-        align-items: center; 
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        gap: 10px; /* Reduced gap for mobile */
     }
+    
     .sns-column {
-        width: 100%; 
-        max-width: 380px; 
-        margin-bottom: 20px; 
+        width: 100%;
+        max-width: 375px;
+        margin: 0;
     }
-    .sns-column:last-child {
-        margin-bottom: 0;
+}
+
+@media screen {
+    .sns-hybrid-container {
+        padding: 5px;
     }
 }
 </style>
 ]]
-        -- Add a class to body when hybrid view is active to control page background
+        -- css 추가
         local hybridLayout = combinedStyles .. hybridSpecificCss .. [[
 <script>document.body.classList.add('hybrid-sns-active');</script>
 <div class="sns-hybrid-container">
@@ -2224,24 +2227,25 @@ body.hybrid-sns-active {
             return cleanedData .. "\n" .. hybridLayout
         end
 
-    -- Case 2: Only Twitter content is available
+    -- 상황 2, 트위터만 존재할 경우
     elseif finalTwitterBody then
         if cleanedData == "" then
-            return twitterFullHtmlOutput -- Return original full HTML (includes its own style)
+            return twitterFullHtmlOutput -- 원래 데이터 반환
         else
             return cleanedData .. "\n" .. twitterFullHtmlOutput
         end
 
-    -- Case 3: Only Instagram content is available
+    -- 상황 3, 인스타그램만 존재할 경우
     elseif finalInstaBody then
         if cleanedData == "" then
-            return instaFullHtmlOutput -- Return original full HTML (includes its own style)
+            return instaFullHtmlOutput -- 원래 데이터 반환
         else
             return cleanedData .. "\n" .. instaFullHtmlOutput
         end
     end
 
-    -- Case 4: No SNS tags were found or processed, return original data as is
+    -- 상황4, 트위터와 인스타그램 모두 존재하지 않을 경우
+    -- 원래 데이터 반환
     return originalData
 end
 
@@ -2716,34 +2720,14 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
 .fullscreen-toggle:checked ~ .fullscreen-overlay { display: flex; }
 </style>
 ]]
-    local messageContent
-    local overlayContent = ""
-    local uniqueId = ""
-    local fullTagMatch = string.match(message, "({{inlay::[^}]+}})")
 
-    if fullTagMatch then
-        imageCounter = imageCounter + 1
-        uniqueId = "fs-toggle-" .. imageCounter
-        local cleanedTag = string.gsub(fullTagMatch, "%s*%<%!%-%- KAKAO%_%d+ %-%->%s*", "")
-        messageContent = cleanedTag
-        overlayContent = cleanedTag
-    else
-        messageContent = escapeHtml(message)
-        overlayContent = ""
-    end
+
+    local uniqueId = ""
 
     local html = {}
     
     table.insert(html, charMessageTemplate)
     table.insert(html, '<div class="message-group">')
-
-    if fullTagMatch then
-        if NAIMESSENGERNOIMAGE == "0" then
-        table.insert(html, '<input type="checkbox" id="' .. uniqueId .. '" class="fullscreen-toggle">')
-        else 
-        table.insert(html, '<input type="checkbox" id="" class="fullscreen-toggle">')
-        end
-    end
 
     table.insert(html, '<div class="profile-column">')
     table.insert(html, '<img src="{{source::char}}" alt="Profile" class="profile-image">')
@@ -2753,42 +2737,29 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
     table.insert(html, '<div class="username">{{char}}</div>')
     table.insert(html, '<div class="message-bubble-container">')
     table.insert(html, '<div class="message-bubble">')
-    
-    if fullTagMatch then
-        table.insert(html, '<label class="message-text-label clickable-image-label" for="' .. uniqueId .. '">')
-    else
-        table.insert(html, '<label class="message-text-label">')
-    end
-    table.insert(html, messageContent)
+    table.insert(html, '<label class="message-text-label">')
+    table.insert(html, message)
     table.insert(html, '</label>')
-    
     table.insert(html, '</div>')
     table.insert(html, '<div class="timestamp">' .. timestamp .. '</div>')
     table.insert(html, '</div>')
     table.insert(html, '</div>')
+    table.insert(html, '</div>')
 
-    if fullTagMatch then
-        table.insert(html, '<div class="fullscreen-overlay">')
-        table.insert(html, '<label for="' .. uniqueId .. '" class="fullscreen-close-label"></label>')
-
-        if NAIMESSENGERNOIMAGE == "0" then
+    -- inlay::가 존재할 경우
+    local inlayTag = string.match(message, "{{inlay::[^}]+}}")
+    if inlayTag and NAIMESSENGERNOIMAGE == "0" then
         local buttonJsonBody = '{"action":"KAKAO_REROLL", "identifier":"KAKAO_' .. timestamp .. '"}'
-        table.insert(html, '<div style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;">')
-        table.insert(html, overlayContent)
         table.insert(html, '<div class="reroll-button-wrapper" style="margin-top: 10px; z-index: 2;">')
         table.insert(html, '<div class="global-reroll-controls">')
         table.insert(html, '<button style="text-align: center;" class="reroll-button" risu-btn=\'' .. buttonJsonBody .. '\'>KAKAO</button>')
         table.insert(html, '</div></div>')
-        table.insert(html, '</div>')
-        end
-        
-        table.insert(html, '</div>')
     end
 
-    table.insert(html, '</div>')
-
     return table.concat(html)
+
     end)
+    
     return data
 end
 
@@ -3613,11 +3584,11 @@ onOutput = async(function (triggerId)
 		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
 	elseif NAIPRESETPROMPT == "3" then
-        artistPrompt = "0.7::artist:taesi ::, 0.6::artist:shiratama (shiratamaco) ::,0.8::artist:ningen mame ::, 1.3::artist:tianliang duohe fangdongye ::, 1.3::artist:shuz ::, 0.8::artist:wlop ::, 0.7::artist:kase daiki ::, 0.6::artist:chobi (penguin paradise) ::,{year 2025, year 2024}"
-		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
+        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
+        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
     elseif NAIPRESETPROMPT == "4" then
-        artistPrompt = "{artist:Goldcan9, artist:shiba}, artist:sakurai norio,artist: torino, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{artist:ciloranko}, {artist:kawakami rokkaku}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow)]], artist:healthyman, artist:baffu, [[artist:deadnooodles]], [[artist:jyt]], artist:yd (orange maru), [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], 0.9::artist:taesi ::, 0.7::artist:shiratama (shiratamaco) ::,1.2::artist:ningen mame ::, 1.7::artist:tianliang duohe fangdongye ::, 1.7::artist:shuz ::, 1.2::artist:wlop ::, 1.5::artist:kase daiki ::, 0.6::artist:chobi (penguin paradise) ::,{year 2025, year 2024},[aged down]"
+        artistPrompt = "1.2::artist:tianliang duohe fangdongye ::,1.1::artist:shuz ::, 0.7::artist:wlop ::, 0.9::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::0.7::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     elseif NAIPRESETPROMPT == "5" then
@@ -3625,10 +3596,6 @@ onOutput = async(function (triggerId)
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
     elseif NAIPRESETPROMPT == "6" then
-        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
-        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
-        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
-    elseif NAIPRESETPROMPT == "7" then
         artistPrompt = "[artist:dismaless], {{{artist:TrNyteal (CiloRanko)}}}, [artist:mx2j], {{artist:kawakami rokkaku, {artist:yd (idolmaster shiny colors)}, artist:freng}}, artist:healthyman, {{channel (caststation)}, {{colorful, oily skin, shiny skin}, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "1.2::worst quality::, 1.2::bad quality::, 1.2::lowres::, 1.2::censored::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::"
@@ -5194,14 +5161,20 @@ onButtonClick = async(function(triggerId, data)
         artistPrompt = getGlobalVar(triggerId, "toggle_NAIARTISTPROMPT")
         qualityPrompt = getGlobalVar(triggerId, "toggle_NAIQUALITYPROMPT")
         negativePrompt = getGlobalVar(triggerId, "toggle_NAINEGPROMPT")
-    elseif NAIPRESETPROMPT == "1" then artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}" qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres" negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
-    elseif NAIPRESETPROMPT == "2" then artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}" qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres" negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "3" then
-        artistPrompt = "0.7::artist:taesi ::, 0.6::artist:shiratama (shiratamaco) ::,0.8::artist:ningen mame ::, 1.3::artist:tianliang duohe fangdongye ::, 1.3::artist:shuz ::, 0.8::artist:wlop ::, 0.7::artist:kase daiki ::, 0.6::artist:chobi (penguin paradise) ::,{year 2025, year 2024}"
+    elseif NAIPRESETPROMPT == "1" then
+		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
+		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
+		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
+	elseif NAIPRESETPROMPT == "2" then
+		artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}"
 		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+		negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+	elseif NAIPRESETPROMPT == "3" then
+        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
+        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
+        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
     elseif NAIPRESETPROMPT == "4" then
-        artistPrompt = "{artist:Goldcan9, artist:shiba}, artist:sakurai norio,artist: torino, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{artist:ciloranko}, {artist:kawakami rokkaku}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow)]], artist:healthyman, artist:baffu, [[artist:deadnooodles]], [[artist:jyt]], artist:yd (orange maru), [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], 0.9::artist:taesi ::, 0.7::artist:shiratama (shiratamaco) ::,1.2::artist:ningen mame ::, 1.7::artist:tianliang duohe fangdongye ::, 1.7::artist:shuz ::, 1.2::artist:wlop ::, 1.5::artist:kase daiki ::, 0.6::artist:chobi (penguin paradise) ::,{year 2025, year 2024},[aged down]"
+        artistPrompt = "1.2::artist:tianliang duohe fangdongye ::,1.1::artist:shuz ::, 0.7::artist:wlop ::, 0.9::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::0.7::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     elseif NAIPRESETPROMPT == "5" then
@@ -5209,10 +5182,6 @@ onButtonClick = async(function(triggerId, data)
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
     elseif NAIPRESETPROMPT == "6" then
-        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
-        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
-        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
-    elseif NAIPRESETPROMPT == "7" then
         artistPrompt = "[artist:dismaless], {{{artist:TrNyteal (CiloRanko)}}}, [artist:mx2j], {{artist:kawakami rokkaku, {artist:yd (idolmaster shiny colors)}, artist:freng}}, artist:healthyman, {{channel (caststation)}, {{colorful, oily skin, shiny skin}, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "1.2::worst quality::, 1.2::bad quality::, 1.2::lowres::, 1.2::censored::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::"
