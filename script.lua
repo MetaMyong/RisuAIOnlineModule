@@ -1863,8 +1863,10 @@ local function inputKAKAOTalk(triggerId, data)
 
     if NAIMESSENGERNOIMAGE == "0" then
         data = data .. [[
-	- When  {{char}} sends a picture or photo, print it will exactly output '<NAI>'.
-	- DO NOT PRINT <NAI> MORE THAN ONCE.
+	- When {{char}} sends a picture or photo, exactly output '<NAI>'.
+        - ONLY when {{char}} sends a picture or photo.
+        - if not, DO NOT PRINT <NAI>.
+    - DO NOT PRINT <NAI> with message, and more than once.
     - ALWAYS PRINT WITH SHORTENED MESSAGE.
 ]]
     end
