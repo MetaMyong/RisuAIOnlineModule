@@ -1011,6 +1011,73 @@ local function inputStatusHybrid(triggerId, data)
     return data
 end
 
+local function inputInlayOnly(triggerId, data)
+    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
+    local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
+
+    data = data .. [[
+## Status Interface
+
+### Inlay Interface
+- ALWAYS PRINT THE INLAY INTERFACE VIA INLAY[<NAI(INDEX)>].
+    - Example:
+        - IF THE INLAY BLOCK IS THE FIRST ONE, PRINT OUT <NAI1>.
+        - IF THE INLAY BLOCK IS THE SECOND ONE, PRINT OUT <NAI2>.
+        - IF THE INLAY BLOCK IS THE THIRD ONE, PRINT OUT <NAI3>.
+        - ...
+- YOU MUST INSERT THE INLAY INTERFACE BLOCK BEFORE THE DIALOGUE.
+    - Example:
+        - Invalid:
+            - "Eek?!" The sudden voice startled Moya-mo so badly she almost dropped her Smart Rotom. She whirled around, a yellow oversized hoodie sleeve fluttering behind her. Her eyes, wide with surprise at the unexpected presence, glittered with her signature heart-shaped highlights.
+            - "Oh, Siwoo! How long have you been standing there~? You scared me half to death! My heart skipped a beat~!" She exaggeratedly clutched at her chest and made a fuss, but quickly returned to her usual cheerful tone. Her eyes darted around, as if trying to quickly assess the situation.
+            - ...
+        - Valid:
+            - INLAY[<NAI1>]
+            - "Eek?!" The sudden voice startled Moya-mo so badly she almost dropped her Smart Rotom. She whirled around, a yellow oversized hoodie sleeve fluttering behind her. Her eyes, wide with surprise at the unexpected presence, glittered with her signature heart-shaped highlights.
+            - INLAY[<NAI2>]
+            - "Oh, Siwoo! How long have you been standing there~? You scared me half to death! My heart skipped a beat~!" She exaggeratedly clutched at her chest and made a fuss, but quickly returned to her usual cheerful tone. Her eyes darted around, as if trying to quickly assess the situation.
+            - ...
+]]
+    return data
+end
+
+local function changeInlayOnly(triggerId, data)
+    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
+
+    local inlayPattern = "(INLAY)%[([^%]]*)%]"
+    data = string.gsub(data, inlayPattern, function(
+        start_pattern, inlayContent
+        )
+        -- Inlay only 옵션은 {{inlay::uuid}}만 출력하면 됨
+        -- INLAY[{{inlay::uuid}}] 에서 블록만 제거 후 리롤만 추가
+        -- 인덱스를 따로 추출해야 함
+        local inlayIndex = string.match(inlayContent, "<NAI(%d+)>")
+        if inlayIndex == nil then
+            inlayIndex = "1"
+        end
+
+        -- 가로 최대 360px, 드래그 방지 및 클릭 방지 옵션 설정
+        -- {{inlay::uuid}} 구문은 텍스트로 인식하기 때문에 고정 크기 사용해야함
+        local html = {}
+        
+        table.insert(html, "<div style=\"width: 360px; max-width: 100%; margin: 0 auto; padding: 0; background-color: transparent; border: none; box-shadow: none; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; cursor: default;\">")
+        table.insert(html, inlayContent)
+        table.insert(html, "</div>")
+
+        -- 리롤 버튼 추가 - 추출한 inlayIndex 값 기반으로 identifier 설정
+        local buttonJson = '{"action":"INLAY_REROLL", "identifier":"' .. "INLAY_" .. (inlayIndex or "") .. '"}'
+
+        table.insert(html, "<div class=\"reroll-button-wrapper\">")
+        table.insert(html, "<div class=\"global-reroll-controls\">")
+        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJson .. "'>INLAY</button>")
+        
+        table.insert(html, "</div></div>")
+
+        return table.concat(html)
+    end)
+    return data
+end
+
 local function inputTwitter(triggerId, data)
     local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
     local NAISNSTARGET = getGlobalVar(triggerId, "toggle_NAISNSTARGET")
@@ -2015,7 +2082,8 @@ local function inputImage(triggerId, data)
     
     
     data = data .. [[
-## Image Prompt- This prompt must describe situations, settings, and actions related to the Character in vivid and detailed language.
+## Image Prompt
+- This prompt must describe situations, settings, and actions related to the Character in vivid and detailed language.
 
 ### Image Prompt Extraction
 - From the narrative, extract details to construct a comprehensive Prompt.
@@ -2079,6 +2147,11 @@ local function inputImage(triggerId, data)
             - For male:
                 - NAISIMULCARDPROMPT + INDEX
                 - NEG_NAISIMULCARDPROMPT + INDEX
+]]
+    elseif NAICARD == "4" then
+        data = data .. [[
+            - NAIINLAYPROMPT + INDEX
+            - NEG_NAIINLAYPROMPT + INDEX
 ]]
     end
 
@@ -2152,6 +2225,18 @@ local function inputImage(triggerId, data)
         - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
         - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
         - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
+]] 
+        elseif NAICARD == "4" then
+            data = data .. [[
+    - ALWAYS PRINT OUT INLAY INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the INLAY INTERFACE
+    - Output Format:
+        - INLAY[...|INLAY:<NAI1>]
+        - [NAIINLAYPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAIINLAYPROMPT1:(NEGATIVE PROMPT)]
+        - INLAY[...|INLAY:<NAI2>]
+        - [NAIINLAYPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAIINLAYPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
         end
@@ -2394,6 +2479,9 @@ listenEdit("editRequest", function(triggerId, data)
         elseif NAICARD == "3" then
             currentInput = inputStatusHybrid(triggerId, currentInput)
             changedValue = true
+        elseif NAICARD == "4" then
+            currentInput = inputInlayOnly(triggerId, currentInput)
+            changedValue = true
         end
         
         if NAISNS == "1" then
@@ -2462,7 +2550,7 @@ listenEdit("editDisplay", function(triggerId, data)
 .profile-id-value{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .profile-preview{width:32px;height:32px;border-radius:50%;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}
 .profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}
-.reroll-button{padding:10px 20px;background-color:#000000;color:#ffffff;border:2px solid #ff69b4;font-family:inherit;font-size:18px;cursor:pointer;transition:all 0.2s ease;flex-shrink:0;min-width:80px;min-height:24px;position:relative;}
+.reroll-button{background-color:#000000;color:#ffffff;border:2px solid #ff69b4;font-family:inherit;font-size:18px;cursor:pointer;transition:all 0.2s ease;flex-shrink:0;min-width:80px;min-height:24px;position:relative;}
 .reroll-button::before{content:attr(data-text);white-space:pre;}
 .reroll-button::after{content:"REROLL";font-weight:bold;font-size:18px;color:#ffffff;pointer-events:none;transition:color 0.2s ease;}
 .reroll-button:hover{background-color:#ff69b4;color:#000000;border-color:#000000;}
@@ -2481,6 +2569,8 @@ listenEdit("editDisplay", function(triggerId, data)
     elseif NAICARD == "3" then
         data = changeEroStatus(triggerId, data)
         data = changeSimulCard(triggerId, data)
+    elseif NAICARD == "4" then
+        data = changeInlayOnly(triggerId, data)
     end
 
     if NAISNS == "1" then
@@ -3352,7 +3442,7 @@ onOutput = async(function (triggerId)
                                not string.find(inlayImage, "실패", 1, true) then
                                 
                                 -- 기존 INLAY[<NAI>] 블록을 새로운 inlay로 교체
-                                local replacement = "INLAY[<NAI" .. naiIndex .. ">" .. "{{inlay::" .. inlayImage .. "}}" .. "]"
+                                local replacement = "INLAY[<NAI" .. naiIndex .. ">" .. inlayImage .. "]"
                                 
                                 table.insert(inlayReplacements, {
                                     start = s_inlay,
@@ -3818,6 +3908,12 @@ onButtonClick = async(function(triggerId, data)
         chatVarKeyForInlay = identifier
         specificPromptKey = identifier .. "_SIMULPROMPT"
         specificNegPromptKey = identifier .. "_NEGSIMULPROMPT"
+    elseif action == "INLAY_REROLL" then
+        -- INLAY ONLY 옵션(4)
+        rerollType = "INLAY"
+        chatVarKeyForInlay = identifier
+        specificPromptKey = identifier .. "_PROMPT"
+        specificNegPromptKey = identifier .. "_NEGPROMPT"
     elseif action == "PROFILE_REROLL" then
         rerollType = "PROFILE"
         chatVarKeyForInlay = identifier
