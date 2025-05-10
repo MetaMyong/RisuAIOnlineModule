@@ -1100,14 +1100,17 @@ local function inputTwitter(triggerId, data)
     if NAISNSTARGET == "0" then
         data = data .. [[
 - MAKE a {{user}}'s TWITTER INTERFACE
+- MUST INCLUDE THE {{user}}'s NSFW POST
 ]]
     elseif NAISNSTARGET == "1" then
         data = data .. [[
 - MAKE a {{char}}'s TWITTER INTERFACE
+- MUST INCLUDE THE {{char}}'s NSFW POST
 ]]
     elseif NAISNSTARGET == "2" then
         data = data .. [[
 - MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE
+- MUST INCLUDE THE (RANDOM OPPONENT NPC)'s NSFW POST
 ]]
     end
 
@@ -1129,6 +1132,7 @@ local function inputTwitter(triggerId, data)
         data = data .. [[
         - Print '<NAI>' Exactly.
     - TWEET: Content of the Tweet.
+        - MUST INLUDE the character's NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
     - MEDIA: Media of the post
         - Print '<NAI>' Exactly.
@@ -1138,6 +1142,7 @@ local function inputTwitter(triggerId, data)
             data = data .. [[
         - Print {{source::user}} Exactly.
     - TWEET: Content of the Tweet.
+        - MUST INCLUDE the {{user}}'s NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
     - MEDIA: Media of the post
         - Describe the situation of the twitter post.
@@ -1146,6 +1151,7 @@ local function inputTwitter(triggerId, data)
             data = data .. [[
         - Print {{source::char}} Exactly.
     - TWEET: Content of the Tweet.
+        - MUST INCLUDE the {{char}}'s NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
     - MEDIA: Media of the post
         - Describe the situation of the twitter post.
@@ -1179,16 +1185,16 @@ local function inputTwitter(triggerId, data)
 ]]
     if NAISNSNOIMAGE == "0" then
         data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:<NAI>|TWEET:⁉️⁉️⁉️ Just got really surprised...;; Suddenly sensed someone in a place where no one should be... Thought my heart was going to burst!!|MEDIA:<NAI>|HASH:→MagicalGirl←→FlameHeart←→Shocked←→AnythingSuspiciousOnPatrol?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?! Could it be a villain?!|SexHunter|What happened? Post pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<NAI>|TWEET:Wanna see more?|MEDIA:<NAI>|HASH:→SexTweet←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
 ]]
     elseif NAISNSNOIMAGE == "1" then
         if NAISNSTARGET == "0" then
             data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::user}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::user}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→SexTweet←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
         elseif NAISNSTARGET == "1" then
             data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::char}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::char}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→SexTweet←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
         end
     end
