@@ -2716,34 +2716,14 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
 .fullscreen-toggle:checked ~ .fullscreen-overlay { display: flex; }
 </style>
 ]]
-    local messageContent
-    local overlayContent = ""
-    local uniqueId = ""
-    local fullTagMatch = string.match(message, "({{inlay::[^}]+}})")
 
-    if fullTagMatch then
-        imageCounter = imageCounter + 1
-        uniqueId = "fs-toggle-" .. imageCounter
-        local cleanedTag = string.gsub(fullTagMatch, "%s*%<%!%-%- KAKAO%_%d+ %-%->%s*", "")
-        messageContent = cleanedTag
-        overlayContent = cleanedTag
-    else
-        messageContent = escapeHtml(message)
-        overlayContent = ""
-    end
+
+    local uniqueId = ""
 
     local html = {}
     
     table.insert(html, charMessageTemplate)
     table.insert(html, '<div class="message-group">')
-
-    if fullTagMatch then
-        if NAIMESSENGERNOIMAGE == "0" then
-        table.insert(html, '<input type="checkbox" id="' .. uniqueId .. '" class="fullscreen-toggle">')
-        else 
-        table.insert(html, '<input type="checkbox" id="" class="fullscreen-toggle">')
-        end
-    end
 
     table.insert(html, '<div class="profile-column">')
     table.insert(html, '<img src="{{source::char}}" alt="Profile" class="profile-image">')
@@ -2753,42 +2733,29 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
     table.insert(html, '<div class="username">{{char}}</div>')
     table.insert(html, '<div class="message-bubble-container">')
     table.insert(html, '<div class="message-bubble">')
-    
-    if fullTagMatch then
-        table.insert(html, '<label class="message-text-label clickable-image-label" for="' .. uniqueId .. '">')
-    else
-        table.insert(html, '<label class="message-text-label">')
-    end
-    table.insert(html, messageContent)
+    table.insert(html, '<label class="message-text-label">')
+    table.insert(html, message)
     table.insert(html, '</label>')
-    
     table.insert(html, '</div>')
     table.insert(html, '<div class="timestamp">' .. timestamp .. '</div>')
     table.insert(html, '</div>')
     table.insert(html, '</div>')
-
-    if fullTagMatch then
-        table.insert(html, '<div class="fullscreen-overlay">')
-        table.insert(html, '<label for="' .. uniqueId .. '" class="fullscreen-close-label"></label>')
-
-        if NAIMESSENGERNOIMAGE == "0" then
+    table.insert(html, '</div>')
+    
+    -- inlay::가 존재할 경우
+    local inlayTag = string.match(message, "{{inlay::[^}]+}}")
+    if inlayTag and NAIMESSENGERNOIMAGE == "0" then
         local buttonJsonBody = '{"action":"KAKAO_REROLL", "identifier":"KAKAO_' .. timestamp .. '"}'
-        table.insert(html, '<div style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;">')
-        table.insert(html, overlayContent)
         table.insert(html, '<div class="reroll-button-wrapper" style="margin-top: 10px; z-index: 2;">')
         table.insert(html, '<div class="global-reroll-controls">')
         table.insert(html, '<button style="text-align: center;" class="reroll-button" risu-btn=\'' .. buttonJsonBody .. '\'>KAKAO</button>')
         table.insert(html, '</div></div>')
-        table.insert(html, '</div>')
-        end
-        
-        table.insert(html, '</div>')
     end
 
-    table.insert(html, '</div>')
-
     return table.concat(html)
+
     end)
+    
     return data
 end
 
