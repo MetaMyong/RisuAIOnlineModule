@@ -38,130 +38,14 @@ local function ERR(triggerId, str, code)
     alertNormal(triggerId, "ERROR: " .. str .. ": " .. message)
 end
 
-local function openRerollForm(triggerId)
-    local storedIdsVar = "STORED_SIMCARD_IDS"
-    local idListStr = getChatVar(triggerId, storedIdsVar) or "null"
-    if idListStr == "null" then idListStr = "" end
-    print("ONLINEMODULE: onButtonClick: Value retrieved for " .. storedIdsVar .. " with triggerId " .. triggerId .. ": [" .. tostring(idListStr) .. "]") 
-    local identifiers = {}
-
-    if idListStr and idListStr ~= "" and idListStr ~= "null" then
-         for id in string.gmatch(idListStr, "([^,]+)") do
-            local trimmedId = id:match("^%s*(.-)%s*$")
-            if trimmedId and trimmedId ~= "" then 
-                table.insert(identifiers, trimmedId)
-            else
-               print("ONLINEMODULE: Skipping invalid/empty ID found in list: [" .. tostring(id) .. "]")
-            end
-        end
-    else
-        print("ONLINEMODULE: No stored SIMCARD IDs string found or list is empty in variable: " .. storedIdsVar)
-    end
-
-
-    if #identifiers == 0 then
-        addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터가 없습니다.")
-        print("ONLINEMODULE: No valid identifiers found to display.")
-        return
-    end
-
-    local allRerollFormsCSS = [[
-<style>@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}.profile-reroll-area-wrapper{border-bottom:1px solid #000000;padding-bottom:0px;margin-bottom:10px;}.profile-reroll-area-wrapper:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}.profile-reroll-area{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}.simcard-name-clickable{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-decoration-color:#ff69b4;text-decoration-thickness:1px;text-underline-offset:2px;}.simcard-name-clickable:hover{color:#ff69b4;}.profile-preview{width:32px;height:32px;border-radius:16px;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}.reroll-button{padding:5px 12px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:14px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;}.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}.simcard-fullscreen-toggle{display:none;}.simcard-fullscreen-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:9999;padding:20px;box-sizing:border-box;}.simcard-fullscreen-content{position:relative;display:flex;justify-content:center;align-items:center;max-width:90%;max-height:90%;}.simcard-fullscreen-content>img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid white;box-shadow:0 0 25px rgba(0,0,0,0.5);object-fit:contain;}.simcard-fullscreen-close-label{position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer;z-index:1;}.simcard-fullscreen-close-button{position:absolute;top:-15px;right:-15px;font-size:24px;color:white;background-color:rgba(0,0,0,0.6);border-radius:50%;width:35px;height:35px;line-height:35px;text-align:center;cursor:pointer;z-index:3;border:1px solid rgba(255,255,255,0.3);}.simcard-fullscreen-toggle:checked+.profile-reroll-area-wrapper>.simcard-fullscreen-overlay{display:flex;align-items:center;justify-content:center;}</style>
-]]
-
-    local allRerollFormsBodyHtml = '<div><h2 style="text-align:center; margin-bottom: 15px;">저장된 시뮬레이션 카드 리롤 인터페이스</h2>'
-    local count = 0
-
-    for i, simId in ipairs(identifiers) do
-        local inlay = getChatVar(triggerId, simId) or "null"
-        if inlay == "null" then inlay = "" end
-
-        if inlay and type(inlay) == "string" and inlay ~= "" and inlay ~= "null" and string.len(inlay) > 5 then
-            count = count + 1
-            local uniqueId = "simcard-fs-" .. count
-            local rerollType = "SIMULATIONCARD"
-            local displayLabel = "NAME:"
-            local actionName = "SIMCARD_REROLL"
-            local buttonText = ""
-            local safeIdentifierHtml = escapeHtml(tostring(simId))
-            local safeIdentifierJson = escapeJsonValue(tostring(simId))
-            local risuBtnJson = string.format('{"action":%s, "identifier":%s}', escapeJsonValue(actionName), safeIdentifierJson)
-            local safeRisuBtnAttr = risuBtnJson
-
-            local htmlFormatPattern = [[<input type="checkbox" id="%s" class="simcard-fullscreen-toggle"><div class="profile-reroll-area-wrapper"><div class="profile-reroll-area"><div class="profile-info"><span class="profile-id-label" style="font-weight: bold;">%s</span><label for="%s" class="simcard-name-clickable">%s</label><div class="profile-preview">%s</div></div><div style="text-align: right; margin-top: 5px;"><button class="reroll-button" risu-btn='%s' style="padding: 5px 10px;">%s</button></div></div><div class="simcard-fullscreen-overlay"><label for="%s" class="simcard-fullscreen-close-label"></label><div class="simcard-fullscreen-content">%s<label for="%s" class="simcard-fullscreen-close-button">✕</label></div></div></div>]]
-            
-            local singleFormHtml = string.format(htmlFormatPattern .. "\n",
-                uniqueId,
-                displayLabel,
-                uniqueId,
-                safeIdentifierHtml,
-                inlay, -- 작은 미리보기
-                safeRisuBtnAttr,
-                buttonText,
-                -- 오버레이 부분
-                uniqueId, -- 배경 닫기 라벨
-                inlay, -- <<< 크게 보여줄 내용 (inlay 값 자체) >>>
-                uniqueId -- 'X' 닫기 버튼 라벨
-            )
-
-            allRerollFormsBodyHtml = allRerollFormsBodyHtml .. singleFormHtml
-        else
-            print("ONLINEMODULE: WARN - Could not retrieve valid inlay for stored SIMCARD ID: [" .. simId .. "]. Skipping.")
-        end
-    end
-
-    local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
-    local safeGlobalRisuBtnAttr = globalBtnJson
-    local globalButtonHtml = string.format([[ ... ]])
-    local finalHtml = allRerollFormsCSS .. allRerollFormsBodyHtml .. globalButtonHtml .. "</div>"
-
-    if count > 0 then
-         print("ONLINEMODULE: Displaying reroll interface for " .. count .. " stored SIMULATIONCARDs via addChat.")
-         addChat(triggerId, "user", finalHtml)
-    else
-         addChat(triggerId, "user", "⚠️ 저장된 시뮬레이션 카드 데이터를 찾았으나, 유효한 이미지(inlay) 정보가 없습니다.")
-         print("ONLINEMODULE: Found identifiers but no valid inlays to display.")
-    end
+local function getKakaoTime(now)
+    now = now or os.date("*t")
+    local hours = now.hour % 12 == 0 and 12 or now.hour % 12
+    local minutes = string.format("%02d", now.min)
+    local ampm = now.hour >= 12 and 'PM' or 'AM'
+    local formattedTime = string.format("%d:%s %s", hours, minutes, ampm)
+    return formattedTime
 end
-
-local function addRerollFormButton(triggerId, data)
-    local html = {}
-    local rerollTemplate = [[
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;}
-.simple-ui-bar{width:100%;max-width:600px;margin:20px auto;background-color:#ffe6f2;border:3px solid #000000;box-shadow:3px 3px 0px #000000;padding:8px 15px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}
-.separator{height:2px;background-color:#000000;width:100%;margin:5px 0;}
-.profile-reroll-area{display:flex;align-items:center;gap:10px;padding:10px 0;justify-content:space-between;flex-wrap:wrap;border-bottom:2px solid #000000;}
-.profile-info{display:flex;align-items:center;gap:8px;flex-grow:1;min-width:150px;}
-.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}
-.profile-id-value{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.profile-preview{width:32px;height:32px;border-radius:50%;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}
-.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}
-.reroll-button{padding:16px 36px;background-color:#000000;color:#ffe6f2;border:2px solid #000000;font-family:inherit;font-size:18px;cursor:pointer;box-shadow:2px 2px 0px #ff69b4;transition:all 0.1s ease-out;flex-shrink:0;min-width:80px;min-height:24px;position:relative;}
-.reroll-button::before{content:"REROLL";position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:#ffe6f2;pointer-events:none;}
-.reroll-button:hover{background-color:#ff69b4;color:#000000;box-shadow:1px 1px 0px #000000;transform:translate(1px,1px);}
-.reroll-button:active{box-shadow:none;transform:translate(2px,2px);}
-.global-reroll-controls{text-align:center;margin-top:15px;padding-top:10px;border-top:2px solid #000000;}
-</style>
-]]      
-    
-    local globalBtnJson = '{"action":"RUNREROLLSETTING", "identifier":"GLOBAL"}'
-    local safeGlobalRisuBtnAttr = globalBtnJson
-    local globalButtonHtml = string.format([[
-    <div class="global-reroll-controls">
-        <button class="reroll-button" risu-btn='%s'></button>
-    </div>
-    ]], safeGlobalRisuBtnAttr)
-
-    table.insert(html, rerollTemplate)
-    table.insert(html, data)
-    table.insert(html, globalButtonHtml)
-
-    return table.concat(html, "\n")
-
-end
-
 
 local function changeInlay(triggerId, index, oldInlay, newInlay)
     print("changeInlay is in PROCESS!")
@@ -242,6 +126,7 @@ end
 local function convertDialogue(triggerId, data)
     print("convertDialogue is in PROCESS!")
     local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
+    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
 
     local lineToModify = data 
 
@@ -249,10 +134,9 @@ local function convertDialogue(triggerId, data)
     local anyReplacementMade = false 
     local searchStartIndex = 1 
 
-    -- Add patterns for both quote styles
     local patterns = {
-        '"(.-)"',        -- Western quotes
-        '「(.-)」'       -- Asian quotes
+        '"(.-)"',
+        '「(.-)」'
     }
     
     local prefixEroStatus = "EROSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
@@ -308,8 +192,49 @@ local function convertDialogue(triggerId, data)
         else
             print("ONLINEMODULE: convertDialogue: No dialogue modifications applied (no matching dialogues found).")
         end
+    elseif NAIMESSENGER == "1" then
+        local modifiedString = ""
+        local currentIndex = 1
+        local madeChange = false
+
+        while currentIndex <= #lineToModify do
+            local found = false
+            local earliest_s = nil
+            local earliest_e = nil
+            local earliest_captured = nil
+
+            -- Find the earliest occurrence of any quote style
+            for _, pattern in ipairs(patterns) do
+                local s, e, captured = string.find(lineToModify, pattern, currentIndex)
+                if s and (earliest_s == nil or s < earliest_s) then
+                    earliest_s = s
+                    earliest_e = e
+                    earliest_captured = captured
+                    found = true
+                end
+            end
+
+            if found then
+                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex, earliest_s - 1)
+                local now = os.date("*t")
+                local replacementText = "KAKAO[" .. earliest_captured .. "|" .. getKakaoTime(now) .. "]"
+                modifiedString = modifiedString .. replacementText
+                madeChange = true
+                currentIndex = earliest_e + 1
+            else
+                modifiedString = modifiedString .. string.sub(lineToModify, currentIndex)
+                break
+            end
+        end
+
+        if madeChange then
+            lineToModify = modifiedString
+            print("ONLINEMODULE: convertDialogue: Dialogues were modified for KAKAO format.")
+        else
+            print("ONLINEMODULE: convertDialogue: No dialogue modifications applied (no matching dialogues found).")
+        end
     else
-        print("ONLINEMODULE: convertDialogue: NAICARD is not '1' or '2', skipping dialogue modification.")
+        print("ONLINEMODULE: convertDialogue: NAICARD and NAIMESSENGER are not enabled, skipping dialogue modification.")
     end
 
     data = lineToModify 
@@ -349,14 +274,14 @@ local function inputEroStatus(triggerId, data)
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - *PRINT* EROSTATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
+- DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.
+    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - PRINT EROSTATUS[...] INSTEAD.
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - *Valid*:
+    - Valid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -364,120 +289,118 @@ local function inputEroStatus(triggerId, data)
 
 #### Erotic Status Interface Template
 - AI must follow this template:
-- EROSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
-- NAME: English Name of NPC.
-- DIALOGUE: NPC's Dailogue.
-    - DO NOT INCLUDE "", '' HERE.
-- MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
-- Bodypart Image: Image of the Bodypart.
-    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
-        - 0: This is the default state for each keyword.
-        - 1: This is the aroused state for each keyword.
-        - 2: This is the cum-showered or injected state for each keyword.
-    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
-- Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
-    - Include NPC's real-time assessment, use erotic language
-    - Do not include "" or ''.
-- Bodypart Comment: A short, two-sentence self-assessment of the keyword from NPC's perspective.
-    - Do not include "" or ''. Must be short two phrases.
-    - Include NPC's real-time assessment.
-    - If NPC is aroused, use erotic language.
-- Bodypart Info: Each item must provides objective information.
-    - Each item must be short.
-    - ↔: Internally replaced with <br>.
-        - Change the line with ↔(Upto 5 lines)
-    - **ALWAYS OBSERVE and PRINT the EXACT VALUE.**.
-        - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
-        - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
-        - List:
-            - Mouth:
-                - Condition: Condition in the mouth(e.g., Cum swallowed, Blowjob, etc.)
-                - Swallowed cum amount: Total amount of cum swallowed, 0~99999 ml
-                - ...
-            - Nipples:
-                - Condition: Stimulation, Nipple climax, Breast milk discharge, etc.
-                - Nipple climax experience: Count of climax with nipples, 0~99999 times
-                - Breast milk discharge amount: Total amount of breast milk, 0~99999 ml
-                - ...
-            - Uterus:
-                - Condition: Menstual cycle(e.g., Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.)
-                - Injected cum amount: Total amount of cum injected into the uterus, 0~99999 ml
-                - Pregnancy probability: 0~100 %
-                - ...
-            - Vaginal:
-                - Condition: Virgin, Non-virgin, etc.
-                - Masturbation count: Total count of masturbation with fingers, 0~99999 times
-                - Vaginal intercourse count: Total count of penis round trips, 0~99999 times
-                - ...
-            - Anal:
-                - Condition: Undeveloped
-                - Anal intercourse count: Total count of penis round trips, 0~99999 times
-                - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
-                - ...
-            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
-                - Korean: 1 char.
-                - English: 0.5 char.
-                - Blank space: 0.5 char.
-    - Please print out the total count from birth to now.
-    - If character has no experience, state that character has no experience.
-- TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
-- LOCATION: Current NPC's location and detail location.
-- OUTFITS: Current NPC's OUTFITS List.
-    - *EACH ITEMS MUST NOT OVER 20 CHAR*.
-        - Korean: 1 char.
-        - English: 0.5 char.
-        - Blank space: 0.5 char.
-    - NO () BRACKET ALLOWED.
-    - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
-            - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
-                - Avoid dirty descriptions (e.g., Smelly Rags *OR* Filthy Barefoot, etc).
-                - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
-            - Breasts: size, shape, Color and size of the nipple and areola.
-            - Pussy: degree of opening, shape of pussy hair.
-            - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows "Not visible". However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
-                - Usually, when wearing a skirt or pants, the panties are not visible.
-                - Usually, when wearing panties or something similar, the vaginal is not visible.
-                - Usually, when wearing a top, bra, or dress, the breasts are not visible.
-- INLAY: This is a Flag.  
+    - EROSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
+    - NAME: English Name of NPC.
+    - DIALOGUE: NPC's Dialogue.
+        - DO NOT INCLUDE "", '' HERE.
+    - MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
+    - Bodypart Image: Image of the Bodypart.
+        - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 OR UTERUS_2, etc.).
+            - 0: This is the default state for each keyword.
+            - 1: This is the aroused state for each keyword.
+            - 2: This is the cum-showered or injected state for each keyword.
+        - If Character is MALE, PRINT OUT "MALE" instead of the keyword.
+    - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
+        - Include NPC's real-time assessment, use erotic language
+        - Do not include "" or ''.
+    - Bodypart Comment: A short, two-sentence self-assessment of the keyword from NPC's perspective.
+        - Do not include "" or ''. Must be short two phrases.
+        - Include NPC's real-time assessment.
+        - If NPC is aroused, use erotic language.
+    - Bodypart Info: Each item must provides objective information.
+        - Each item must be short.
+        - ↔: Internally replaced with <br>.
+            - Change the line with ↔(Upto 5 lines)
+        - ALWAYS OBSERVE and PRINT the EXACT VALUE..
+            - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
+            - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
+            - List:
+                - Mouth:
+                    - Swallowed cum amount: Total amount of cum swallowed, 0~99999 ml
+                    - ...
+                - Nipples:
+                    - Nipple climax experience: Count of climax with nipples, 0~99999 times
+                    - Breast milk discharge amount: Total amount of breast milk, 0~99999 ml
+                    - ...
+                - Uterus:
+                    - Menstual cycle: Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.
+                    - Injected cum amount: Total amount of cum injected into the uterus, 0~99999 ml
+                    - Pregnancy probability: 0~100 %
+                    - ...
+                - Vaginal:
+                    - State: Virgin, Non-virgin, etc.
+                    - Masturbation count: Total count of masturbation with fingers, 0~99999 times
+                    - Vaginal intercourse count: Total count of penis round trips, 0~99999 times
+                    - ...
+                - Anal:
+                    - State: Undeveloped
+                    - Anal intercourse count: Total count of penis round trips, 0~99999 times
+                    - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
+                    - ...
+                - EACH ITEMS MUST NOT OVER 15 CHAR.
+                    - Korean: 1 char.
+                    - English: 0.5 char.
+                    - Blank space: 0.5 char.
+        - Please print out the total count from birth to now.
+        - If character has no experience, state that character has no experience.
+    - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
+    - LOCATION: Current NPC's location and detail location.
+    - OUTFITS: Current NPC's OUTFITS List.
+        - EACH ITEMS MUST NOT OVER 15 CHAR.
+            - Korean: 1 char.
+            - English: 0.5 char.
+            - Blank space: 0.5 char.
+        - NO () BRACKET ALLOWED.
+        - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
+                - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
+                    - Avoid dirty descriptions (e.g., Smelly Rags OR Filthy Barefoot, etc).
+                    - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
+                - Breasts: size, shape, Color and size of the nipple and areola.
+                - Pussy: degree of opening, shape of pussy hair.
+                - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows "Not visible". However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
+                    - Usually, when wearing a skirt or pants, the panties are not visible.
+                    - Usually, when wearing panties or something similar, the vaginal is not visible.
+                    - Usually, when wearing a top, bra, or dress, the breasts are not visible.
+    - INLAY: This is a Flag.  
 ]]
 
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
-    - Just print <NAI(INDEX)> Exactly.
+        - Just print <NAI(INDEX)> Exactly.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
-    - Just print <NOIMAGE> Exactly.        
+        - Just print <NOIMAGE> Exactly.        
 ]]
     end
             
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
-- NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
-        - Invalid: <!-- EROSTATUS_1 -->
-        - *Valid*: <NAI1>
-    - Example:
-        - If the status interface is the first one, print '<NAI1>'.
-        - If the status interface is the second one, print '<NAI2>'.
-        - If the status interface is the third one, print '<NAI3>'.
-        - ...
+    - NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
+            - Invalid: <!-- EROSTATUS_1 -->
+            - Valid: <NAI1>
+        - Example:
+            - If the status interface is the first one, print '<NAI1>'.
+            - If the status interface is the second one, print '<NAI2>'.
+            - If the status interface is the third one, print '<NAI3>'.
+            - ...
 ]]
     end
 
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
-    - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Condition: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Condition: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+        - Example:
+            - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
-    - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Condition: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Condition: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Condition: Ovulation period↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Condition: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Condition: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+        - Example:
+            - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Menstual: Ovulation cycle↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|State: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
     data = data .. [[
-        - If Character is MALE.
-            - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|Condition: MALE|NIPPLES:MALE|Ha?|Condition: MALE||TERUS:MALE|I don't have one.|Condition: MALE|VAGINAL:MALE|I don't have one.|Condition: MALE|ANAL:MALE|I don't have one.|Condition: MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
+            - If Character is MALE.
+                - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|MALE|NIPPLES:MALE|Ha?|MALE||TERUS:MALE|I don't have one.|MALE|VAGINAL:MALE|I don't have one.|MALE|ANAL:MALE|I don't have one.|MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
 ]]
 
     return data
@@ -636,6 +559,9 @@ opacity: 0;
         local outfitsText = parsed["OUTFITS"]
         local inlayContent = parsed["INLAY"]
 
+        -- INLAY 에서 <NAI(INDEX)> 를 찾아서 INDEX 번호만 추출
+        local inlayIndex = string.match(inlayContent, "<NAI(%d+)>")
+
         local mouthImg   = getPart("MOUTH", 0)
         local mouthText  = getPart("MOUTH", 1)
         local mouthHover = getPart("MOUTH", 2)
@@ -726,7 +652,16 @@ opacity: 0;
         table.insert(html, "</div>")
         table.insert(html, "</div>")
         table.insert(html, "<div id=\"outfit-list-content\">" .. outfitsText .. "</div>")
-        table.insert(html, "</div>")
+        
+        -- 리롤 버튼 추가 - 추출한 INDEX 값 기반으로 identifier 설정
+        local buttonJson = '{"action":"EROSTATUS_REROLL", "identifier":"' .. (("EROSTATUS_" .. inlayIndex) or "") .. '"}'
+
+        table.insert(html, "<div class=\"reroll-button-wrapper\">")
+        table.insert(html, "<div class=\"global-reroll-controls\">")
+        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJson .. "'>EROSTATUS</button>")
+       
+        table.insert(html, "</div></div>")
+        table.insert(html, "</div><br>")
 
         return table.concat(html, "\n")
     end)
@@ -739,14 +674,14 @@ local function inputSimulCard(triggerId, data)
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- *DO NOT PRINT* DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - *PRINT* SIMULSTATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPERATE THEM*
+- DO NOT PRINT DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.
+    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - PRINT SIMULSTATUS[...] INSTEAD.
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPERATE THEM
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - *Valid*:
+    - Valid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -816,7 +751,8 @@ body { background-color: #f0f0f0;padding: 20px;}
 .info-line .label {font-weight: bold;color:rgb(105, 170, 255);margin-right: 5px;}
 .info-line .value {color: #000000;}
 </style>
-]]
+]] 
+
         
         local html = {}
         table.insert(html, SimulBotTemplate)
@@ -846,7 +782,17 @@ body { background-color: #f0f0f0;padding: 20px;}
         table.insert(html, "<span class=\"value\">" .. location .. "</span>")
         table.insert(html, "</div>")
         table.insert(html, "</div>")
-        table.insert(html, "</div>")
+
+        -- 리롤 버튼 추가 - 추출한 name 값 기반으로 identifier 설정
+        local buttonJson = '{"action":"SIMCARD_REROLL", "identifier":"' .. (name or "") .. '"}'
+        
+        table.insert(html, "<div class=\"reroll-button-wrapper\">")
+        table.insert(html, "<div class=\"global-reroll-controls\">")
+        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJson .. "'>SIMUL</button>")
+       
+        table.insert(html, "</div></div>")
+
+        table.insert(html, "</div><br>")
 
         return table.concat(html, "\n")
     end)
@@ -885,14 +831,14 @@ local function inputStatusHybrid(triggerId, data)
     end
     
     data = data .. [[
-- *DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - *PRINT* EROSTATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
+- DO NOT PRINT FEMALE's DIALOGUE via "" or 「」, REPLACE ALL FEMALE's DIALOGUE to EROSTATUS BLOCK.
+    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of EROSTATUS BLOCK(EROSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - PRINT EROSTATUS[...] INSTEAD.
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
 - Example:
     - Invalid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - *Valid*:
+    - Valid:
         - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
         - EROSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
@@ -900,144 +846,143 @@ local function inputStatusHybrid(triggerId, data)
 
 #### Erotic Status Interface Template
 - AI must follow this template:
-- EROSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
-- NAME: English Name of NPC.
-- DIALOGUE: NPC's Dailogue.
-    - DO NOT INCLUDE "", '' HERE.
-- MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
-- Bodypart Image: Image of the Bodypart.
-    - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 *OR* UTERUS_2, etc.).
-        - 0: This is the default state for each keyword.
-        - 1: This is the aroused state for each keyword.
-        - 2: This is the cum-showered or injected state for each keyword.
-    - *If Character is MALE, PRINT OUT "MALE" instead of the keyword.*
-- Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
-    - Include NPC's real-time assessment, use erotic language
-    - Do not include "" or ''.
-- Bodypart Comment: A short, two-sentence self-assessment of the keyword from NPC's perspective.
-    - Do not include "" or ''. Must be short two phrases.
-    - Include NPC's real-time assessment.
-    - If NPC is aroused, use erotic language.
-- Bodypart Info: Each item must provides objective information.
-    - Each item must be short.
-    - ↔: Internally replaced with <br>.
-        - Change the line with ↔(Upto 5 lines)
-    - **ALWAYS OBSERVE and PRINT the EXACT VALUE.**.
-        - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
-        - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
-        - List:
-            - Mouth:
-                - Condition: Condition in the mouth(e.g., Cum swallowed, Blowjob, etc.)
-                - Swallowed cum amount: Total amount of cum swallowed, 0~99999 ml
-                - ...
-            - Nipples:
-                - Condition: Stimulation, Nipple climax, Breast milk discharge, etc.
-                - Nipple climax experience: Count of climax with nipples, 0~99999 times
-                - Breast milk discharge amount: Total amount of breast milk, 0~99999 ml
-                - ...
-            - Uterus:
-                - Condition: Menstual cycle(e.g., Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.)
-                - Injected cum amount: Total amount of cum injected into the uterus, 0~99999 ml
-                - Pregnancy probability: 0~100 %
-                - ...
-            - Vaginal:
-                - Condition: Virgin, Non-virgin, etc.
-                - Masturbation count: Total count of masturbation with fingers, 0~99999 times
-                - Vaginal intercourse count: Total count of penis round trips, 0~99999 times
-                - ...
-            - Anal:
-                - Condition: Undeveloped
-                - Anal intercourse count: Total count of penis round trips, 0~99999 times
-                - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
-                - ...
-            - *EACH ITEMS MUST NOT OVER 15 CHAR*.
-                - Korean: 1 char.
-                - English: 0.5 char.
-                - Blank space: 0.5 char.
-    - Please print out the total count from birth to now.
-    - If character has no experience, state that character has no experience.
-- TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
-- LOCATION: Current NPC's location and detail location.
-- OUTFITS: Current NPC's OUTFITS List.
-    - *EACH ITEMS MUST NOT OVER 20 CHAR*.
-        - Korean: 1 char.
-        - English: 0.5 char.
-        - Blank space: 0.5 char.
-    - NO () BRACKET ALLOWED.
-    - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
-            - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
-                - Avoid dirty descriptions (e.g., Smelly Rags *OR* Filthy Barefoot, etc).
-                - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
-            - Breasts: size, shape, Color and size of the nipple and areola.
-            - Pussy: degree of opening, shape of pussy hair.
-            - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows "Not visible". However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
-                - Usually, when wearing a skirt or pants, the panties are not visible.
-                - Usually, when wearing panties or something similar, the vaginal is not visible.
-                - Usually, when wearing a top, bra, or dress, the breasts are not visible.
-- INLAY: This is a Flag.  
+    - EROSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|TIME:(TIME)|LOCATION:(LOCATION)|OUTFITS:(OUTFITS)|INLAY:(INLAY)]
+    - NAME: English Name of NPC.
+    - DIALOGUE: NPC's Dialogue.
+        - DO NOT INCLUDE "", '' HERE.
+    - MOUTH, NIPPLES, UTERUS, VAGINAL, ANAL: This is the Body parts Keyword.
+    - Bodypart Image: Image of the Bodypart.
+        - Each section consists of a keyword and a number: 0, 1, or 2 (e.g., MOUTH_0 OR UTERUS_2, etc.).
+            - 0: This is the default state for each keyword.
+            - 1: This is the aroused state for each keyword.
+            - 2: This is the cum-showered or injected state for each keyword.
+        - If Character is MALE, PRINT OUT "MALE" instead of the keyword.
+    - Bodypart Comment:  A short, one-sentence self-assessment of the keyword from NPC's perspective.
+        - Include NPC's real-time assessment, use erotic language
+        - Do not include "" or ''.
+    - Bodypart Comment: A short, two-sentence self-assessment of the keyword from NPC's perspective.
+        - Do not include "" or ''. Must be short two phrases.
+        - Include NPC's real-time assessment.
+        - If NPC is aroused, use erotic language.
+    - Bodypart Info: Each item must provides objective information.
+        - Each item must be short.
+        - ↔: Internally replaced with <br>.
+            - Change the line with ↔(Upto 5 lines)
+        - ALWAYS OBSERVE and PRINT the EXACT VALUE..
+            - Invalid: Low probability, Considerable amount, Not applicable, ... , etc.
+            - Valid: 13 %, 32 ml, 1921 counts, ... , etc.
+            - List:
+                - Mouth:
+                    - Swallowed cum amount: Total amount of cum swallowed, 0~99999 ml
+                    - ...
+                - Nipples:
+                    - Nipple climax experience: Count of climax with nipples, 0~99999 times
+                    - Breast milk discharge amount: Total amount of breast milk, 0~99999 ml
+                    - ...
+                - Uterus:
+                    - Menstual cycle: Follicular phase, Ovulatory phase, Luteal phase, Pregnancy, etc.
+                    - Injected cum amount: Total amount of cum injected into the uterus, 0~99999 ml
+                    - Pregnancy probability: 0~100 %
+                    - ...
+                - Vaginal:
+                    - State: Virgin, Non-virgin, etc.
+                    - Masturbation count: Total count of masturbation with fingers, 0~99999 times
+                    - Vaginal intercourse count: Total count of penis round trips, 0~99999 times
+                    - ...
+                - Anal:
+                    - State: Undeveloped
+                    - Anal intercourse count: Total count of penis round trips, 0~99999 times
+                    - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
+                    - ...
+                - EACH ITEMS MUST NOT OVER 15 CHAR.
+                    - Korean: 1 char.
+                    - English: 0.5 char.
+                    - Blank space: 0.5 char.
+        - Please print out the total count from birth to now.
+        - If character has no experience, state that character has no experience.
+    - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
+    - LOCATION: Current NPC's location and detail location.
+    - OUTFITS: Current NPC's OUTFITS List.
+        - EACH ITEMS MUST NOT OVER 15 CHAR.
+            - Korean: 1 char.
+            - English: 0.5 char.
+            - Blank space: 0.5 char.
+        - NO () BRACKET ALLOWED.
+        - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
+                - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
+                    - Avoid dirty descriptions (e.g., Smelly Rags OR Filthy Barefoot, etc).
+                    - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
+                - Breasts: size, shape, Color and size of the nipple and areola.
+                - Pussy: degree of opening, shape of pussy hair.
+                - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows "Not visible". However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
+                    - Usually, when wearing a skirt or pants, the panties are not visible.
+                    - Usually, when wearing panties or something similar, the vaginal is not visible.
+                    - Usually, when wearing a top, bra, or dress, the breasts are not visible.
+    - INLAY: This is a Flag.  
 ]]
 
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
-    - Just print <NAI(INDEX)> Exactly.
+        - Just print <NAI(INDEX)> Exactly.
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
-    - Just print <NOIMAGE> Exactly.        
+        - Just print <NOIMAGE> Exactly.        
 ]]
     end
             
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
-- NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
-        - Invalid: <!-- EROSTATUS_1 -->
-        - *Valid*: <NAI1>
-    - Example:
-        - If the status interface is the first one, print '<NAI1>'.
-        - If the status interface is the second one, print '<NAI2>'.
-        - If the status interface is the third one, print '<NAI3>'.
-        - ...
+    - NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
+            - Invalid: <!-- EROSTATUS_1 -->
+            - Valid: <NAI1>
+        - Example:
+            - If the status interface is the first one, print '<NAI1>'.
+            - If the status interface is the second one, print '<NAI2>'.
+            - If the status interface is the third one, print '<NAI3>'.
+            - ...
 ]]
     end
 
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
-    - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Status: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Status: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|Status: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+        - Example:
+            - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
 ]]
     elseif NAICARDNOIMAGE == "1" then
         data = data .. [[
-    - Example:
-        - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Status: Calm↔Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Status: Stimulation 0 times↔Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Status: Ovulation period↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|Status: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|Status: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
+        - Example:
+            - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Menstual: Ovulation cycle↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|State: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
 ]]
     end
 
     data = data .. [[
 ## Status Interface
 ### Simulation Status Interface
-- Male's Status Interface, NOT THE FEMALE.
-- *DO NOT PRINT MALE's DIALOGUE via "" or 「」, REPLACE ALL MALE's DIALOGUE to SIMULSTATUS BLOCK.*
-    - *DO NOT PRINT* "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
-        - *PRINT* SIMULSTATUS[...] INSTEAD.
-    - *DO NOT COMBINE* THEM into ONE SENTENCE, *SEPARATE THEM*
+- If the character is NOT a FEMALE, PRINT OUT the Simulation Status Interface.
+    - If the character is not a human type(e.g., robot, monster, etc.), PRINT OUT the Simulation Status Interface.
+- DO NOT PRINT CHARACTER's DIALOGUE via "" or 「」, REPLACE ALL CHARACTER's DIALOGUE to SIMULSTATUS BLOCK.
+    - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
+        - PRINT SIMULSTATUS[...] INSTEAD.
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
 - Example:
     - Invalid:
-        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - *Valid*:
-        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
-        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
-        - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+        - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
+    - Valid:
+        - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
+        - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect.|...]
+        - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed.|...]
+        - His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
 
 #### Simulation Status Interface Template
-- SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
-- NAME: The name of the NPC.
-- DIALOGUE: The dialogue of the NPC.
-- Make sure to include NPC's dialogue here
-- Do not include any other NPC's dialogue or actions.
+- SIMULSTATUS[NAME:(CHARACTER's Name)|DIALOGUE:(CHARACTER's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
+- NAME: The name of the CHARACTER.
+- DIALOGUE: The dialogue of the CHARACTER.
+- Make sure to include CHARACTER's dialogue here
+- Do not include any other CHARACTER's dialogue or actions.
 - Do not include ' and " in the dialogue.
 - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
-- LOCATION: The location of the NPC.
+- LOCATION: The location of the CHARACTER.
 - INLAY: This is a Flag.
 ]] 
         if NAICARDNOIMAGE == "0" then
@@ -1081,103 +1026,108 @@ local function inputTwitter(triggerId, data)
 ## SNS Interface
 ### Twitter Interface
 ]]
-    if NAISNSREAL == "0" then
+    if NAISNSREAL == "1" then
         data = data .. [[
-- **PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY**
+- PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY AFTER UPLOADING TWITTER POST
 ]]
-    elseif NAISNSREAL == "1" then
+    else
         data = data .. [[
-- **PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY AFTER UPLOADING TWITTER POST**
-]]
+- ALWAYS PRINT OUT THE CHARACTER's TWITTER INTERFACE
+]]        
     end
 
     if NAISNSTARGET == "0" then
         data = data .. [[
-- *MAKE a {{user}}'s TWITTER INTERFACE*
+- MAKE a {{user}}'s TWITTER INTERFACE
 ]]
     elseif NAISNSTARGET == "1" then
         data = data .. [[
-- *MAKE a {{char}}'s TWITTER INTERFACE*
+- MAKE a {{char}}'s TWITTER INTERFACE
 ]]
     elseif NAISNSTARGET == "2" then
         data = data .. [[
-- *MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE*
+- MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE
 ]]
     end
 
     data = data .. [[
 ### Twitter Interface Template
 - AI must follow this template:
-- TWITTER[NAME:(Real Name)|TNAME:(Twitter Nickname)|TID:(Twitter ID)|TPROFILE:(Profile Image)|TWEET:(Tweet Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date/Time)|VIEW:(Viewer Count)|REPLY:(Reply Count)|RETWEET:(Retweet Count)|LIKES:(Likes Count)|COMMENT:(Viewer Nickname1)|(Comment Body1)|(Viewer Nickname2)|(Comment Body2)|...]
-- NAME: Real name of the Twitter account's owner(e.g., 'Eun-Young').
-- TNAME: The nickname of the character on Twitter.
-- TID: The unique identifier for the character on Twitter, no @ sign.
-- TPROFILE: The profile image of the character on Twitter.
+    - TWITTER[NAME:(Real Name)|TNAME:(Twitter Nickname)|TID:(Twitter ID)|TPROFILE:(Profile Image)|TWEET:(Tweet Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date/Time)|VIEW:(Viewer Count)|REPLY:(Reply Count)|RETWEET:(Retweet Count)|LIKES:(Likes Count)|COMMENT:(Viewer Nickname1)|(Comment Body1)|(Viewer Nickname2)|(Comment Body2)|...]
+    - NAME: Real name of the Twitter account's owner(e.g., 'Eun-Young').
+    - TNAME: The nickname of the character on Twitter.
+    - TID: The unique identifier for the character on Twitter, no @ sign.
+        - If character ALREADY has a Twitter ID, use the EXISTING ONE.
+        - Else, MAKE UP a new one.
+            - Example: If TWITTER[NAME:Iono|TNAME:⚡Moyamo⚡|TID:Moyamo_PaldeaQueen|...] exists.
+                - Invalid: TWITTER[NAME:Iono|TNAME:⚡Moyamo⚡|TID:Moyamo_PaldeaStreaming|...]
+                - Valid: TWITTER[NAME:Iono|TNAME:⚡Moyamo⚡|TID:Moyamo_PaldeaQueen|...]
+    - TPROFILE: The profile image of the character on Twitter.
 ]]  
     if NAISNSNOIMAGE == "0" then
         data = data .. [[
-    - Print '<NAI>' Exactly.
-- TWEET: Content of the Tweet.
-	- *NO #HASHTAGS ALLOWED AT HERE.*
-- MEDIA: Media of the post
-    - Print '<NAI>' Exactly.
+        - Print '<NAI>' Exactly.
+    - TWEET: Content of the Tweet.
+        - NO #HASHTAGS ALLOWED AT HERE.
+    - MEDIA: Media of the post
+        - Print '<NAI>' Exactly.
 ]]
     elseif NAISNSNOIMAGE == "1" then
         if NAISNSTARGET == "0" then
             data = data .. [[
-    - Print {{source::user}} Exactly.
-- TWEET: Content of the Tweet.
-	- *NO #HASHTAGS ALLOWED AT HERE.*
-- MEDIA: Media of the post
-    - Describe the situation of the twitter post.
+        - Print {{source::user}} Exactly.
+    - TWEET: Content of the Tweet.
+        - NO #HASHTAGS ALLOWED AT HERE.
+    - MEDIA: Media of the post
+        - Describe the situation of the twitter post.
 ]]
         elseif NAISNSTARGET == "1" then
             data = data .. [[
-    - Print {{source::char}} Exactly.
-- TWEET: Content of the Tweet.
-	- *NO #HASHTAGS ALLOWED AT HERE.*
-- MEDIA: Media of the post
-    - Describe the situation of the twitter post.
+        - Print {{source::char}} Exactly.
+    - TWEET: Content of the Tweet.
+        - NO #HASHTAGS ALLOWED AT HERE.
+    - MEDIA: Media of the post
+        - Describe the situation of the twitter post.
 ]]           
         end
     end
 
     data = data .. [[
-- HASH: The hashtags of the tweet.	
-	- Each tag *MUST BE* wrapped in → and ←.
-	- If post includes NSFW content, first tag is 'SexTweet'.
-	- Final value example: →SexTweet←→BitchDog←→PublicToilet←.
-- TIME: The date and time the tweet was posted.
-	- Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
-- VIEW: The number of viewers of the tweet.
-- REPLY: The number of replies to the tweet.
-- RETWEET: The number of retweets of the tweet.
-- LIKES: The number of likes on the tweet.
-- COMMENT:
-	- Viewer Nickname: The nickname of the viewer who replied to the tweet.
-		- Use the Twitter nickname of a realistic native Korean.
-		- Final value example:
-			- Invalid: KinkyDog
-			- *Valid*: SexTweetHunter
-	- Comment Body: The content of the reply to the tweet.
-		- Print the reply of a realistic native Korean with crude manner.
-			- Example:
-				- Invalid: Whoa, you shouldn't post such photos in a place like this;;
-				- *Valid*: Damn this is so fucking arousing bitch! lol
-- Example:
+    - HASH: The hashtags of the tweet.	
+        - Each tag MUST BE wrapped in → and ←.
+        - If post includes NSFW content, first tag is 'SexTweet'.
+        - Final value example: →SexTweet←→BitchDog←→PublicToilet←.
+    - TIME: The date and time the tweet was posted.
+        - Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
+    - VIEW: The number of viewers of the tweet.
+    - REPLY: The number of replies to the tweet.
+    - RETWEET: The number of retweets of the tweet.
+    - LIKES: The number of likes on the tweet.
+    - COMMENT:
+        - Viewer Nickname: The nickname of the viewer who replied to the tweet.
+            - Use the realistic Twitter nickname.
+            - Final value example:
+                - Invalid: KinkyDog
+                - Valid: SexTweetHunter
+        - Comment Body: The content of the reply to the tweet.
+            - Print the reply of a viewer with crude manner.
+                - Example:
+                    - Invalid: Whoa, you shouldn't post such photos in a place like this;;
+                    - Valid: Damn this is so fucking arousing bitch! lol
+    - Example:
 ]]
     if NAISNSNOIMAGE == "0" then
         data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:<NAI>|TWEET:⁉️⁉️⁉️ Just got really surprised...;; Suddenly sensed someone in a place where no one should be... Thought my heart was going to burst!!|MEDIA:<NAI>|HASH:→MagicalGirl←→FlameHeart←→Shocked←→AnythingSuspiciousOnPatrol?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?! Could it be a villain?!|SexHunter|What happened? Post pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:<NAI>|TWEET:⁉️⁉️⁉️ Just got really surprised...;; Suddenly sensed someone in a place where no one should be... Thought my heart was going to burst!!|MEDIA:<NAI>|HASH:→MagicalGirl←→FlameHeart←→Shocked←→AnythingSuspiciousOnPatrol?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?! Could it be a villain?!|SexHunter|What happened? Post pics]
 ]]
     elseif NAISNSNOIMAGE == "1" then
         if NAISNSTARGET == "0" then
             data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::user}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::user}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
 ]]
         elseif NAISNSTARGET == "1" then
             data = data .. [[
-- TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::char}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_Yen|TPROFILE:{{source::char}}|TWEET:⁉️⁉️⁉️ I was so surprised just now...;; Suddenly sensed someone's presence in a place where no one should be... Thought my heart was going to burst!!|MEDIA:A magical girl walking in the middle of a dark alley.|HASH:→magicalgirl←→flameheart←→surprised←→onpatrolstrangeoccurrence?←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone?? Not someone dangerous, right? Be careful!|MagicalGirlFan|Wow FlameHeart real-time tweet?! Is it a villain?!|SexHunter|What happened? Show us pics]
 ]]
         end
     end
@@ -1482,9 +1432,22 @@ body, .tweet-card { font-size: 15px; }
             table.insert(html, "</div>")
         end
 
+        -- 리롤 버튼 추가 - 추출한 twitterid 값 기반으로 identifier 설정
+        local buttonJsonProfile = '{"action":"PROFILE_REROLL", "identifier":"' .. (twitter_id or "") .. '"}'
+        local buttonJsonBody = '{"action":"TWEET_REROLL", "identifier":"' .. (twitter_id or "") .. '"}'
+
+        table.insert(html, "<div class=\"reroll-button-wrapper\">")
+        table.insert(html, "<div class=\"global-reroll-controls\">")
+        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJsonProfile .. "'>PROFILE</button>")
+        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJsonBody .. "'>TWEET</button>")
+        
+        table.insert(html, "</div></div>")
+
         table.insert(html, "</div>")
         table.insert(html, "</div>")
-        table.insert(html, "</div>")
+
+        
+        table.insert(html, "</div><br>")
         return table.concat(html, "\n")
     end)
 
@@ -1499,49 +1462,49 @@ local function inputDCInside(triggerId, data)
     data = data .. [[
 ## Community Interface
 ### DCInside Gallery Interface
-- *PRINT OUT EXACTLY ONE DCINSIDE GALLERY INTERFACE at the BOTTOM of the RESPONSE**
-- *MAKE ]] .. NAIDCPOSTNUMBER .. [[ POSTS EXACTLY*
+- PRINT OUT EXACTLY ONE DCINSIDE GALLERY INTERFACE at the BOTTOM of the RESPONSE
+- MAKE ]] .. NAIDCPOSTNUMBER .. [[ POSTS EXACTLY
 
 #### DCInside Gallery Interface Template
 - AI must follow this template:
-- DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. NAIDCPOSTNUMBER ..[[ TIMES *MORE* ]
-- GN: The name of the gallery where the post is located.
-- PID: The unique identifier for the post in the gallery.
-- PN: The unique number of the post in the gallery.
-- PT: The title of the post.
-	- **Do not include ', ", [, |, ] in the title.**
-- PC: The number of comments on the post.
-- PW: The Writer of the post.
-- PD: The time post was made.
-- PV: The number of views the post has received.
-- PR: The number of recommendations the post has received.
-- BODY: The content of the post.
-	- **Do not include ', ", [, |, ] in the content.**
+    - DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. NAIDCPOSTNUMBER ..[[ TIMES MORE ]
+    - GN: The name of the gallery where the post is located.
+    - PID: The unique identifier for the post in the gallery.
+    - PN: The unique number of the post in the gallery.
+    - PT: The title of the post.
+        - Do not include ', ", [, |, ] in the title.
+    - PC: The number of comments on the post.
+    - PW: The Writer of the post.
+    - PD: The time post was made.
+    - PV: The number of views the post has received.
+    - PR: The number of recommendations the post has received.
+    - BODY: The content of the post.
+        - Do not include ', ", [, |, ] in the content.
 ]]
     if NAICOMMUNITYNOIMAGE == "0" then
         data = data .. [[
-        - If the post includes an image, print a specific keyword (e.g., '<NAI1>', '<NAI2>', etc.) to indicate where the prompt should be generated.
+            - If the post includes an image, print a specific keyword (e.g., '<NAI1>', '<NAI2>', etc.) to indicate where the prompt should be generated.
 ]]
     end
 
     data = data .. [[
-- Comment Author: The author of the comment.
-- Comment Content: The content of the comment.
-	- Do not include ', ", [, |, ] in the content.
-- Example:
+    - Comment Author: The author of the comment.
+    - Comment Content: The content of the comment.
+        - Do not include ', ", [, |, ] in the content.
+    - Example:
 ]]
     if NAICOMMUNITYNOIMAGE == "0" then
         data = data .. [[
-    - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:<NAI1>I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:<NAI7>The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
+        - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:<NAI1>I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:<NAI7>The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
 ]]
     elseif NAICOMMUNITYNOIMAGE == "1" then
         data = data .. [[
-    - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
+        - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
 ]]
     end
     data = data .. [[
 #### DCInside Gallery Information
-- All users typically post anonymously ('ㅇㅇ', 'ㅁㄴㅇㄹ', etc.) or use specific nicknames (고정닉). IP addresses (often partial) are usually displayed next to anonymous posts. **Fixed Nicknames (고정닉)** have an orange icon, **Semi-fixed Nicknames (반고정닉)** have a green icon.
+- All users typically post anonymously ('ㅇㅇ', 'ㅁㄴㅇㄹ', etc.) or use specific nicknames (고정닉). IP addresses (often partial) are usually displayed next to anonymous posts. Fixed Nicknames (고정닉) have an orange icon, Semi-fixed Nicknames (반고정닉) have a green icon.
 	- Wrap with ▶ and ◀ for fixed nicknames (고정닉), ▷ and ◁ for semi-fixed nicknames (반고정닉) before the author information.
 		- ▶: Internally replaced with <h1>.
 		- ◀: Internally replaced with </h1>.
@@ -1557,8 +1520,8 @@ local function inputDCInside(triggerId, data)
 ]]
     if NAIDCNOSTALKER == "1" then
         data = data .. [[
-### DCInside Gallery **CRITICAL**
-- ***DO NOT MENTION {{user}} and {{char}} in DCInside***     
+### DCInside Gallery CRITICAL
+- DO NOT MENTION {{user}} and {{char}} in DCInside     
 ]]
     end
 
@@ -1657,7 +1620,9 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     elseif currentPost then
                         if key == "PN" then currentPost.number = escapeHtml(value)
                         elseif key == "PT" then currentPost.title = escapeHtml(value)
-                        elseif key == "PC" then currentPost.commentCountRaw = value
+                        elseif key == "PC" then 
+                            local count = tonumber(value) or 0
+                            currentPost.commentCountRaw = tostring(count)
                         elseif key == "PW" then
                             currentPost.authorRaw = value
                             currentPost.authorParsed = parseAuthor(value)
@@ -1780,17 +1745,45 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
 
                         last_end = next_element_end + 1
                     end
-
                     local remaining_text = string.sub(rawPostContent, last_end)
-                    local processed_remaining_text = escapeHtml(remaining_text)
-                    processed_remaining_text = string.gsub(processed_remaining_text, "\n", "<br>")
-                    processed_remaining_text = string.gsub(processed_remaining_text, "\r", "")
+                    local processed_remaining_text = ""
+                    local last_pos = 1
+
+                    -- 인레이 태그 체크
+                    while true do
+                        local s, e = string.find(remaining_text, "{{inlay::[^}]+}}", last_pos)
+                        if not s then
+                            -- 일반 텍스트 처리
+                            local text_part = string.sub(remaining_text, last_pos)
+                            if text_part ~= "" then
+                                local processed_part = escapeHtml(text_part)
+                                processed_part = string.gsub(processed_part, "\n", "<br>")
+                                processed_part = string.gsub(processed_part, "\r", "")
+                                processed_remaining_text = processed_remaining_text .. processed_part
+                            end
+                            break
+                        end
+                        -- 텍스트 처리
+                        local text_before = string.sub(remaining_text, last_pos, s - 1)
+                        if text_before ~= "" then
+                            local processed_part = escapeHtml(text_before)
+                            processed_part = string.gsub(processed_part, "\n", "<br>")
+                            processed_part = string.gsub(processed_part, "\r", "")
+                            processed_remaining_text = processed_remaining_text .. processed_part
+                        end
+
+                        -- 인레이 태그 처리
+                        local inlay_tag = string.sub(remaining_text, s, e)
+                        processed_remaining_text = processed_remaining_text .. inlay_tag
+
+                        last_pos = e + 1
+                    end
+
                     postContentDisplayHtml = postContentDisplayHtml .. processed_remaining_text
                     if rawPostContent == "" then postContentDisplayHtml = "" end
 
-                    local commentCount = #post_data.comments
-                    local commentCountDisplay = ""
-                    if commentCount > 0 then commentCountDisplay = "<span class=\"comment-count\">[" .. commentCount .. "]</span>" end
+                    local commentCount = tonumber(post_data.commentCountRaw) or 0
+
                     table.insert(html, "<div class=\"post-item\">")
                     table.insert(html, "<input type=\"checkbox\" id=\"" .. postId .. "\" class=\"post-toggle\">")
 
@@ -1798,7 +1791,10 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     table.insert(html, "  <div class=\"post-cell col-num\">" .. postNumber .. "</div>")
                     table.insert(html, "  <div class=\"post-cell col-title\">")
                     table.insert(html, "    <label for=\"" .. postId .. "\" class=\"post-title-label\">")
-                    table.insert(html, "      <span>" .. postTitle .. commentCountDisplay .. "</span>")
+                    table.insert(html, "      <span class=\"title-text\">" .. postTitle .. "</span>")
+                    if commentCount > 0 then
+                        table.insert(html, "      <span class=\"comment-count\">" .. commentCount .. "</span>")
+                    end
                     table.insert(html, "    </label>")
                     table.insert(html, "  </div>")
                     table.insert(html, "  <div class=\"post-cell col-writer\">" .. postWriterHtml .. "</div>")
@@ -1810,6 +1806,7 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     table.insert(html, "<div class=\"post-content-wrapper\">")
                     table.insert(html, "  <div class=\"post-full-content\"><span>" .. postContentDisplayHtml .. "</span></div>")
 
+      
                     if commentCount > 0 then
                         table.insert(html, "  <div class=\"comments-section\">")
                         table.insert(html, "    <h4>댓글 " .. commentCount .. "</h4>")
@@ -1827,6 +1824,13 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                             table.insert(html, "      </li>")
                         end
                         table.insert(html, "    </ul>")
+
+                        local buttonJsonBody = '{"action":"DC_REROLL", "identifier":"' .. (postId or "") .. '"}'
+                        table.insert(html, "<div class=\"reroll-button-wrapper\">")
+                        table.insert(html, "<div class=\"global-reroll-controls\">")
+                        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJsonBody .. "'>POST</button>")
+                        table.insert(html, "</div></div>")
+
                         table.insert(html, "  </div>")
                     end
 
@@ -1837,21 +1841,13 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
         else
             table.insert(html, "<div style='padding: 20px; text-align: center; color: #666;'>표시할 게시글 없음</div>")
         end
-        table.insert(html, "</div></div></div></div></div>")
+        table.insert(html, "</div></div></div></div></div><br>")
 
         return table.concat(html)
     end)
     return data
 end
 
-local function getKakaoTime(now)
-    now = now or os.date("*t")
-    local hours = now.hour % 12 == 0 and 12 or now.hour % 12
-    local minutes = string.format("%02d", now.min)
-    local ampm = now.hour >= 12 and 'PM' or 'AM'
-    local formattedTime = string.format("%d:%s %s", hours, minutes, ampm)
-    return formattedTime
-end
 
 local function inputKAKAOTalk(triggerId, data)
     local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
@@ -1867,8 +1863,9 @@ local function inputKAKAOTalk(triggerId, data)
 
     if NAIMESSENGERNOIMAGE == "0" then
         data = data .. [[
-	- When  {{char}} sends a picture or photo, print it will **exactly** output '<NAI>'.
-	- **DO NOT PRINT <NAI> MORE THAN ONCE.**        
+	- When  {{char}} sends a picture or photo, print it will exactly output '<NAI>'.
+	- DO NOT PRINT <NAI> MORE THAN ONCE.
+    - ALWAYS PRINT WITH SHORTENED MESSAGE.
 ]]
     end
 
@@ -1876,9 +1873,9 @@ local function inputKAKAOTalk(triggerId, data)
 - TIME: KAKAOTALK Message sent timeline with hh:mm AP/PM.
 
 - Example:
-- KAKAO[What's the matter, {{user}}?|01:45 AM]
-- KAKAO[You must be very bored.|01:45 AM]
-- KAKAO[Would you like to chat with me for a bit? Hehe|01:46 AM]
+    - KAKAO[What's the matter, {{user}}?|01:45 AM]
+    - KAKAO[You must be very bored.|01:45 AM]
+    - KAKAO[Would you like to chat with me for a bit? Hehe|01:46 AM]
 ]]
 
     if NAIMESSENGERNOIMAGE == "0" then
@@ -1919,80 +1916,101 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
 
     end)
 
+
     data = string.gsub(data, "KAKAO%[(.-)|(.-)%]", function(message, timestamp)
         local imageCounter = 0
         local charMessageTemplate = [[
 <style>
-.kakao-char-message-group{display:flex;align-items:flex-start;margin-bottom:15px;padding-left:10px;position:relative;}
-.kakao-profile-column{margin-right:10px;flex-shrink:0;padding-top:0;}
-.kakao-profile-image{width:42px;height:42px;border-radius:16px;object-fit:cover;display:block;position:absolute;top:-25px;left:-25px;}
-.kakao-content-column{display:flex;flex-direction:column;flex-grow:1;min-width:0;}
-.kakao-username{color:#6d6d6d;font-size:0.9em;font-weight:500;margin-top:0;padding-left:2px;margin-top:0;line-height:1.2;}
-.kakao-message-bubble-container{display:flex;align-items:flex-end;max-width:calc(100% - 15px);}
-.kakao-char-message-bubble{background-color:#FFFFFF;color:#000000;padding:8px 12px;border-radius:12px;position:relative;box-shadow:0 1px 1px rgba(0,0,0,0.05);margin-left:6px;max-width:calc(100% - 10px);word-wrap:break-word;overflow-wrap:break-word;}
-.kakao-char-message-bubble::before{content:"";position:absolute;left:-6px;top:6px;width:0;height:0;border-style:solid;border-width:5px 7px 5px 0;border-color:transparent #FFFFFF transparent transparent;}
-.kakao-message-text{font-size:1.05em;line-height:1.4;white-space:pre-wrap;}
-.kakao-char-timestamp{color:#8b8b8b;font-size:0.7em;margin-left:6px;white-space:nowrap;flex-shrink:0;padding-bottom:2px;}
-.kakao-fullscreen-toggle{display:none;}
-.kakao-clickable-image-label{cursor:pointer;}
-.kakao-fullscreen-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
-.kakao-fullscreen-overlay>*{max-width:95%;max-height:95%;}
-.kakao-fullscreen-close-label{position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer;z-index:1;}
-.kakao-fullscreen-close-button{position:absolute;top:20px;right:20px;font-size:24px;color:white;background-color:rgba(0,0,0,0.5);border-radius:50%;width:40px;height:40px;line-height:40px;text-align:center;cursor:pointer;z-index:3;border:1px solid rgba(255,255,255,0.3);}
-.kakao-fullscreen-overlay>*:not(.kakao-fullscreen-close-label){position:relative;z-index:2;}
-.kakao-fullscreen-toggle:checked~.kakao-fullscreen-overlay{display:flex;}
+.message-group { display: flex; align-items: flex-start; margin-bottom: 10px; position: relative; color: black; }
+.profile-column { margin-right: 12px; margin-top: 5px; margin-left: 0; flex-shrink: 0; }
+.profile-image { border-radius: 50%; object-fit: cover; width: 42px; height: 42px; }
+.content-column { flex-grow: 1; }
+.username { margin-bottom: 6px; margin-top: 6px; color: black; font-size: 1.0em; }
+.message-bubble-container { display: inline-flex; align-items: flex-end; }
+.message-bubble { background-color: white; padding: 10px; box-sizing: border-box; position: relative; display: inline-block; font-size: 1.1em; border-radius: 11px; }
+.message-bubble::before { content: ""; position: absolute; border-style: solid; top: 5px; left: -10px; border-width: 0px 20px 10px 3px; border-color: transparent white transparent transparent; }
+.message-text-label { display: block; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+.timestamp { color: #888; white-space: nowrap; margin-left: 10px; padding-bottom: 2px; flex-shrink: 0; font-size: 0.7em; }
+.fullscreen-toggle { display: none; }
+.clickable-image-label { cursor: pointer; }
+.fullscreen-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+.fullscreen-overlay > * { max-width: 95%; max-height: 95%; }
+.fullscreen-close-label { position: absolute; top: 0; left: 0; right: 0; bottom: 0; cursor: pointer; z-index: 1; }
+.fullscreen-toggle:checked ~ .fullscreen-overlay { display: flex; }
 </style>
 ]]
-        
-        local messageContent
-        local overlayContent = ""
-        local uniqueId = ""
+    local messageContent
+    local overlayContent = ""
+    local uniqueId = ""
+    local fullTagMatch = string.match(message, "({{inlay::[^}]+}})")
 
-        local fullTagMatch = string.match(message, "({{inlay::[^}]+}})")
+    if fullTagMatch then
+        imageCounter = imageCounter + 1
+        uniqueId = "fs-toggle-" .. imageCounter
+        local cleanedTag = string.gsub(fullTagMatch, "%s*%<%!%-%- KAKAO%_%d+ %-%->%s*", "")
+        messageContent = cleanedTag
+        overlayContent = cleanedTag
+    else
+        messageContent = escapeHtml(message)
+        overlayContent = ""
+    end
 
-        if fullTagMatch then
-            imageCounter = imageCounter + 1
-            uniqueId = "fs-toggle-" .. imageCounter
+    local html = {}
+    
+    table.insert(html, charMessageTemplate)
+    table.insert(html, '<div class="message-group">')
 
-            local cleanedTag = string.gsub(fullTagMatch, "%s*%<%!%-%- KAKAO%_%d+ %-%->%s*", "")
-            messageContent = cleanedTag
-            overlayContent = cleanedTag
-        else
-            messageContent = escapeHtml(message)
-            overlayContent = ""
-        end
-
-        local html = {}
-        table.insert(html, charMessageTemplate)
-        table.insert(html, "<div class='kakao-char-message-group'>")
+    if fullTagMatch then
         if NAIMESSENGERNOIMAGE == "0" then
-            table.insert(html, '<input type="checkbox" id="' .. uniqueId .. '" class="fullscreen-toggle" style="display:none;">')
-        elseif NAIMESSENGERNOIMAGE == "1" then
-            table.insert(html, '<input type="checkbox" id="" class="kakao-fullscreen-toggle" style="display:none;">')
+        table.insert(html, '<input type="checkbox" id="' .. uniqueId .. '" class="fullscreen-toggle">')
+        else 
+        table.insert(html, '<input type="checkbox" id="" class="fullscreen-toggle">')
         end
+    end
 
-        table.insert(html, '<div class="kakao-profile-column"><img src="{{source::char}}" alt="Profile" class="kakao-profile-image"></div>')
-        table.insert(html, '<div class="kakao-content-column">')
-        table.insert(html, '<div class="kakao-username">{{char}}</div>')
-        table.insert(html, '<div class="kakao-message-bubble-container">')
-        table.insert(html, '<div class="kakao-char-message-bubble">')
-        table.insert(html, '<label class="kakao-message-text clickable-image-label" for="' .. uniqueId .. '">')
-        table.insert(html, messageContent)
-        table.insert(html, '</label></div><div class="kakao-char-timestamp">' .. timestamp .. '</div></div></div>')
-        table.insert(html, '<div class="kakao-fullscreen-overlay">')
-        table.insert(html, '<label for="' .. uniqueId .. '" class="kakao-fullscreen-close-label"></label>')
+    table.insert(html, '<div class="profile-column">')
+    table.insert(html, '<img src="{{source::char}}" alt="Profile" class="profile-image">')
+    table.insert(html, '</div>')
+    
+    table.insert(html, '<div class="content-column">')
+    table.insert(html, '<div class="username">{{char}}</div>')
+    table.insert(html, '<div class="message-bubble-container">')
+    table.insert(html, '<div class="message-bubble">')
+    
+    if fullTagMatch then
+        table.insert(html, '<label class="message-text-label clickable-image-label" for="' .. uniqueId .. '">')
+    else
+        table.insert(html, '<label class="message-text-label">')
+    end
+    table.insert(html, messageContent)
+    table.insert(html, '</label>')
+    
+    table.insert(html, '</div>')
+    table.insert(html, '<div class="timestamp">' .. timestamp .. '</div>')
+    table.insert(html, '</div>')
+    table.insert(html, '</div>')
+
+    if fullTagMatch then
+        table.insert(html, '<div class="fullscreen-overlay">')
+        table.insert(html, '<label for="' .. uniqueId .. '" class="fullscreen-close-label"></label>')
 
         if NAIMESSENGERNOIMAGE == "0" then
-            table.insert(html, overlayContent)
-        elseif NAIMESSENGERNOIMAGE == "1" then
-            table.insert(html, '')
-        end
-
-        table.insert(html, '<label for="' .. uniqueId .. '" class="kakao-fullscreen-close-button">✕</label>')
+        local buttonJsonBody = '{"action":"KAKAO_REROLL", "identifier":"KAKAO_' .. timestamp .. '"}'
+        table.insert(html, '<div style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;">')
+        table.insert(html, overlayContent)
+        table.insert(html, '<div class="reroll-button-wrapper" style="margin-top: 10px; z-index: 2;">')
+        table.insert(html, '<div class="global-reroll-controls">')
+        table.insert(html, '<button style="text-align: center;" class="reroll-button" risu-btn=\'' .. buttonJsonBody .. '\'>KAKAO</button>')
         table.insert(html, '</div></div>')
+        table.insert(html, '</div>')
+        end
+        
+        table.insert(html, '</div>')
+    end
 
-        return table.concat(html)
+    table.insert(html, '</div>')
 
+    return table.concat(html)
     end)
     return data
 end
@@ -2116,45 +2134,46 @@ local function inputImage(triggerId, data)
 	- [NEG_PROMPTPLACEHOLDER: 1girl,female,...]
 
 ### Image Prompt Usage
-- *DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER*
+- DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER
+- NEVER refer to the past chat history when outputting the prompt below:
 ]]
 
     if NAICARDNOIMAGE == "0" then
         if NAICARD == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE*
-- Output Format:
-    - EROSTATUS[...|INLAY:<NAI1>]
-	- [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - EROSTATUS[...|INLAY:<NAI2>]
-	- [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE
+    - Output Format:
+        - EROSTATUS[...|INLAY:<NAI1>]
+        - [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
+        - EROSTATUS[...|INLAY:<NAI2>]
+        - [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         elseif NAICARD == "2" then
             data = data .. [[
-- *ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
-- Output Format:
-    - SIMULSTATUS[...|INLAY:<NAI1>]
-    - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...|INLAY:<NAI2>]
-    - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
+    - Output Format:
+        - SIMULSTATUS[...|INLAY:<NAI1>]
+        - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<NAI2>]
+        - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         elseif NAICARD == "3" then
             data = data .. [[
-- *ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE*
-- Output Format:
-    - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
-    - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-    - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
-    - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-    - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
-    - ..., etc.
+    - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
+    - Output Format:
+        - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
+        - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
+        - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - ..., etc.
 ]]
         end
     end
@@ -2162,12 +2181,12 @@ local function inputImage(triggerId, data)
     if NAISNSNOIMAGE == "0" then
         if NAISNS == "1" then
             data = data .. [[
-    - *ALWAYS PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the TWITTER INTERFACE*
+    - ALWAYS PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the TWITTER INTERFACE
     - Output Format:
-        - TWITTER[...<NAI>...<NAI>...]
+        - TWITTER[...|<NAI>|...|<NAI>|...]
         - [NAISNSPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
         - [NEG_NAISNSPROMPT:(NEGATIVE PROMPT)]
-        - If Character does not have **own** profile image:
+        - If Character does not have own profile image:
             - [NAISNSPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
             - [NEG_NAISNSPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]
@@ -2177,18 +2196,18 @@ local function inputImage(triggerId, data)
     if NAICOMMUNITYNOIMAGE == "0" then
         if NAICOMMUNITY == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE*
-- Output Format:
-    - DC[...|<NAI1>...|<NAI2>...]
-	- If the post is normal:
-		- [NAIDCPROMPT:(Describe the situation of the normal post)]
-	- If the post is Selfie:
-		- [NAIDCPROMPT:(SITUATION),(LABEL),(ANGLE),(ACTIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAIDCPROMPT:(NEGATIVE PROMPT)]
-- The number of the POST CONTENT including '<NAI>' and the number of the prompt must match.
-	- Example: If 3rd POST CONTENT is including '<NAI3>'.
-		- [NAIDCPROMPT3:3rd Post's '<NAI3>' Prompt Generated]
-		- [NEG_NAIDCPROMPT3:3rd Post's '<NAI3>' (NEGATIVE PROMPT)]
+    - ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE
+    - Output Format:
+        - DC[...|<NAI1>...|<NAI2>...]
+        - If the post is normal:
+            - [NAIDCPROMPT:(Describe the situation of the normal post)]
+        - If the post is Selfie:
+            - [NAIDCPROMPT:(SITUATION),(LABEL),(ANGLE),(ACTIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAIDCPROMPT:(NEGATIVE PROMPT)]
+    - The number of the POST CONTENT including '<NAI>' and the number of the prompt must match.
+        - Example: If 3rd POST CONTENT is including '<NAI3>'.
+            - [NAIDCPROMPT3:3rd Post's '<NAI3>' Prompt Generated]
+            - [NEG_NAIDCPROMPT3:3rd Post's '<NAI3>' (NEGATIVE PROMPT)]
 ]]
         end
     end
@@ -2196,12 +2215,12 @@ local function inputImage(triggerId, data)
     if NAIMESSENGERNOIMAGE == "0" then
         if NAIMESSENGER == "1" then
             data = data .. [[
-- *ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE*
-- Print <NAI> Exactly once when {{char}} sends a picture or image.
-- Output Format:
-    - KAKAO[<NAI>|...]
-	- [NAIKAKAOPROMPT:(SITUATION),(LABEL),Selfie,portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-	- [NEG_NAIKAKAOPROMPT:(NEGATIVE PROMPT)]
+    - ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE
+    - Print <NAI> Exactly once when {{char}} sends a picture or image.
+    - Output Format:
+        - KAKAO[<NAI>|...]
+        - [NAIKAKAOPROMPT:(SITUATION),(LABEL),Selfie,portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_NAIKAKAOPROMPT:(NEGATIVE PROMPT)]
 ]]
         end
     end
@@ -2231,7 +2250,7 @@ local function inputImage(triggerId, data)
 
     if tonumber(NAICOMPATIBILITY) >= 1 then
         data = data .. [[
-- ***REPLACE { and } to ( and ) in IMAGE PROMPT!!!***
+- REPLACE { and } to ( and ) in IMAGE PROMPT!!!
 	- Example:
 		- {1girl} => (1girl)
 		- {{1boy}} => ((1boy))
@@ -2245,37 +2264,42 @@ local function inputImportant(triggerId, data)
     local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
     local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
+    local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
 
     data = data .. [[
+
 # CRITICAL
-- *FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES*
+- FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES
 ]]
 
     if NAICARD == "1" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
-- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
-    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
-- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
+- DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK
+    - MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]
+- BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE
 ]]
     elseif NAICARD == "2" then
         data = data .. [[
 ## CRITICAL: SIMULATION STATUS INTERFACE
-- *DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
-    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
+- DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK
+    - MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]
 ]]
     elseif NAICARD == "3" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
-- *DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK*
-    - *MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]*
-- *BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE*
+- DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK
+    - MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]
+- BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE
 ## CRITICAL: SIMULATION STATUS INTERFACE
-- *DO NOT PRINT MALE CHARACTER's "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK*
-    - *MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]*
+- DO NOT PRINT MALE CHARACTER's "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK
+    - MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]
 ]]
     end
 
+    if NAIMESSENGER == "1" then
+        data = inputKAKAOTalk(triggerId, data)
+    end
     return data
 end
 
@@ -2335,7 +2359,7 @@ listenEdit("editRequest", function(triggerId, data)
     local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
     local NAIGLOBAL = getGlobalVar(triggerId, "toggle_NAIGLOBAL")
-    local NAICARDFORCEOUTPUT = getGlobalVar(triggerId, "toggle_NAICARDFORCEOUTPUT")
+    local UTILFORCEOUTPUT = getGlobalVar(triggerId, "toggle_UTILFORCEOUTPUT")
 
     local currentInput = nil
     local currentIndex = nil
@@ -2343,13 +2367,13 @@ listenEdit("editRequest", function(triggerId, data)
     local convertDialogueFlag = false
     local changedValue = false
     
-    if NAICARDFORCEOUTPUT == "1" then
+    if UTILFORCEOUTPUT == "1" then
         -- 받아온 리퀘스트 전부 ""변환
         for i = 1, #data, 1 do
             local chat = data[i]
-            -- 만약 role이 assistant 또는 model이라면
+            -- 만약 role이 assistant이라면
             -- 대화 내용 변환
-            if (chat.role == "assistant" or chat.role == "model") then
+            if chat.role == "assistant" then
                 chat.content = convertDialogue(triggerId, chat.content)
                 -- 50글자까지 변환된 대화 내용 출력
                 print([[ONLINEMODULE: editRequest: Converted dialogue to:
@@ -2360,67 +2384,73 @@ listenEdit("editRequest", function(triggerId, data)
     end
     
     for i = 1, #data, 1 do
-        -- 이후, 대화 내용이 "user"인 경우에 1회 한정으로 리퀘스트 삽입
+        -- 이후, 앞에서부터 role이 "system"인 경우에 1회 한정으로 inputImportant 삽입
         local chat = data[i]
-        if chat.role == "user" then
-            local importantInput = inputImportant(triggerId, "")
-            currentInput = importantInput .. [[
+        if chat.role == "system" then
+            local importantInput = inputImportant(triggerId, chat.content)
+            print ([[ONLINEMODULE: editRequest: Inserted important input to: "
             
-            
-]] .. chat.content .. [[
+]] .. importantInput .. [[ "]])
+            data[i].content = importantInput
+            break
+        end
+    end
+
+
+
+    local chat = data[#data]
+        -- 가장 마지막에 로직 삽입
+    currentInput = chat.content .. [[
 
 <-----ONLINEMODULESTART----->
 
 ]]
 
-            if NAIMESSENGER == "0" then
-                if NAICARD == "1" then
-                    currentInput = inputEroStatus(triggerId, currentInput)
-                    changedValue = true
-                elseif NAICARD == "2" then
-                    currentInput = inputSimulCard(triggerId, currentInput)
-                    changedValue = true
-                elseif NAICARD == "3" then
-                    currentInput = inputStatusHybrid(triggerId, currentInput)
-                    changedValue = true
-                end
-                
-                if NAISNS == "1" then
-                    currentInput = inputTwitter(triggerId, currentInput)
-                    changedValue = true
-                end
-                if NAICOMMUNITY == "1" then
-                    currentInput = inputDCInside(triggerId, currentInput)
-                    changedValue = true
-                end
-                
-            elseif NAIMESSENGER == "1" then
-                currentInput = inputKAKAOTalk(triggerId, currentInput)
-                changedValue = true
-            end
+    if NAIMESSENGER == "0" then
+        if NAICARD == "1" then
+            currentInput = inputEroStatus(triggerId, currentInput)
+            changedValue = true
+        elseif NAICARD == "2" then
+            currentInput = inputSimulCard(triggerId, currentInput)
+            changedValue = true
+        elseif NAICARD == "3" then
+            currentInput = inputStatusHybrid(triggerId, currentInput)
+            changedValue = true
+        end
+        
+        if NAISNS == "1" then
+            currentInput = inputTwitter(triggerId, currentInput)
+            changedValue = true
+        end
+        if NAICOMMUNITY == "1" then
+            currentInput = inputDCInside(triggerId, currentInput)
+            changedValue = true
+        end
+        
+    elseif NAIMESSENGER == "1" then
+        currentInput = inputKAKAOTalk(triggerId, currentInput)
+        changedValue = true
+    end
 
-            if NAIGLOBAL == "1" then
-                currentInput = inputImage(triggerId, currentInput)
-                changedValue = true
-            end
+    if NAIGLOBAL == "1" then
+        currentInput = inputImage(triggerId, currentInput)
+        changedValue = true
+    end
 
-            currentInput = currentInput .. [[
+    currentInput = currentInput .. [[
 
 <-----ONLINEMODULEEND----->
 
 ]] 
-            currentInput = currentInput .. [[
-            
+    currentInput = currentInput .. [[
+    
 ]]
 
-            print([[FINAL EDIT REQUEST is
+    print([[FINAL EDIT REQUEST is
 
 ]] .. currentInput)
 
-            data[i].content = currentInput
-            break
-        end
-    end
+    data[#data].content = currentInput
     
     if changedValue then
         print("Successful.")
@@ -2442,6 +2472,30 @@ listenEdit("editDisplay", function(triggerId, data)
     local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
     local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
     
+    local rerollTemplate = [[
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+.simple-ui-bar{width:100%;max-width:600px;margin:5px auto;background-color:#ffe6f2;border:3px solid #000000;padding:5px 10px;font-family:'Pixelify Sans',sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}
+.separator{height:2px;background-color:#000000;width:100%;margin:3px 0;}
+.profile-reroll-area{display:flex;align-items:center;gap:5px;padding:5px 0;justify-content:space-between;flex-wrap:wrap;border-bottom:2px solid #000000;}
+.profile-info{display:flex;align-items:center;gap:5px;flex-grow:1;min-width:150px;}
+.profile-id-label{font-weight:bold;color:#ff69b4;flex-shrink:0;}
+.profile-id-value{font-weight:normal;color:#000000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.profile-preview{width:32px;height:32px;border-radius:50%;background-color:#cccccc;border:2px solid #000000;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-shrink:0;}
+.profile-preview>*{width:100%;height:100%;object-fit:cover;display:block;}
+.reroll-button{padding:10px 20px;background-color:#000000;color:#ffffff;border:2px solid #ff69b4;font-family:inherit;font-size:18px;cursor:pointer;transition:all 0.2s ease;flex-shrink:0;min-width:80px;min-height:24px;position:relative;}
+.reroll-button::before{content:attr(data-text);white-space:pre;}
+.reroll-button::after{content:"REROLL";font-weight:bold;font-size:18px;color:#ffffff;pointer-events:none;transition:color 0.2s ease;}
+.reroll-button:hover{background-color:#ff69b4;color:#000000;border-color:#000000;}
+.reroll-button:hover::after{color:#000000;}
+.reroll-button:active{transform:translateY(1px);}
+.global-reroll-controls{text-align:center;margin-top:10px;padding-top:5px;border-top:2px solid #000000;}
+</style>
+]]   
+
+    data = rerollTemplate .. data
+
     if NAICARD == "1" then
         data = changeEroStatus(triggerId, data)
     elseif NAICARD == "2" then
@@ -2463,8 +2517,47 @@ listenEdit("editDisplay", function(triggerId, data)
         data = changeKAKAOTalk(triggerId, data)
     end
 
-    data = addRerollFormButton(triggerId, data)
+    -- data = addRerollFormButton(triggerId, data)
 
+    return data
+end)
+
+listenEdit("editOutput", function(triggerId, data)
+    if not data or data == "" then return "" end
+    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
+
+    if NAIMESSENGER == "1" then
+        print("ONLINEMODULE: editOutput: NAIMESSENGER == 1, filtering to keep only KAKAO blocks")
+        
+        local lines = {}
+        for line in (data .. "\n"):gmatch("([^\n]*)\n") do
+            table.insert(lines, line)
+        end
+        
+        local filteredLines = {}
+        local keepNextLines = false
+        
+        for i, line in ipairs(lines) do
+            if string.find(line, "^KAKAO%[") then
+                table.insert(filteredLines, line)
+                keepNextLines = true
+            elseif keepNextLines and (
+                string.find(line, "^%[NAIKAKAOPROMPT:") or
+                string.find(line, "^%[NEG_NAIKAKAOPROMPT:")
+            ) then
+                table.insert(filteredLines, line)
+                if string.find(line, "^%[NEG_NAIKAKAOPROMPT:") then
+                    keepNextLines = false 
+                end
+            elseif line:match("^%s*$") then
+                table.insert(filteredLines, line)
+            end
+        end
+        
+        data = table.concat(filteredLines, "\n")
+        print("ONLINEMODULE: editOutput: Filtered to keep only KAKAO blocks and their prompts")
+    end
+    
     return data
 end)
 
@@ -2502,39 +2595,12 @@ function onInput(triggerId)
 
 
     local chatHistoryTable = getFullChat(triggerId)
-    if type(chatHistoryTable) ~= "table" then
-        print("onInput: History is not table type. Aborting.")
-        return nil
-    end
-
     local historyLength = #chatHistoryTable
-    local targetIndex = historyLength - 1
-
-
-    while true do
-        if historyLength < 2 then
-            print("ONLINEMODULE: onInput: Not enough history to process. Breaking loop.")
-            break
-        end
-
-        if chatHistoryTable[historyLength].role == 'char' then
-            break
-        elseif chatHistoryTable[historyLength].role == 'user' then
-            removeChat(triggerId, historyLength - 1)
-            chatHistoryTable = getFullChat(triggerId)
-            historyLength = #chatHistoryTable
-        else
-            break
-        end
-    end
-
-    chatHistoryTable = getFullChat(triggerId)
-    historyLength = #chatHistoryTable
-    targetIndex = historyLength
+    local targetIndex = historyLength
 
     print(string.format("ONLINEMODULE: onInput>>>> DEBUG: historyLength = %d, targetIndex = %d <<<<", historyLength, targetIndex))
 
-    if targetIndex < 1 then
+    if targetIndex < 3 then
         print(string.format("ONLINEMODULE: onInput: History too short to find target message (index %d). Minimum 3 entries required (currently %d).", targetIndex, historyLength))
         return nil
     end
@@ -2814,7 +2880,7 @@ onOutput = async(function (triggerId)
                                         table.insert(statusReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = inlayStatus .. marker
+                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayStatus .. marker
                                         })
                                         local infoEro = {
                                             type = "EROSTATUS",
@@ -2972,7 +3038,11 @@ onOutput = async(function (triggerId)
                                         local content_offset = e_simul_prefix 
                                         local nai_abs_start = content_offset + s_nai_in_content
                                         local nai_abs_end = content_offset + e_nai_in_content -1
-                                        table.insert(simulReplacements, { start = nai_abs_start, finish = nai_abs_end, inlay = inlaySimul })
+                                        table.insert(simulReplacements, {
+                                            start = nai_abs_start,
+                                            finish = nai_abs_end,
+                                            inlay = "<NAI" .. naiIndex .. ">" .. inlaySimul
+                                        })
                                         print("ONLINEMODULE: onOutput: Adding new inlay replacement for NAI" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
 
                                         if trimmedBlockName then
@@ -3055,6 +3125,7 @@ onOutput = async(function (triggerId)
                 local replacements = {}
                 local statusBlocksFound = 0
                 local listKey = "STORED_SIMCARD_IDS"
+                local characterImageCache = {} -- 캐릭터별 이미지 캐시 (시뮬레이션용)
 
                 while true do
                     local s_ero, e_ero = string.find(currentLine, "EROSTATUS%[", searchPos)
@@ -3111,10 +3182,17 @@ onOutput = async(function (triggerId)
                             trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
                         end
 
-                        local existingInlay = nil
-                        if trimmedBlockName and not isEroStatus then
-                            existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
-                            if existingInlay == "null" then existingInlay = nil end
+                        -- 시뮬레이션 카드일 때만 캐시 확인/사용
+                        local cachedInlay = nil
+                        if not isEroStatus and trimmedBlockName then
+                            cachedInlay = characterImageCache[trimmedBlockName]
+                            if not cachedInlay then
+                                local existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
+                                if existingInlay ~= "null" then
+                                    characterImageCache[trimmedBlockName] = existingInlay
+                                    cachedInlay = existingInlay
+                                end
+                            end
                         end
 
                         local naiSearchPosInContent = 1
@@ -3127,85 +3205,96 @@ onOutput = async(function (triggerId)
                             naiIndex = tonumber(naiIndex)
 
                             if naiIndex then
-                                local promptPattern, negPromptPattern, promptType
-                                if isEroStatus then
-                                    promptPattern = "%[NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                    negPromptPattern = "%[NEG_NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                    promptType = "EROSTATUS"
+                                local content_offset = e_status_prefix
+                                local nai_abs_start = content_offset + s_nai_in_content
+                                local nai_abs_end = content_offset + e_nai_in_content
+
+                                -- 시뮬레이션이고 캐시된 이미지가 있으면 재사용
+                                if not isEroStatus and cachedInlay then
+                                    print("ONLINEMODULE: onOutput: Reusing cached image for character: " .. trimmedBlockName)
+                                    table.insert(replacements, {
+                                        start = nai_abs_start,
+                                        finish = nai_abs_end,
+                                        inlay = "<NAI" .. naiIndex .. ">" .. cachedInlay
+                                    })
                                 else
-                                    promptPattern = "%[NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                    negPromptPattern = "%[NEG_NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                    promptType = "SIMULCARD" 
-                                end
-
-                                local _, _, foundPrompt = string.find(currentLine, promptPattern)
-                                local _, _, foundNegPrompt = string.find(currentLine, negPromptPattern)
-
-                                if foundPrompt then
-                                    local currentNegativePrompt = negativePrompt
-                                    local storedNegPrompt = ""
-                                    if foundNegPrompt then
-                                        currentNegativePrompt = foundNegPrompt .. ", " .. currentNegativePrompt
-                                        storedNegPrompt = foundNegPrompt
+                                    -- 새 이미지 생성
+                                    local promptPattern, negPromptPattern, promptType, identifier
+                                    if isEroStatus then
+                                        promptPattern = "%[NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        negPromptPattern = "%[NEG_NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        promptType = "EROSTATUS"
+                                        identifier = "EROSTATUS_" .. naiIndex
+                                    else
+                                        promptPattern = "%[NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        negPromptPattern = "%[NEG_NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        promptType = "SIMULCARD"
+                                        identifier = trimmedBlockName
                                     end
 
-                                    local finalPrompt = artistPrompt .. foundPrompt .. qualityPrompt
-                                    local inlay = generateImage(triggerId, finalPrompt, currentNegativePrompt):await()
+                                    local _, _, foundPrompt = string.find(currentLine, promptPattern)
+                                    local _, _, foundNegPrompt = string.find(currentLine, negPromptPattern)
 
-                                    if inlay and type(inlay) == "string" and string.len(inlay) > 10 
-                                       and not string.find(inlay, "fail", 1, true) 
-                                       and not string.find(inlay, "error", 1, true)
-                                       and not string.find(inlay, "실패", 1, true) then
-
-                                        local identifier
-                                        if isEroStatus then
-                                            identifier = "EROSTATUS_" .. naiIndex
-                                        else
-                                            identifier = trimmedBlockName
+                                    if foundPrompt then
+                                        local currentNegativePrompt = negativePrompt
+                                        local storedNegPrompt = ""
+                                        if foundNegPrompt then
+                                            currentNegativePrompt = foundNegPrompt .. ", " .. currentNegativePrompt
+                                            storedNegPrompt = foundNegPrompt
                                         end
 
-                                        local marker = "<!-- " .. (isEroStatus and identifier or "SIMULSTATUS_" .. identifier) .. " -->"
-                                        local content_offset = e_status_prefix
-                                        local nai_abs_start = content_offset + s_nai_in_content
-                                        local nai_abs_end = content_offset + e_nai_in_content
-
-                                        table.insert(replacements, {
-                                            start = nai_abs_start,
-                                            finish = nai_abs_end,
-                                            inlay = inlay .. marker
-                                        })
-
-                                        local info = {
-                                            type = promptType,
-                                            identifier = identifier,
-                                            inlay = inlay,
-                                            prompt = foundPrompt,
-                                            negPrompt = storedNegPrompt
-                                        }
-                                        table.insert(generatedImagesInfo, info)
-
-                                        if isEroStatus then
-                                            setChatVar(triggerId, identifier .. "_PROMPT", info.prompt)
-                                            setChatVar(triggerId, identifier .. "_NEGPROMPT", info.negPrompt) 
-                                            setChatVar(triggerId, identifier, info.inlay)
-                                        else
-                                            setChatVar(triggerId, identifier, inlay)
-                                            setChatVar(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
-                                            setChatVar(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
-
-                                            local currentList = getChatVar(triggerId, listKey) or "null"
-                                            if currentList == "null" then currentList = "" end
+                                        local finalPrompt = artistPrompt .. foundPrompt .. qualityPrompt
+                                        local inlay = generateImage(triggerId, finalPrompt, currentNegativePrompt):await()
+                                        
+                                        if inlay and type(inlay) == "string" and string.len(inlay) > 10 
+                                           and not string.find(inlay, "fail", 1, true) 
+                                           and not string.find(inlay, "error", 1, true)
+                                           and not string.find(inlay, "실패", 1, true) then
                                             
-                                            if not string.find("," .. currentList .. ",", "," .. identifier .. ",", 1, true) then
-                                                local newList = currentList == "" and identifier or (currentList .. "," .. identifier)
-                                                setChatVar(triggerId, listKey, newList)
+                                            -- 시뮬레이션 카드일 때만 캐시에 저장
+                                            if not isEroStatus then
+                                                characterImageCache[trimmedBlockName] = inlay
                                             end
+
+                                            local marker = "<!-- " .. identifier .. " -->"
+                                            table.insert(replacements, {
+                                                start = nai_abs_start,
+                                                finish = nai_abs_end,
+                                                inlay = "<NAI" .. naiIndex .. ">" .. inlay .. marker
+                                            })
+
+                                            local info = {
+                                                type = promptType,
+                                                identifier = identifier,
+                                                inlay = inlay,
+                                                prompt = foundPrompt,
+                                                negPrompt = storedNegPrompt
+                                            }
+                                            table.insert(generatedImagesInfo, info)
+
+                                            if isEroStatus then
+                                                setChatVar(triggerId, identifier .. "_PROMPT", info.prompt)
+                                                setChatVar(triggerId, identifier .. "_NEGPROMPT", info.negPrompt)
+                                                setChatVar(triggerId, identifier, info.inlay)
+                                            else
+                                                setChatVar(triggerId, identifier, inlay)
+                                                setChatVar(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
+                                                setChatVar(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
+
+                                                local currentList = getChatVar(triggerId, listKey) or "null"
+                                                if currentList == "null" then currentList = "" end
+                                                
+                                                if not string.find("," .. currentList .. ",", "," .. identifier .. ",", 1, true) then
+                                                    local newList = currentList == "" and identifier or (currentList .. "," .. identifier)
+                                                    setChatVar(triggerId, listKey, newList)
+                                                end
+                                            end
+                                        else
+                                            ERR(triggerId, promptType, 2)
                                         end
                                     else
-                                        ERR(triggerId, promptType, 2)
+                                        ERR(triggerId, promptType, 0)
                                     end
-                                else
-                                    ERR(triggerId, promptType, 0)
                                 end
                             end
                             naiSearchPosInContent = e_nai_in_content + 1
@@ -3239,64 +3328,130 @@ onOutput = async(function (triggerId)
 
             if NAISNS == "1" and not skipNAISNS then
                 print("ONLINEMODULE: onOutput: NAISNS == 1")
+                print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
+                
                 local twitterPromptFindPattern = "%[NAISNSPROMPT:([^%]]*)%]"
                 local twitterNegPromptFindPattern = "%[NEG_NAISNSPROMPT:([^%]]*)%]"
                 local twitterPattern = "(TWITTER)%[NAME:([^|]*)|TNAME:([^|]*)|TID:([^|]*)|TPROFILE:([^|]*)|TWEET:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|VIEW:([^|]*)|REPLY:([^|]*)|RETWEET:([^|]*)|LIKES:([^|]*)|COMMENT:(.-)%]"
+                
+                print("ONLINEMODULE: onOutput: Looking for Twitter pattern...")
                 local s_twitter, e_twitter, twCap1, twName, twTname, twTid, twTprofile, twTweet, twMedia, twHash, twTime, twView, twReply, twRetweet, twLikes, twCommentBlock = string.find(currentLine, twitterPattern)
+                
+                if s_twitter then
+                    print("ONLINEMODULE: onOutput: Found Twitter block at positions", s_twitter, e_twitter)
+                    print("ONLINEMODULE: onOutput: Twitter ID:", twTid)
+                else
+                    print("ONLINEMODULE: onOutput: No Twitter block found")
+                end
+
                 local twitterId = twTid
                 local profileInlayToUse = nil
 
                 if twitterId then
+                    print("ONLINEMODULE: onOutput: Processing Twitter ID:", twitterId)
                     local existingProfileInlay = getChatVar(triggerId, twitterId) or "null"
+                    print("ONLINEMODULE: onOutput: Existing profile inlay:", existingProfileInlay)
+
                     if existingProfileInlay == "null" or not existingProfileInlay then
+                        print("ONLINEMODULE: onOutput: Need to generate new profile image")
                         local profilePromptFindPattern = "%[NAISNSPROFILEPROMPT:([^%]]*)%]"
                         local profileNegPromptFindPattern = "%[NEG_NAISNSPROFILEPROMPT:([^%]]*)%]"
+                        
                         local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
                         local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
+                        
+                        print("ONLINEMODULE: onOutput: Found profile prompt:", foundProfilePrompt ~= nil)
+                        print("ONLINEMODULE: onOutput: Found profile neg prompt:", foundProfileNegPrompt ~= nil)
+
                         if foundProfilePrompt then
                             local finalPromptTwitterProfile = (artistPrompt or "") .. (foundProfilePrompt or "") .. (qualityPrompt or "")
                             local currentNegativePromptProfile = (negativePrompt or "")
                             local storedNegProfilePrompt = ""
-                            if foundProfileNegPrompt then currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile; storedNegProfilePrompt = foundProfileNegPrompt end
+                            
+                            if foundProfileNegPrompt then 
+                                currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
+                                storedNegProfilePrompt = foundProfileNegPrompt 
+                            end
+
+                            print("ONLINEMODULE: onOutput: Generating profile image...")
                             local inlayProfile = generateImage(triggerId, finalPromptTwitterProfile, currentNegativePromptProfile):await()
-                            local isSuccessProfile = inlayProfile and type(inlayProfile) == "string" and string.len(inlayProfile) > 10 and not string.find(inlayProfile, "fail", 1, true) and not string.find(inlayProfile, "error", 1, true) and not string.find(inlayProfile, "실패", 1, true)
+                            
+                            local isSuccessProfile = inlayProfile and type(inlayProfile) == "string" and 
+                                                   string.len(inlayProfile) > 10 and 
+                                                   not string.find(inlayProfile, "fail", 1, true) and 
+                                                   not string.find(inlayProfile, "error", 1, true) and 
+                                                   not string.find(inlayProfile, "실패", 1, true)
+
                             if isSuccessProfile then
+                                print("ONLINEMODULE: onOutput: Profile image generation successful")
                                 profileInlayToUse = inlayProfile
                                 setChatVar(triggerId, twitterId, profileInlayToUse)
-                                setchatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                                setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
                                 setChatVar(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
                                 setChatVar(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
 
                                 local infoProfile = {
                                     type = "PROFILE",
                                     identifier = twitterId, 
-                                    inlay = profileInlayToUse,
+                                    inlay = profileInlayToUse, 
                                     prompt = foundProfilePrompt,
                                     negPrompt = storedNegProfilePrompt
                                 }
                                 table.insert(generatedImagesInfo, infoProfile)
-                                print("ONLINEMODULE: onOutput: Stored info for generated PROFILE image: " .. twitterId)
+                                print("ONLINEMODULE: onOutput: Stored generated profile info")
                             else
+                                print("ONLINEMODULE: onOutput: Profile image generation failed")
                                 ERR(triggerId, "TWITTERPROFILE", 2)
-                                print("ONLINEMODULE: onOutput: PROFILE image generation failed for twitterId: " .. tostring(twitterId))
                             end
                         end
                     else
+                        print("ONLINEMODULE: onOutput: Using existing profile inlay")
                         profileInlayToUse = existingProfileInlay
                         setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
                     end
                 end
 
+                print("ONLINEMODULE: onOutput: Looking for tweet prompt...")
                 local _, _, foundTwitterPrompt = string.find(currentLine, twitterPromptFindPattern)
+                print("ONLINEMODULE: onOutput: Tweet prompt found:", foundTwitterPrompt ~= nil)
+
                 if foundTwitterPrompt and s_twitter then
+                    print("ONLINEMODULE: onOutput: Processing tweet...")
                     local _, _, foundTwitterNegPrompt = string.find(currentLine, twitterNegPromptFindPattern)
                     local currentNegativePromptTwitter = negativePrompt
                     local storedNegTweetPrompt = ""
-                    if foundTwitterNegPrompt then currentNegativePromptTwitter = foundTwitterNegPrompt .. ", " .. currentNegativePromptTwitter; storedNegTweetPrompt = foundTwitterNegPrompt end
+                    
+                    if foundTwitterNegPrompt then 
+                        currentNegativePromptTwitter = foundTwitterNegPrompt .. ", " .. currentNegativePromptTwitter
+                        storedNegTweetPrompt = foundTwitterNegPrompt 
+                    end
+
                     local finalPromptTwitterTweet = artistPrompt .. foundTwitterPrompt .. qualityPrompt
+                    print("ONLINEMODULE: onOutput: Generating tweet image...")
                     local inlayTwitter = generateImage(triggerId, finalPromptTwitterTweet, currentNegativePromptTwitter):await()
-                    if inlayTwitter and type(inlayTwitter) == "string" and string.len(inlayTwitter) > 10 and not string.find(inlayTwitter, "fail", 1, true) and not string.find(inlayTwitter, "error", 1, true) and not string.find(inlayTwitter, "실패", 1, true) then
-                        local replacementTwitter = "TWITTER[NAME:" .. (twName or "") .. "|TNAME:" .. (twTname or "") .. "|TID:" .. (twTid or "") .. "|TPROFILE:" .. (profileInlayToUse or twTprofile or "") .. "|TWEET:" .. (twTweet or "") .. "|MEDIA:" .. inlayTwitter .. "|HASH:" .. (twHash or "") .. "|TIME:" .. (twTime or "") .. "|VIEW:" .. (twView or "") .. "|REPLY:" .. (twReply or "") .. "|RETWEET:" .. (twRetweet or "") .. "|LIKES:" .. (twLikes or "") .. "|COMMENT:" .. (twCommentBlock or "") .. "]"
+                    
+                    if inlayTwitter and type(inlayTwitter) == "string" and 
+                       string.len(inlayTwitter) > 10 and 
+                       not string.find(inlayTwitter, "fail", 1, true) and 
+                       not string.find(inlayTwitter, "error", 1, true) and 
+                       not string.find(inlayTwitter, "실패", 1, true) then
+                        
+                        print("ONLINEMODULE: onOutput: Tweet image generation successful")
+                        local replacementTwitter = "TWITTER[NAME:" .. (twName or "") .. 
+                            "|TNAME:" .. (twTname or "") .. 
+                            "|TID:" .. (twTid or "") .. 
+                            "|TPROFILE:" .. (profileInlayToUse or twTprofile or "") .. 
+                            "|TWEET:" .. (twTweet or "") .. 
+                            "|MEDIA:" .. "<NAI>" .. inlayTwitter ..
+                            "|HASH:" .. (twHash or "") .. 
+                            "|TIME:" .. (twTime or "") .. 
+                            "|VIEW:" .. (twView or "") .. 
+                            "|REPLY:" .. (twReply or "") .. 
+                            "|RETWEET:" .. (twRetweet or "") .. 
+                            "|LIKES:" .. (twLikes or "") .. 
+                            "|COMMENT:" .. (twCommentBlock or "") .. "]"
+
+                        print("ONLINEMODULE: onOutput: Replacing content in line...")
                         currentLine = string.sub(currentLine, 1, s_twitter-1) .. replacementTwitter .. string.sub(currentLine, e_twitter + 1)
                         lineModifiedInThisPass = true
 
@@ -3307,22 +3462,50 @@ onOutput = async(function (triggerId)
                             prompt = foundTwitterPrompt,
                             negPrompt = storedNegTweetPrompt
                         }
+
                         table.insert(generatedImagesInfo, infoTweet)
                         setChatVar(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
                         setChatVar(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
                         setChatVar(triggerId, twitterId .. "_TWEET", infoTweet.inlay)
-                        print("ONLINEMODULE: onOutput: Stored info for generated TWEET image: " .. twitterId)
+                        print("ONLINEMODULE: onOutput: Stored generated tweet info")
                     elseif profileInlayToUse then
-                        local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. "|TNAME:" .. (twTname or "") .. "|TID:" .. (twTid or "") .. "|TPROFILE:" .. profileInlayToUse .. "|TWEET:" .. (twTweet or "") .. "|MEDIA:" .. (twMedia or "") .. "|HASH:" .. (twHash or "") .. "|TIME:" .. (twTime or "") .. "|VIEW:" .. (twView or "") .. "|REPLY:" .. (twReply or "") .. "|RETWEET:" .. (twRetweet or "") .. "|LIKES:" .. (twLikes or "") .. "|COMMENT:" .. (twCommentBlock or "") .. "]"
+                        print("ONLINEMODULE: onOutput: Using profile-only replacement")
+                        local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. 
+                            "|TNAME:" .. (twTname or "") .. 
+                            "|TID:" .. (twTid or "") .. 
+                            "|TPROFILE:" .. "<NAI>" .. profileInlayToUse ..
+                            "|TWEET:" .. (twTweet or "") .. 
+                            "|MEDIA:" .. (twMedia or "") .. 
+                            "|HASH:" .. (twHash or "") .. 
+                            "|TIME:" .. (twTime or "") .. 
+                            "|VIEW:" .. (twView or "") .. 
+                            "|REPLY:" .. (twReply or "") .. 
+                            "|RETWEET:" .. (twRetweet or "") .. 
+                            "|LIKES:" .. (twLikes or "") .. 
+                            "|COMMENT:" .. (twCommentBlock or "") .. "]"
                         currentLine = string.sub(currentLine, 1, s_twitter-1) .. originalBlockReplacement .. string.sub(currentLine, e_twitter + 1)
                         lineModifiedInThisPass = true
                     end
                 elseif profileInlayToUse and s_twitter then
-                    local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. "|TNAME:" .. (twTname or "") .. "|TID:" .. (twTid or "") .. "|TPROFILE:" .. profileInlayToUse .. "|TWEET:" .. (twTweet or "") .. "|MEDIA:" .. (twMedia or "") .. "|HASH:" .. (twHash or "") .. "|TIME:" .. (twTime or "") .. "|VIEW:" .. (twView or "") .. "|REPLY:" .. (twReply or "") .. "|RETWEET:" .. (twRetweet or "") .. "|LIKES:" .. (twLikes or "") .. "|COMMENT:" .. (twCommentBlock or "") .. "]"
+                    print("ONLINEMODULE: onOutput: Using profile-only replacement (no tweet prompt)")
+                    local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. 
+                        "|TNAME:" .. (twTname or "") .. 
+                        "|TID:" .. (twTid or "") .. 
+                        "|TPROFILE:" .. "<NAI>" .. profileInlayToUse ..
+                        "|TWEET:" .. (twTweet or "") .. 
+                        "|MEDIA:" .. (twMedia or "") .. 
+                        "|HASH:" .. (twHash or "") .. 
+                        "|TIME:" .. (twTime or "") .. 
+                        "|VIEW:" .. (twView or "") .. 
+                        "|REPLY:" .. (twReply or "") .. 
+                        "|RETWEET:" .. (twRetweet or "") .. 
+                        "|LIKES:" .. (twLikes or "") .. 
+                        "|COMMENT:" .. (twCommentBlock or "") .. "]"
                     currentLine = string.sub(currentLine, 1, s_twitter-1) .. originalBlockReplacement .. string.sub(currentLine, e_twitter + 1)
                     lineModifiedInThisPass = true
                 end
             end
+
             if NAICOMMUNITY == "1" and not skipNAICOMMUNITY then
                 print("ONLINEMODULE: onOutput: NAICOMMUNITY == 1")
                 local searchPos = 1
@@ -3401,7 +3584,7 @@ onOutput = async(function (triggerId)
                                         table.insert(dcReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = inlayDc .. marker 
+                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayDc .. marker 
                                         })
 
                                         local infoDC = {
@@ -3460,16 +3643,16 @@ onOutput = async(function (triggerId)
                     lineModifiedInThisPass = true
                 end
             end
+            
             if NAIMESSENGER == "1" and not skipNAIMESSENGER then
                 print("ONLINEMODULE: onOutput: NAIMESSENGER == 1 (KAKAO) processing...")
                 local kakaoPromptFindPattern = "%[NAIKAKAOPROMPT:([^%]]*)%]"
                 local kakaoNegPromptFindPattern = "%[NEG_NAIKAKAOPROMPT:([^%]]*)%]"
-                local kakaoPattern = "(KAKAO)%[(<NAI>)%|([^|]*)%]"
+                local kakaoPattern = "(KAKAO)%[(<NAI>)%|([^%]]*)%]"
                 local _, _, foundKakaoPrompt = string.find(currentLine, kakaoPromptFindPattern)
                 local s_kakao, e_kakao, cap1, cap2, cap3 = string.find(currentLine, kakaoPattern)
-
-                print("ONLINEMODULE: onOutput: Found NAI Value is" .. cap2)
-        
+                print("Found Prefix: " .. cap1 .. " Found NAI Value: " .. cap2 .. " Found Suffix: " .. cap3)
+       
                 if foundKakaoPrompt and s_kakao then
                     print("ONLINEMODULE: onOutput: Found KAKAO block and prompt. Generating image...")
                     local _, _, foundKakaoNegPrompt = string.find(currentLine, kakaoNegPromptFindPattern)
@@ -3483,7 +3666,7 @@ onOutput = async(function (triggerId)
         
                     if isSuccessKakao then
                         print("ONLINEMODULE: onOutput: KAKAO image generated successfully.")
-                        local kakaoIdentifier = "KAKAO_" .. s_kakao
+                        local kakaoIdentifier = "KAKAO_" .. cap3
                         local marker = "<!-- " .. kakaoIdentifier .. " -->"
                         local replacementKakao = "KAKAO[" .. inlayKakao .. marker .. "|" .. cap3 .. "]"
                         currentLine = string.sub(currentLine, 1, s_kakao-1) .. replacementKakao .. string.sub(currentLine, e_kakao + 1)
@@ -3496,7 +3679,7 @@ onOutput = async(function (triggerId)
                         setChatVar(triggerId, kakaoIdentifier, infoEro.inlay)
                         print("ONLINEMODULE: onOutput: Stored info for generated KAKAO image. Identifier: " .. kakaoIdentifier)
                     else
-                        ERR(triggerId, "DCINSIDE", 2)
+                        ERR(triggerId, "KAKAOTALK", 2)
                         print("ONLINEMODULE: onOutput: KAKAO image generation FAILED. Error/Result: " .. tostring(inlayKakao))
                     end
                 end
@@ -3506,9 +3689,6 @@ onOutput = async(function (triggerId)
                 print("ONLINEMODULE: onOutput: Last message data is not in the expected format.")
         end
     end
-
-    currentLine = string.gsub(currentLine, "%[[Nn][Aa][Ii][^:]*PROMPT[^:]*:[^%]]-%]", "")
-    currentLine = string.gsub(currentLine, "%[[Nn][Ee][Gg]_[Nn][Aa][Ii][^:]*PROMPT[^:]*:[^%]]-%]", "")
 
     print("ONLINEMODULE: onOutput: Always applying setChat to last message after prompt cleanup.")
     setChat(triggerId, lastIndex - 1, currentLine)
@@ -3553,13 +3733,7 @@ onButtonClick = async(function(triggerId, data)
     print(action .. " currently triggered!")
     print("ONLINEMODULE: onButtonClick: Processing action " .. action .. " for identifier: [" .. identifier .. "]")
 
-    if action == "RUNREROLLSETTING" then
-        print("ONLINEMODULE: ACTION - RUNREROLLSETTING triggered.")
-        removeChat(triggerId, (getChatLength(triggerId) - 1))
-        openRerollForm(triggerId)
-        return
-
-    elseif action == "EROSTATUS_REROLL" then
+    if action == "EROSTATUS_REROLL" then
         rerollType = "EROSTATUS"
         chatVarKeyForInlay = identifier
         specificPromptKey = identifier .. "_PROMPT"
@@ -3664,6 +3838,5 @@ onButtonClick = async(function(triggerId, data)
         local newBlockContent = ""
 
         changeInlay(triggerId, targetIndex, oldInlay, newInlay)
-        changeInlay(triggerId, targetIndex + 1, oldInlay, newInlay)
     end
 end)
