@@ -376,9 +376,6 @@ local function inputEroStatus(triggerId, data)
             
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
-    - NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
-            - Invalid: <!-- EROSTATUS_1 -->
-            - Valid: <NAI1>
         - Example:
             - If the status interface is the first one, print '<NAI1>'.
             - If the status interface is the second one, print '<NAI2>'.
@@ -933,9 +930,6 @@ local function inputStatusHybrid(triggerId, data)
             
     if NAICARDNOIMAGE == "0" then
         data = data .. [[
-    - NOT THE <!-- EROSTATUS_INDEX -->, USE <NAI(INDEX)>!
-            - Invalid: <!-- EROSTATUS_1 -->
-            - Valid: <NAI1>
         - Example:
             - If the status interface is the first one, print '<NAI1>'.
             - If the status interface is the second one, print '<NAI2>'.
@@ -1712,39 +1706,22 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     local last_end = 1
                     rawPostContent = string.gsub(rawPostContent, "<!%-%-.-%-%->", "")
                     local nai_pattern = "(<NAI%d+>)"
-                    local markerPattern = "(<!--%s*DCINSIDE_[^%s%-]+%s*-->)"
 
                     while true do
                         local naiStart, naiEnd, naiTag = string.find(rawPostContent, nai_pattern, last_end)
-                        local markerStart, markerEnd, markerTag = string.find(rawPostContent, markerPattern, last_end)
-                        local next_element_start, next_element_end, next_element_match, is_marker
-
-                        if naiStart and markerStart then
-                            if naiStart < markerStart then
-                                next_element_start, next_element_end, next_element_match, is_marker = naiStart, naiEnd, naiTag, false
-                            else
-                                next_element_start, next_element_end, next_element_match, is_marker = markerStart, markerEnd, markerTag, true
-                            end
-                        elseif naiStart then
-                            next_element_start, next_element_end, next_element_match, is_marker = naiStart, naiEnd, naiTag, false
-                        elseif markerStart then
-                            next_element_start, next_element_end, next_element_match, is_marker = markerStart, markerEnd, markerTag, true
-                        else
+                        if not naiStart then
                             break
                         end
 
-                        local text_part = string.sub(rawPostContent, last_end, next_element_start - 1)
+                        local text_part = string.sub(rawPostContent, last_end, naiStart - 1)
                         local processed_text = escapeHtml(text_part)
                         processed_text = string.gsub(processed_text, "\n", "<br>")
                         processed_text = string.gsub(processed_text, "\r", "")
-                        postContentDisplayHtml = postContentDisplayHtml .. processed_text
+                        postContentDisplayHtml = postContentDisplayHtml .. processed_text .. naiTag
 
-                        if not is_marker then
-                            postContentDisplayHtml = postContentDisplayHtml .. next_element_match
-                        end
-
-                        last_end = next_element_end + 1
+                        last_end = naiEnd + 1
                     end
+
                     local remaining_text = string.sub(rawPostContent, last_end)
                     local processed_remaining_text = ""
                     local last_pos = 1
@@ -2377,7 +2354,6 @@ listenEdit("editRequest", function(triggerId, data)
             -- 대화 내용 변환
             if chat.role == "assistant" then
                 chat.content = convertDialogue(triggerId, chat.content)
-                -- 50글자까지 변환된 대화 내용 출력
                 print([[ONLINEMODULE: editRequest: Converted dialogue to:
 
 ]] .. chat.content)
@@ -2813,6 +2789,7 @@ onOutput = async(function (triggerId)
             print("ONLINEMODULE: onOutput: Processing last message (index " .. lastIndex .. ") for NAI Generation/Replacement")
 
             if NAICARD == "1" and not skipNAICARD then
+                -- 에로스테만 사용할 때
                 print("ONLINEMODULE: onOutput: NAICARD == 1")
                 local searchPos = 1
                 local statusBlocksFound = 0
@@ -2879,14 +2856,13 @@ onOutput = async(function (triggerId)
                                     local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
                                     if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and not string.find(inlayStatus, "fail", 1, true) and not string.find(inlayStatus, "error", 1, true) and not string.find(inlayStatus, "실패", 1, true) then
                                         local erostatusIdentifier = "EROSTATUS_" .. naiIndex
-                                        local marker = "<!-- " .. erostatusIdentifier .. " -->"
                                         local content_offset = e_status_prefix
                                         local nai_abs_start = content_offset + s_nai_in_content
                                         local nai_abs_end = content_offset + e_nai_in_content
                                         table.insert(statusReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayStatus .. marker
+                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayStatus
                                         })
                                         local infoEro = {
                                             type = "EROSTATUS",
@@ -2928,9 +2904,10 @@ onOutput = async(function (triggerId)
                 else
                     print("ONLINEMODULE: onOutput: No erostatus replacements to apply.")
                 end
-            end
+            
 
-            if NAICARD == "2" and not skipNAICARD then
+            elseif NAICARD == "2" and not skipNAICARD then
+                -- 시뮬봇 상태창만 사용할 때
                 print("ONLINEMODULE: onOutput: NAICARD == 2 entered.")
                 local searchPos = 1
                 local simulReplacements = {}
@@ -3123,9 +3100,9 @@ onOutput = async(function (triggerId)
                 else
                     print("ONLINEMODULE: onOutput: No simulcard replacements to apply.")
                 end
-            end
             
-            if NAICARD == "3" and not skipNAICARD then
+            elseif NAICARD == "3" and not skipNAICARD then
+                -- 상태창 하이브리드 모드 사용할 때
                 print("ONLINEMODULE: onOutput: NAICARD == 3 (Hybrid mode)")
                 local searchPos = 1
                 local replacements = {}
@@ -3262,11 +3239,10 @@ onOutput = async(function (triggerId)
                                                 characterImageCache[trimmedBlockName] = inlay
                                             end
 
-                                            local marker = "<!-- " .. identifier .. " -->"
                                             table.insert(replacements, {
                                                 start = nai_abs_start,
                                                 finish = nai_abs_end,
-                                                inlay = "<NAI" .. naiIndex .. ">" .. inlay .. marker
+                                                inlay = "<NAI" .. naiIndex .. ">" .. inlay
                                             })
 
                                             local info = {
@@ -3330,8 +3306,103 @@ onOutput = async(function (triggerId)
                         lineModifiedInThisPass = true
                     end
                 end
-            end
+            elseif NAICARD == "4" and not skipNAICARD then
+                -- 인레이만 출력할 때
+                print("ONLINEMODULE: onOutput: NAICARD == 4 (Inlay only mode)")
+                local searchPos = 1
+                local inlayReplacements = {}
+                local inlayBlocksFound = 0
+                
+                -- INLAY[<NAI(INDEX)>] 블록 검색
+                while true do
+                    local s_inlay, e_inlay = string.find(currentLine, "INLAY%[([^%]]*)%]", searchPos)
+                    if not s_inlay then
+                        print("ONLINEMODULE: onOutput: No more INLAY[...] blocks found starting from position " .. searchPos)
+                        break
+                    end
+                    inlayBlocksFound = inlayBlocksFound + 1
+                    print("ONLINEMODULE: onOutput: Found INLAY block #" .. inlayBlocksFound .. " starting at index " .. s_inlay)
 
+                    local inlayContent = string.sub(currentLine, s_inlay, e_inlay)
+                    local _, _, naiIndexStr = string.find(inlayContent, "<NAI(%d+)>")
+                    local naiIndex = tonumber(naiIndexStr)
+
+                    if naiIndex then
+                        print("ONLINEMODULE: onOutput: Found NAI index: " .. naiIndex)
+                        local promptPattern = "%[NAIINLAYPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                        local negPromptPattern = "%[NEG_NAIINLAYPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                        local _, _, foundInlayPrompt = string.find(currentLine, promptPattern)
+                        local _, _, foundInlayNegPrompt = string.find(currentLine, negPromptPattern)
+
+                        if foundInlayPrompt then
+                            print("ONLINEMODULE: onOutput: Found prompt for NAI" .. naiIndex .. ": [" .. string.sub(foundInlayPrompt, 1, 50) .. "...]")
+                            local currentNegativePromptInlay = negativePrompt
+                            local storedNegInlayPrompt = ""
+                            if foundInlayNegPrompt then 
+                                currentNegativePromptInlay = foundInlayNegPrompt .. ", " .. currentNegativePromptInlay
+                                storedNegInlayPrompt = foundInlayNegPrompt 
+                            end
+
+                            local finalPromptInlay = artistPrompt .. foundInlayPrompt .. qualityPrompt
+                            local inlayImage = generateImage(triggerId, finalPromptInlay, currentNegativePromptInlay):await()
+                            
+                            if inlayImage and type(inlayImage) == "string" and string.len(inlayImage) > 10 and 
+                               not string.find(inlayImage, "fail", 1, true) and 
+                               not string.find(inlayImage, "error", 1, true) and 
+                               not string.find(inlayImage, "실패", 1, true) then
+                                
+                                -- 기존 INLAY[<NAI>] 블록을 새로운 inlay로 교체
+                                local replacement = "INLAY[<NAI" .. naiIndex .. ">" .. "{{inlay::" .. inlayImage .. "}}" .. "]"
+                                
+                                table.insert(inlayReplacements, {
+                                    start = s_inlay,
+                                    finish = e_inlay, 
+                                    replacement = replacement
+                                })
+
+                                -- 이미지 정보 저장
+                                local infoInlay = {
+                                    type = "INLAY",
+                                    identifier = "INLAY_" .. naiIndex,
+                                    inlay = inlayImage,
+                                    prompt = foundInlayPrompt,
+                                    negPrompt = storedNegInlayPrompt
+                                }
+                                table.insert(generatedImagesInfo, infoInlay)
+                                
+                                -- ChatVar에 정보 저장
+                                setChatVar(triggerId, "INLAY_" .. naiIndex .. "_PROMPT", foundInlayPrompt)
+                                setChatVar(triggerId, "INLAY_" .. naiIndex .. "_NEGPROMPT", storedNegInlayPrompt)
+                                setChatVar(triggerId, "INLAY_" .. naiIndex, inlayImage)
+                                
+                                print("ONLINEMODULE: onOutput: Successfully processed INLAY block #" .. inlayBlocksFound)
+                                lineModifiedInThisPass = true
+                            else
+                                ERR(triggerId, "INLAY", 2)
+                                print("ONLINEMODULE: onOutput: Image generation failed for INLAY block #" .. inlayBlocksFound)
+                            end
+                        else
+                            ERR(triggerId, "INLAY", 0)
+                            print("ONLINEMODULE: onOutput: No prompt found for INLAY block #" .. inlayBlocksFound)
+                        end
+                    else
+                        ERR(triggerId, "INLAY", 3)
+                        print("ONLINEMODULE: onOutput: No NAI index found in INLAY block #" .. inlayBlocksFound)
+                    end
+                    
+                    searchPos = e_inlay + 1
+                end
+
+                -- 모든 교체작업 수행
+                if #inlayReplacements > 0 then
+                    table.sort(inlayReplacements, function(a, b) return a.start > b.start end)
+                    for _, rep in ipairs(inlayReplacements) do
+                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
+                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.replacement .. string.sub(currentLine, rep.finish + 1)
+                        end
+                    end
+                end
+            end
             if NAISNS == "1" and not skipNAISNS then
                 print("ONLINEMODULE: onOutput: NAISNS == 1")
                 print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
@@ -3585,12 +3656,11 @@ onOutput = async(function (triggerId)
                                     local isSuccessDc = successCall and (inlayDc ~= nil) and (type(inlayDc) == "string") and (string.len(inlayDc) > 10) and not string.find(inlayDc, "fail", 1, true) and not string.find(inlayDc, "error", 1, true) and not string.find(inlayDc, "실패", 1, true)
                                     if isSuccessDc then
                                         local dcIdentifier = postId
-                                        local marker = "<!-- DC_MARKER_POSTID_" .. dcIdentifier .. " -->"
 
                                         table.insert(dcReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayDc .. marker 
+                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayDc
                                         })
 
                                         local infoDC = {
@@ -3673,8 +3743,7 @@ onOutput = async(function (triggerId)
                     if isSuccessKakao then
                         print("ONLINEMODULE: onOutput: KAKAO image generated successfully.")
                         local kakaoIdentifier = "KAKAO_" .. cap3
-                        local marker = "<!-- " .. kakaoIdentifier .. " -->"
-                        local replacementKakao = "KAKAO[" .. inlayKakao .. marker .. "|" .. cap3 .. "]"
+                        local replacementKakao = "KAKAO[" .. inlayKakao .. "|" .. cap3 .. "]"
                         currentLine = string.sub(currentLine, 1, s_kakao-1) .. replacementKakao .. string.sub(currentLine, e_kakao + 1)
                         lineModifiedInThisPass = true
         
