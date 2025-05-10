@@ -1089,12 +1089,12 @@ local function inputTwitter(triggerId, data)
 ]]
     if NAISNSREAL == "1" then
         data = data .. [[
-- PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY AFTER UPLOADING TWITTER POST
+- PRINT OUT EXACTLY ONE TWITTER INTERFACE ONLY AFTER UPLOADING TWITTER POST
 ]]
-    else
+    elseif NAISNSREAL == "0" then
         data = data .. [[
-- ALWAYS PRINT OUT THE CHARACTER's TWITTER INTERFACE
-]]        
+- ALWAYS PRINT OUT EXACTLY ONE TWITTER INTERFACE
+]]               
     end
 
     if NAISNSTARGET == "0" then
@@ -1115,7 +1115,7 @@ local function inputTwitter(triggerId, data)
     end
 
     data = data .. [[
-### Twitter Interface Template
+#### Twitter Interface Template
 - AI must follow this template:
     - TWITTER[NAME:(Real Name)|TNAME:(Twitter Nickname)|TID:(Twitter ID)|TPROFILE:(Profile Image)|TWEET:(Tweet Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date/Time)|VIEW:(Viewer Count)|REPLY:(Reply Count)|RETWEET:(Retweet Count)|LIKES:(Likes Count)|COMMENT:(Viewer Nickname1)|(Comment Body1)|(Viewer Nickname2)|(Comment Body2)|...]
     - NAME: Real name of the Twitter account's owner(e.g., 'Eun-Young').
@@ -1162,8 +1162,8 @@ local function inputTwitter(triggerId, data)
     data = data .. [[
     - HASH: The hashtags of the tweet.	
         - Each tag MUST BE wrapped in → and ←.
-        - If post includes NSFW content, first tag is 'SexTweet'.
-        - Final value example: →SexTweet←→BitchDog←→PublicToilet←.
+        - If post includes NSFW content, first tag is '섹트'.
+        - Final value example: →섹트←→BitchDog←→PublicToilet←.
     - TIME: The date and time the tweet was posted.
         - Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
     - VIEW: The number of viewers of the tweet.
@@ -1175,7 +1175,7 @@ local function inputTwitter(triggerId, data)
             - Use the realistic Twitter nickname.
             - Final value example:
                 - Invalid: KinkyDog
-                - Valid: SexTweetHunter
+                - Valid: 섹트헌터
         - Comment Body: The content of the reply to the tweet.
             - Print the reply of a viewer with crude manner.
                 - Example:
@@ -1185,16 +1185,16 @@ local function inputTwitter(triggerId, data)
 ]]
     if NAISNSNOIMAGE == "0" then
         data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<NAI>|TWEET:Wanna see more?|MEDIA:<NAI>|HASH:→SexTweet←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<NAI>|TWEET:Wanna see more?|MEDIA:<NAI>|HASH:→섹트←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
 ]]
     elseif NAISNSNOIMAGE == "1" then
         if NAISNSTARGET == "0" then
             data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::user}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→SexTweet←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::user}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→섹트←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
         elseif NAISNSTARGET == "1" then
             data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::char}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→SexTweet←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::char}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→섹트←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
         end
     end
@@ -1284,8 +1284,7 @@ img { user-select: none; -webkit-user-drag: none; }
 @media  {
 body { background-color: #1c1c1e; }
 .iphone-frame-container { display: block; width: 100%; max-width: 360px; height: calc(100vh - 40px); max-height: 700px; margin: 20px auto; background-color: #111; border: 8px solid #000; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; position: relative; }
-.iphone-frame-container::before { content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 40%; height: 20px; background: #000; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; z-index: 10; }
-.iphone-screen { background-color: #000000; width: 100%; height: 100%; overflow: hidden; position: relative; padding-top: 25px; }
+.iphone-screen { background-color: #000000; width: 100%; height: 100%; overflow: hidden; position: relative; }
 .tweet-card { margin: 0; border: none; border-radius: 0; max-width: 100%; height: 100%; background-color: #000000; color: #e7e9ea; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
 .tweet-card::-webkit-scrollbar { display: none; }
 .tweet-padding { padding: 12px 12px; }
@@ -1375,6 +1374,11 @@ body, .tweet-card { font-size: 15px; }
             reply_block_raw = table.concat(reply_parts, "|")
         end
 
+        -- TPROFILE에서 <NAI(INDEX)> 플레이스홀더 제거
+        twitter_profile_image_raw = string.gsub(twitter_profile_image_raw, "<NAI%d*>", "")
+        -- TWEET에서 <NAI(INDEX)> 플레이스홀더 제거
+        tweet_body = string.gsub(tweet_body, "<NAI%d*>", "")
+
         local html = {}
         table.insert(html, TwitterTemplate)
         local isDarkMode = true
@@ -1452,12 +1456,7 @@ body, .tweet-card { font-size: 15px; }
         table.insert(html, "</div>")
 
         table.insert(html, "<div class=\"tweet-reply-input-section tweet-padding\">")
-        local userProfileInput = "{{source::user}}"
-        if string.match(userProfileInput, "^%{%{.-%}%}$") then
-            table.insert(html, "<div class=\"tweet-user-profile-pic\">" .. userProfileInput .. "</div>")
-        else
-            table.insert(html, "<div class=\"tweet-user-profile-pic\"></div>")
-        end
+        table.insert(html, [[<div class="tweet-user-profile-pic"><img src="{{source::user}}" /></div>]])
         table.insert(html, "<div class=\"tweet-reply-input-area\">")
         table.insert(html, "<span class=\"tweet-reply-placeholder\">Post your reply...</span>")
         table.insert(html, "<button class=\"tweet-reply-button\">Reply</button>")
@@ -1500,7 +1499,7 @@ body, .tweet-card { font-size: 15px; }
         end
 
         -- 리롤 버튼 추가 - 추출한 twitterid 값 기반으로 identifier 설정
-        local buttonJsonProfile = '{"action":"PROFILE_REROLL", "identifier":"' .. (twitter_id or "") .. '"}'
+        local buttonJsonProfile = '{"action":"TWITTER_PROFILE_REROLL", "identifier":"' .. (twitter_id or "") .. '"}'
         local buttonJsonBody = '{"action":"TWEET_REROLL", "identifier":"' .. (twitter_id or "") .. '"}'
 
         table.insert(html, "<div class=\"reroll-button-wrapper\">")
@@ -1533,12 +1532,12 @@ local function inputInsta(triggerId, data)
 ]]
     if NAISNSREAL == "1" then
         data = data .. [[
-- PRINT OUT THE CHARACTER's INSTAGRAM INTERFACE IMMEDIATELY AFTER UPLOADING INSTAGRAM POST
+- PRINT OUT EXACTLY ONE INSTAGRAM INTERFACE ONLY AFTER UPLOADING INSTAGRAM POST
 ]]
-    else
+    elseif NAISNSREAL == "0" then
         data = data .. [[
-- ALWAYS PRINT OUT THE CHARACTER's INSTAGRAM INTERFACE
-]]        
+- ALWAYS PRINT OUT EXACTLY ONE INSTAGRAM INTERFACE
+]]
     end
 
     if NAISNSTARGET == "0" then
@@ -1562,7 +1561,7 @@ local function inputInsta(triggerId, data)
     end
 
     data = data .. [[
-### Instagram Interface Template
+#### Instagram Interface Template
 - AI must follow this template:
     - INSTA[NAME:(Real Name)|IID:(Instagram ID)|IPROFILE:(Profile Image)|POST:(Post Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date)|LIKES:(Likes Count)|REPLY:(Reply Count)|SHARE:(Share Count)]
     - NAME: Real name of the Instagram account's owner(e.g., 'Eun-Young').
@@ -1789,6 +1788,18 @@ html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;m
         table.insert(html, "<div class='hashtag'>" .. hash_content .. "</div>")
         table.insert(html, "</div>")
         table.insert(html, "<div class='post-time'>" .. (time_text or "Posted Time") .. "</div>")
+
+        -- 리롤 버튼 추가 - 추출한 iid 값 기반으로 identifier 설정
+        local buttonJsonProfile = '{"action":"INSTA_PROFILE_REROLL", "identifier":"' .. (iid or "") .. '"}'
+        local buttonJsonBody = '{"action":"INSTA_REROLL", "identifier":"' .. (iid or "") .. '"}'
+
+        table.insert(html, "<div class=\"reroll-button-wrapper\">")
+        table.insert(html, "<div class=\"global-reroll-controls\">")
+        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJsonProfile .. "'>PROFILE</button>")
+        table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJsonBody .. "'>POST</button>")
+        
+        table.insert(html, "</div></div>")
+
         table.insert(html, "</article>")
         table.insert(html, "</main>")
 
@@ -1835,16 +1846,18 @@ local function inputSNSHybrid(triggerId, data)
 ## SNS Interface
 - TWITTER FOR NSFW POST
 - INSTAGRAM FOR SFW POST
+- TWO INTERFACES MUST BE PRINTED TOGETHER
+    - MUST PRINT OUT THE SAME CHARACTER's SNS INTERFACE
 
 ### Twitter Interface
 ]]
     if NAISNSREAL == "1" then
         data = data .. [[
-- PRINT OUT THE CHARACTER's TWITTER INTERFACE IMMEDIATELY AFTER UPLOADING TWITTER POST
+- PRINT OUT EXACTLY ONE TWITTER INTERFACE ONLY AFTER UPLOADING TWITTER POST
 ]]
-    else
+    elseif NAISNSREAL == "0" then
         data = data .. [[
-- ALWAYS PRINT OUT THE CHARACTER's TWITTER INTERFACE
+- ALWAYS PRINT OUT EXACTLY ONE TWITTER INTERFACE
 ]]        
     end
 
@@ -1866,7 +1879,7 @@ local function inputSNSHybrid(triggerId, data)
     end
 
     data = data .. [[
-### Twitter Interface Template
+#### Twitter Interface Template
 - AI must follow this template:
     - TWITTER[NAME:(Real Name)|TNAME:(Twitter Nickname)|TID:(Twitter ID)|TPROFILE:(Profile Image)|TWEET:(Tweet Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date/Time)|VIEW:(Viewer Count)|REPLY:(Reply Count)|RETWEET:(Retweet Count)|LIKES:(Likes Count)|COMMENT:(Viewer Nickname1)|(Comment Body1)|(Viewer Nickname2)|(Comment Body2)|...]
     - NAME: Real name of the Twitter account's owner(e.g., 'Eun-Young').
@@ -1913,8 +1926,8 @@ local function inputSNSHybrid(triggerId, data)
     data = data .. [[
     - HASH: The hashtags of the tweet.	
         - Each tag MUST BE wrapped in → and ←.
-        - If post includes NSFW content, first tag is 'SexTweet'.
-        - Final value example: →SexTweet←→BitchDog←→PublicToilet←.
+        - If post includes NSFW content, first tag is '섹트'.
+        - Final value example: →섹트←→BitchDog←→PublicToilet←.
     - TIME: The date and time the tweet was posted.
         - Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
     - VIEW: The number of viewers of the tweet.
@@ -1926,7 +1939,7 @@ local function inputSNSHybrid(triggerId, data)
             - Use the realistic Twitter nickname.
             - Final value example:
                 - Invalid: KinkyDog
-                - Valid: SexTweetHunter
+                - Valid: 섹트헌터
         - Comment Body: The content of the reply to the tweet.
             - Print the reply of a viewer with crude manner.
                 - Example:
@@ -1936,16 +1949,16 @@ local function inputSNSHybrid(triggerId, data)
 ]]
     if NAISNSNOIMAGE == "0" then
         data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<NAI>|TWEET:Wanna see more?|MEDIA:<NAI>|HASH:→SexTweet←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<NAI>|TWEET:Wanna see more?|MEDIA:<NAI>|HASH:→섹트←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
 ]]
     elseif NAISNSNOIMAGE == "1" then
         if NAISNSTARGET == "0" then
             data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::user}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→SexTweet←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::user}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→섹트←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
         elseif NAISNSTARGET == "1" then
             data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::char}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→SexTweet←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::char}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→섹트←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
         end
     end
@@ -1953,14 +1966,17 @@ local function inputSNSHybrid(triggerId, data)
     data = data .. [[
 ### Instagram Interface
 ]]
+
     if NAISNSREAL == "1" then
         data = data .. [[
-- PRINT OUT THE CHARACTER's INSTAGRAM INTERFACE IMMEDIATELY AFTER UPLOADING INSTAGRAM POST
+- PRINT OUT THE SAME CHARACTER OF THE ABOVE TWITTER INTERFACE
+- PRINT OUT EXACTLY ONE INSTAGRAM INTERFACE ONLY AFTER UPLOADING INSTAGRAM POST
 ]]
-    else
+    elseif NAISNSREAL == "0" then
         data = data .. [[
-- ALWAYS PRINT OUT THE CHARACTER's INSTAGRAM INTERFACE
-]]        
+- PRINT OUT THE SAME CHARACTER OF THE ABOVE TWITTER INTERFACE
+- ALWAYS PRINT EXACTLY ONE INSTAGRAM INTERFACE
+]]          
     end
 
     if NAISNSTARGET == "0" then
@@ -1984,7 +2000,7 @@ local function inputSNSHybrid(triggerId, data)
     end
 
     data = data .. [[
-### Instagram Interface Template
+#### Instagram Interface Template
 - AI must follow this template:
     - INSTA[NAME:(Real Name)|IID:(Instagram ID)|IPROFILE:(Profile Image)|POST:(Post Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date)|LIKES:(Likes Count)|REPLY:(Reply Count)|SHARE:(Share Count)]
     - NAME: Real name of the Instagram account's owner(e.g., 'Eun-Young').
@@ -2062,6 +2078,172 @@ local function inputSNSHybrid(triggerId, data)
     return data
 end
 
+
+local function changeSNSHybrid(triggerId, data)
+    local originalData = data
+
+    -- Patterns to find the full SNS tags
+    local fullTwitterTagPattern = "(TWITTER%[([^%]]*)%])"
+    local fullInstaTagPattern = "(INSTA%[([^%]]*)%])"
+
+    local twitterTagFound = string.match(originalData, fullTwitterTagPattern)
+    local instaTagFound = string.match(originalData, fullInstaTagPattern)
+
+    local twitterFullHtmlOutput = nil
+    local instaFullHtmlOutput = nil
+
+    -- Generate HTML for Twitter if tag exists
+    if twitterTagFound then
+        -- Pass only the matched tag to changeTwitter to get its specific HTML output
+        twitterFullHtmlOutput = changeTwitter(triggerId, twitterTagFound)
+    end
+
+    -- Generate HTML for Instagram if tag exists
+    if instaTagFound then
+        instaFullHtmlOutput = changeInsta(triggerId, instaTagFound)
+    end
+
+    local finalTwitterBody = nil
+    local finalInstaBody = nil
+    local styleBlocks = {} -- Use a table to store unique style blocks
+
+    -- Helper to add unique style content
+    local function addUniqueStyle(styleContent)
+        if styleContent and styleContent ~= "" then
+            local found = false
+            for _, existingStyle in ipairs(styleBlocks) do
+                if existingStyle == styleContent then
+                    found = true
+                    break
+                end
+            end
+            if not found then
+                table.insert(styleBlocks, styleContent)
+            end
+        end
+    end
+
+    if twitterFullHtmlOutput then
+        local styleContent = twitterFullHtmlOutput:match("<style>(.-)</style>")
+        addUniqueStyle(styleContent)
+        -- Remove style block and the trailing <br> specific to changeTwitter's output
+        finalTwitterBody = twitterFullHtmlOutput:gsub("<style>.-</style>", ""):gsub("<br%s*/?%s*>$", "")
+    end
+
+    if instaFullHtmlOutput then
+        local styleContent = instaFullHtmlOutput:match("<style>(.-)</style>")
+        addUniqueStyle(styleContent)
+        finalInstaBody = instaFullHtmlOutput:gsub("<style>.-</style>", "")
+    end
+    
+    local combinedStyles = ""
+    if #styleBlocks > 0 then
+        combinedStyles = "<style>\n" .. table.concat(styleBlocks, "\n\n") .. "\n</style>\n"
+    end
+
+    -- Remove original tags from the main data stream (only the first occurrence of each)
+    local cleanedData = originalData
+    if twitterTagFound then
+        cleanedData = string.gsub(cleanedData, fullTwitterTagPattern, "", 1)
+    end
+    if instaTagFound then
+        cleanedData = string.gsub(cleanedData, fullInstaTagPattern, "", 1)
+    end
+    
+    -- Trim whitespace and remove common empty tags that might be left after tag removal
+    cleanedData = cleanedData:gsub("<p>%s*</p>", ""):gsub("^(%s*<br%s*/?%s*>)*%s*", ""):gsub("(%s*<br%s*/?%s*>)*%s*$", "")
+    cleanedData = cleanedData:match("^%s*(.-)%s*$") or "" -- Final trim
+
+    -- Case 1: Both Twitter and Instagram content are available
+    if finalTwitterBody and finalInstaBody then
+        local hybridSpecificCss = [[
+<style>
+.sns-hybrid-container {
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start; 
+    gap: 20px; 
+    padding: 20px 0; 
+    max-width: 800px; 
+    margin: 0 auto;
+    flex-wrap: nowrap; 
+}
+
+.sns-column {
+    flex: 1 1 360px; 
+    min-width: 300px; 
+    max-width: 380px; 
+    display: flex; 
+    justify-content: center; 
+}
+
+.sns-column .iphone-frame-container {
+    margin: 0 !important; /* Override individual template margins */
+    width: 100% !important; /* Take width of sns-column */
+    max-width: 375px !important; /* Standardized max width for the phone frame itself */
+    /* height will be auto or set by individual templates */
+}
+/* Ensure the body styling from templates doesn't make hybrid page too dark by default */
+/* This is a general override, specific dark mode classes within components are fine */
+body.hybrid-sns-active { 
+    background-color: #fafafa; /* A light neutral background for the page */
+}
+
+
+@media (max-width: 799px) { 
+    .sns-hybrid-container {
+        flex-direction: column; 
+        align-items: center; 
+    }
+    .sns-column {
+        width: 100%; 
+        max-width: 380px; 
+        margin-bottom: 20px; 
+    }
+    .sns-column:last-child {
+        margin-bottom: 0;
+    }
+}
+</style>
+]]
+        -- Add a class to body when hybrid view is active to control page background
+        local hybridLayout = combinedStyles .. hybridSpecificCss .. [[
+<script>document.body.classList.add('hybrid-sns-active');</script>
+<div class="sns-hybrid-container">
+    <div class="sns-column"> <!-- Instagram Column -->
+        ]] .. finalInstaBody .. [[
+    </div>
+    <div class="sns-column"> <!-- Twitter Column -->
+        ]] .. finalTwitterBody .. [[
+    </div>
+</div>
+]]
+        if cleanedData == "" then
+            return hybridLayout
+        else
+            return cleanedData .. "\n" .. hybridLayout
+        end
+
+    -- Case 2: Only Twitter content is available
+    elseif finalTwitterBody then
+        if cleanedData == "" then
+            return twitterFullHtmlOutput -- Return original full HTML (includes its own style)
+        else
+            return cleanedData .. "\n" .. twitterFullHtmlOutput
+        end
+
+    -- Case 3: Only Instagram content is available
+    elseif finalInstaBody then
+        if cleanedData == "" then
+            return instaFullHtmlOutput -- Return original full HTML (includes its own style)
+        else
+            return cleanedData .. "\n" .. instaFullHtmlOutput
+        end
+    end
+
+    -- Case 4: No SNS tags were found or processed, return original data as is
+    return originalData
+end
 
 local function inputDCInside(triggerId, data)
     local NAICOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_NAICOMMUNITYNOIMAGE")
@@ -2840,11 +3022,12 @@ local function inputImage(triggerId, data)
             data = data .. [[
     - ALWAYS PRINT OUT INSTAGRAM INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the INSTAGRAM INTERFACE
     - Output Format:
-        - INSTAGRAM[...|<NAI>|...|<NAI>|...]
-        - [NAINSTAPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
+        - INSTA[...|<NAI>|...|<NAI>|...]
+        - [NAIINSTAPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
         - [NEG_NAIINSTAPROMPT:(NEGATIVE PROMPT)]
         - If Character does not have own profile image:
-            - [NAITWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+            - [NAIINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+            - [NEG_NAIINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]
         elseif NAISNS == "3" then
             if NAISNSREAL == "1" then
@@ -2863,17 +3046,19 @@ local function inputImage(triggerId, data)
     - TWITTER PROMPT MUST INCLUDE NSFW SITUATION
         - Output Format:
             - TWITTER[...|<NAI>|...|<NAI>|...]
-            - [NAITWITTERPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-            - [NEG_NAITWITTERPROMPT:(NEGATIVE PROMPT)]
+            - [NAITWITTERPROMPT:{{{NSFW,UNCENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
+            - [NEG_NAITWITTERPROMPT:{{{CENSORED}}},(NEGATIVE PROMPT)]
             - If Character does not have own profile image:
                 - [NAITWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+                - [NEG_NAITWITTERPROFILEPROMPT:(NEGATIVE PROMPT)]
     - INSTAGRAM PROMPT MUST INCLUDE SFW SITUATION
         - Output Format:
-            - INSTAGRAM[...|<NAI>|...|<NAI>|...]
-            - [NAINSTAPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-            - [NEG_NAINSTAPROMPT:(NEGATIVE PROMPT)]
+            - INSTA[...|<NAI>|...|<NAI>|...]
+            - [NAIINSTAPROMPT:{{{CENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
+            - [NEG_NAIINSTAPROMPT:{{{NSFW, UNCENSORED}}},(NEGATIVE PROMPT)]
             - If Character does not have own profile image:
                 - [NAIINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+                - [NEG_NAIINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]  
         end
     end
@@ -3210,8 +3395,7 @@ listenEdit("editDisplay", function(triggerId, data)
     elseif NAISNS == "2" then
         data = changeInsta(triggerId, data)
     elseif NAISNS == "3" then
-        data = changeTwitter(triggerId, data)
-        data = changeInsta(triggerId, data)
+        data = changeSNSHybrid(triggerId, data)
     end
     
     if NAICOMMUNITY == "1" then
@@ -4317,7 +4501,7 @@ onOutput = async(function (triggerId)
                 print("ONLINEMODULE: onOutput: NAISNS == 2")
                 print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
                 
-                local instaPromptFindPattern = "%[NAINSTAPROMPT:([^%]]*)%]"
+                local instaPromptFindPattern = "%[NAIINSTAPROMPT:([^%]]*)%]"
                 local instaNegPromptFindPattern = "%[NEG_NAIINSTAPROMPT:([^%]]*)%]"
                 local instaPattern = "(INSTA)%[NAME:([^|]*)|IID:([^|]*)|IPROFILE:([^|]*)|POST:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|LIKES:([^|]*)|REPLY:([^|]*)|SHARE:([^%]]*)%]"
                 
@@ -4341,8 +4525,8 @@ onOutput = async(function (triggerId)
 
                     if existingProfileInlay == "null" or not existingProfileInlay then
                         print("ONLINEMODULE: onOutput: Need to generate new profile image")
-                        local profilePromptFindPattern = "%[NAITWITTERPROFILEPROMPT:([^%]]*)%]"
-                        local profileNegPromptFindPattern = "%[NEG_NAITWITTERPROFILEPROMPT:([^%]]*)%]"
+                        local profilePromptFindPattern = "%[NAIINSTAPROFILEPROMPT:([^%]]*)%]"
+                        local profileNegPromptFindPattern = "%[NEG_NAIINSTAPROFILEPROMPT:([^%]]*)%]"
                         
                         local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
                         local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
@@ -4374,8 +4558,8 @@ onOutput = async(function (triggerId)
                                 profileInlayToUse = inlayProfile
                                 setChatVar(triggerId, instaId, profileInlayToUse)
                                 setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
-                                setChatVar(triggerId, instaId .. "_PROFILEPROMPT", foundProfilePrompt)
-                                setChatVar(triggerId, instaId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
+                                setChatVar(triggerId, instaId .. "_INSTAPROFILEPROMPT", foundProfilePrompt)
+                                setChatVar(triggerId, instaId .. "_NEGINSTAPROFILEPROMPT", storedNegProfilePrompt)
 
                                 local infoProfile = {
                                     type = "PROFILE",
@@ -4448,9 +4632,9 @@ onOutput = async(function (triggerId)
                         }
 
                         table.insert(generatedImagesInfo, infoPost)
-                        setChatVar(triggerId, instaId .. "_POSTPROMPT", infoPost.prompt)
-                        setChatVar(triggerId, instaId .. "_POSTNEGPROMPT", infoPost.negPrompt)
-                        setChatVar(triggerId, instaId .. "_POST", infoPost.inlay)
+                        setChatVar(triggerId, instaId .. "_INSTAPROMPT", infoPost.prompt)
+                        setChatVar(triggerId, instaId .. "_INSTANEGPROMPT", infoPost.negPrompt)
+                        setChatVar(triggerId, instaId, infoPost.inlay)
                         print("ONLINEMODULE: onOutput: Stored generated post info")
                     elseif profileInlayToUse then
                         print("ONLINEMODULE: onOutput: Using profile-only replacement")
@@ -4497,13 +4681,10 @@ onOutput = async(function (triggerId)
                 local _, _, foundTwitterPrompt = string.find(currentLine, twitterPromptFindPattern)
                 local s_twitter, e_twitter, twCap1, twName, twTname, twTid, twTprofile, twTweet, twMedia, twHash, twTime, twView, twReply, twRetweet, twLikes, twCommentBlock = string.find(currentLine, twitterPattern)
                 
-                if foundTwitterPrompt and s_twitter then
-                    -- 만약 트위터 프롬프트와 블록이 발견되었다면
+                if s_twitter then  -- s_twitter가 발견되면 프로필 처리 시작
                     local twitterId = twTid
                     local profileInlayToUse = nil
-                    local _, _, foundTwitterNegPrompt = string.find(currentLine, twitterNegPromptFindPattern)
 
-                    -- 프로필 생성 및 재사용 로직
                     if twitterId then
                         local existingProfileInlay = getChatVar(triggerId, twitterId) or "null" 
                         if existingProfileInlay == "null" or not existingProfileInlay then
@@ -4515,8 +4696,11 @@ onOutput = async(function (triggerId)
                             if foundProfilePrompt then
                                 local finalPromptTwitterProfile = artistPrompt .. foundProfilePrompt .. qualityPrompt
                                 local currentNegativePromptProfile = negativePrompt
+                                local storedNegProfilePrompt = ""
+                                
                                 if foundProfileNegPrompt then 
                                     currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
+                                    storedNegProfilePrompt = foundProfileNegPrompt
                                 end
 
                                 local inlayProfile = generateImage(triggerId, finalPromptTwitterProfile, currentNegativePromptProfile):await()
@@ -4528,36 +4712,78 @@ onOutput = async(function (triggerId)
                                     
                                     profileInlayToUse = inlayProfile
                                     setChatVar(triggerId, twitterId, profileInlayToUse)
+                                    setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
                                     setChatVar(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
-                                    setChatVar(triggerId, twitterId .. "_NEGPROFILEPROMPT", foundProfileNegPrompt)
+                                    setChatVar(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
+
+                                    local infoProfile = {
+                                        type = "PROFILE",
+                                        identifier = twitterId,
+                                        inlay = profileInlayToUse,
+                                        prompt = foundProfilePrompt,
+                                        negPrompt = storedNegProfilePrompt
+                                    }
+                                    table.insert(generatedImagesInfo, infoProfile)
                                 else
                                     ERR(triggerId, "TWITTERPROFILE", 2)
                                 end
                             end
                         else
                             profileInlayToUse = existingProfileInlay
+                            setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
                         end
                     end
 
-                    -- 트윗 이미지 생성
-                    local currentNegativePromptTwitter = negativePrompt
-                    if foundTwitterNegPrompt then 
-                        currentNegativePromptTwitter = foundTwitterNegPrompt .. ", " .. currentNegativePromptTwitter
-                    end
-
-                    local finalPromptTwitterTweet = artistPrompt .. foundTwitterPrompt .. qualityPrompt
-                    local inlayTwitter = generateImage(triggerId, finalPromptTwitterTweet, currentNegativePromptTwitter):await()
-                    
-                    if inlayTwitter and type(inlayTwitter) == "string" and string.len(inlayTwitter) > 10 
-                       and not string.find(inlayTwitter, "fail", 1, true) 
-                       and not string.find(inlayTwitter, "error", 1, true)
-                       and not string.find(inlayTwitter, "실패", 1, true) then
+                    -- 트윗 처리는 foundTwitterPrompt가 있을 때만
+                    if foundTwitterPrompt then
+                        local _, _, foundTwitterNegPrompt = string.find(currentLine, twitterNegPromptFindPattern)
+                        local currentNegativePromptTwitter = negativePrompt
+                        local storedNegTweetPrompt = ""
                         
+                        if foundTwitterNegPrompt then 
+                            currentNegativePromptTwitter = foundTwitterNegPrompt .. ", " .. currentNegativePromptTwitter
+                            storedNegTweetPrompt = foundTwitterNegPrompt
+                        end
+
+                        local finalPromptTwitterTweet = artistPrompt .. foundTwitterPrompt .. qualityPrompt
+                        local inlayTwitter = generateImage(triggerId, finalPromptTwitterTweet, currentNegativePromptTwitter):await()
+                        
+                        if inlayTwitter and type(inlayTwitter) == "string" and string.len(inlayTwitter) > 10 
+                           and not string.find(inlayTwitter, "fail", 1, true) 
+                           and not string.find(inlayTwitter, "error", 1, true)
+                           and not string.find(inlayTwitter, "실패", 1, true) then
+                            
+                            local replacementTwitter = string.format(
+                                "TWITTER[NAME:%s|TNAME:%s|TID:%s|TPROFILE:%s|TWEET:%s|MEDIA:%s|HASH:%s|TIME:%s|VIEW:%s|REPLY:%s|RETWEET:%s|LIKES:%s|COMMENT:%s]",
+                                twName or "", twTname or "", twTid or "",
+                                profileInlayToUse and "<NAI>" .. profileInlayToUse or (twTprofile or ""),
+                                twTweet or "", "<NAI>" .. inlayTwitter,
+                                twHash or "", twTime or "", twView or "",
+                                twReply or "", twRetweet or "", twLikes or "",
+                                twCommentBlock or ""
+                            )
+                            currentLine = string.sub(currentLine, 1, s_twitter-1) .. replacementTwitter .. string.sub(currentLine, e_twitter + 1)
+                            lineModifiedInThisPass = true
+
+                            local infoTweet = {
+                                type = "TWEET", 
+                                identifier = twitterId, 
+                                inlay = inlayTwitter,
+                                prompt = foundTwitterPrompt,
+                                negPrompt = storedNegTweetPrompt
+                            }
+                            table.insert(generatedImagesInfo, infoTweet)
+                            setChatVar(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
+                            setChatVar(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
+                            setChatVar(triggerId, twitterId .. "_TWEET", infoTweet.inlay)
+                        end
+                    elseif profileInlayToUse then
+                        -- 프로필만 있을 때의 교체
                         local replacementTwitter = string.format(
                             "TWITTER[NAME:%s|TNAME:%s|TID:%s|TPROFILE:%s|TWEET:%s|MEDIA:%s|HASH:%s|TIME:%s|VIEW:%s|REPLY:%s|RETWEET:%s|LIKES:%s|COMMENT:%s]",
                             twName or "", twTname or "", twTid or "",
-                            profileInlayToUse and "<NAI>" .. profileInlayToUse or (twTprofile or ""),
-                            twTweet or "", "<NAI>" .. inlayTwitter,
+                            "<NAI>" .. profileInlayToUse,
+                            twTweet or "", twMedia or "",
                             twHash or "", twTime or "", twView or "",
                             twReply or "", twRetweet or "", twLikes or "",
                             twCommentBlock or ""
@@ -4568,7 +4794,7 @@ onOutput = async(function (triggerId)
                 end
 
                 -- 그 다음은 인스타
-                local instaPromptFindPattern = "%[NAINSTAPROMPT:([^%]]*)%]"
+                local instaPromptFindPattern = "%[NAIINSTAPROMPT:([^%]]*)%]"
                 local instaNegPromptFindPattern = "%[NEG_NAIINSTAPROMPT:([^%]]*)%]"
                 local instaPattern = "(INSTA)%[NAME:([^|]*)|IID:([^|]*)|IPROFILE:([^|]*)|POST:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|LIKES:([^|]*)|REPLY:([^|]*)|SHARE:([^%]]*)%]"
 
@@ -4593,8 +4819,10 @@ onOutput = async(function (triggerId)
                             if foundProfilePrompt then
                                 local finalPromptInstaProfile = artistPrompt .. foundProfilePrompt .. qualityPrompt
                                 local currentNegativePromptProfile = negativePrompt
+                                local storedNegProfilePrompt = ""
                                 if foundProfileNegPrompt then 
                                     currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
+                                    storedNegProfilePrompt = foundProfileNegPrompt
                                 end
 
                                 local inlayProfile = generateImage(triggerId, finalPromptInstaProfile, currentNegativePromptProfile):await()
@@ -4606,21 +4834,34 @@ onOutput = async(function (triggerId)
                                     
                                     profileInlayToUse = inlayProfile
                                     setChatVar(triggerId, instaId, profileInlayToUse)
-                                    setChatVar(triggerId, instaId .. "_PROFILEPROMPT", foundProfilePrompt)
-                                    setChatVar(triggerId, instaId .. "_NEGPROFILEPROMPT", foundProfileNegPrompt)
+                                    setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                                    setChatVar(triggerId, instaId .. "_INSTAPROFILEPROMPT", foundProfilePrompt)
+                                    setChatVar(triggerId, instaId .. "_NEGINSTAPROFILEPROMPT", storedNegProfilePrompt)
+
+                                    local infoProfile = {
+                                        type = "PROFILE",
+                                        identifier = instaId,
+                                        inlay = profileInlayToUse,
+                                        prompt = foundProfilePrompt,
+                                        negPrompt = storedNegProfilePrompt
+                                    }
+                                    table.insert(generatedImagesInfo, infoProfile)
                                 else
                                     ERR(triggerId, "INSTAPROFILE", 2)
                                 end
                             end
                         else
                             profileInlayToUse = existingProfileInlay
+                            setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
                         end
                     end
 
                     -- 이미지 후처리
                     local currentNegativePromptInsta = negativePrompt
+                    local storedNegPostPrompt = ""
                     if foundInstaNegPrompt then 
                         currentNegativePromptInsta = foundInstaNegPrompt .. ", " .. currentNegativePromptInsta
+                        storedNegPostPrompt = foundInstaNegPrompt
                     end
 
                     local finalPromptInstaPost = artistPrompt .. foundInstaPrompt .. qualityPrompt
@@ -4636,6 +4877,30 @@ onOutput = async(function (triggerId)
                             instaName or "", instaIid or "",
                             profileInlayToUse and "<NAI>" .. profileInlayToUse or (instaIprofile or ""),
                             instaPost or "", "<NAI>" .. inlayInsta,
+                            instaHash or "", instaTime or "",
+                            instaLikes or "", instaReply or "", instaShare or ""
+                        )
+                        currentLine = string.sub(currentLine, 1, s_insta-1) .. replacementInsta .. string.sub(currentLine, e_insta + 1)
+                        lineModifiedInThisPass = true
+
+                        local infoPost = {
+                            type = "POST",
+                            identifier = instaId,
+                            inlay = inlayInsta,
+                            prompt = foundInstaPrompt,
+                            negPrompt = storedNegPostPrompt
+                        }
+                        table.insert(generatedImagesInfo, infoPost)
+
+                        setChatVar(triggerId, instaId .. "_INSTAPROMPT", infoPost.prompt)
+                        setChatVar(triggerId, instaId .. "_INSTANEGPROMPT", infoPost.negPrompt) 
+                        setChatVar(triggerId, instaId, infoPost.inlay)
+                    elseif profileInlayToUse then
+                        local replacementInsta = string.format(
+                            "INSTA[NAME:%s|IID:%s|IPROFILE:%s|POST:%s|MEDIA:%s|HASH:%s|TIME:%s|LIKES:%s|REPLY:%s|SHARE:%s]",
+                            instaName or "", instaIid or "",
+                            "<NAI>" .. profileInlayToUse,
+                            instaPost or "", instaMedia or "",
                             instaHash or "", instaTime or "",
                             instaLikes or "", instaReply or "", instaShare or ""
                         )
@@ -4886,8 +5151,8 @@ onButtonClick = async(function(triggerId, data)
         chatVarKeyForInlay = identifier
         specificPromptKey = identifier .. "_PROMPT"
         specificNegPromptKey = identifier .. "_NEGPROMPT"
-    elseif action == "PROFILE_REROLL" then
-        rerollType = "PROFILE"
+    elseif action == "TWITTER_PROFILE_REROLL" then
+        rerollType = "TWITTER_PROFILE"
         chatVarKeyForInlay = identifier
         specificPromptKey = identifier .. "_PROFILEPROMPT"
         specificNegPromptKey = identifier .. "_NEGPROFILEPROMPT"
@@ -4896,6 +5161,16 @@ onButtonClick = async(function(triggerId, data)
         chatVarKeyForInlay = identifier .. "_TWEET"
         specificPromptKey = identifier .. "_TWEETPROMPT"
         specificNegPromptKey = identifier .. "_TWEETNEGPROMPT"
+    elseif action == "INSTA_PROFILE_REROLL" then
+        rerollType = "INSTAGRAM_PROFILE"
+        chatVarKeyForInlay = identifier
+        specificPromptKey = identifier .. "_INSTAPROFILEPROMPT"
+        specificNegPromptKey = identifier .. "_NEGINSTAPROFILEPROMPT"
+    elseif action == "INSTA_REROLL" then
+        rerollType = "INSTAGRAM"
+        chatVarKeyForInlay = identifier
+        specificPromptKey = identifier .. "_INSTAPROMPT" 
+        specificNegPromptKey = identifier .. "_INSTANEGPROMPT"
     elseif action == "DC_REROLL" then
         rerollType = "DC"
         chatVarKeyForInlay = "DC_" .. identifier
