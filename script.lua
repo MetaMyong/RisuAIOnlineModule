@@ -2641,11 +2641,12 @@ local function inputKAKAOTalk(triggerId, data)
         - ONLY when {{char}} sends a picture or photo.
         - if not, DO NOT PRINT <NAI>.
     - DO NOT PRINT <NAI> with message, and more than once.
-    - ALWAYS PRINT WITH SHORTENED MESSAGE.
 ]]
     end
 
     data = data .. [[
+    - ALWAYS PRINT WITH SHORTENED MESSAGE.
+    - NEVER INCLUDE {{user}}'s MESSAGE in RESPONSE.
 - TIME: KAKAOTALK Message sent timeline with hh:mm AP/PM.
 
 - Example:
