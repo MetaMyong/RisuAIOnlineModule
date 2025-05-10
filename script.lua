@@ -1647,7 +1647,7 @@ local function changeInsta(triggerId, data)
 
     local InstaTemplate = [[
 <style>
-html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.4;background-color:#fff;color:#262626;margin:0;padding:0;min-height:100%}.iphone-frame-container{display:none}@media (min-width:400px) {body{background-color:#1c1c1e}.iphone-frame-container{display:block;width:100%;max-width:375px;height:calc(100vh - 40px);max-height:812px;margin:20px auto;background-color:#111;border:8px solid #000;border-radius:40px;box-shadow:0 10px 30px rgba(0,0,0,0.3);overflow:hidden;position:relative}.iphone-frame-container::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:40%;height:22px;background:#000;border-bottom-left-radius:12px;border-bottom-right-radius:12px;z-index:10}.iphone-screen{background-color:#fff;width:100%;height:100%;overflow:hidden;position:relative;padding-top:0;border-radius:32px}}.instagram-app{background-color:#fff;height:100%;display:flex;flex-direction:column;overflow:hidden;color:#262626}.insta-header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #dbdbdb;background-color:#fff;flex-shrink:0;height:44px}.insta-header .header-left{display:flex;align-items:center;margin-bottom:-10px}.insta-header .logo-text{margin-left:10px;color:#262626}.insta-header .actions{display:flex;align-items:center}.insta-header .actions .icon{margin-left:20px;cursor:pointer}.insta-stories{display:flex;padding:10px 0 10px 12px;border-bottom:1px solid #dbdbdb;overflow-x:auto;background-color:#fff;flex-shrink:0;-ms-overflow-style:none;scrollbar-width:none}.insta-stories::-webkit-scrollbar{display:none}.story-item{text-align:center;margin-right:12px;flex-shrink:0;position:relative}
+html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.4;background-color:#fff;color:#262626;margin:0;padding:0;min-height:100%}.iphone-frame-container{display:none}@media {body{background-color:#1c1c1e}.iphone-frame-container{display:block;width:100%;max-width:375px;height:calc(100vh - 40px);max-height:812px;margin:20px auto;background-color:#111;border:8px solid #000;border-radius:40px;box-shadow:0 10px 30px rgba(0,0,0,0.3);overflow:hidden;position:relative}.iphone-frame-container::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:40%;height:22px;background:#000;border-bottom-left-radius:12px;border-bottom-right-radius:12px;z-index:10}.iphone-screen{background-color:#fff;width:100%;height:100%;overflow:hidden;position:relative;padding-top:0;border-radius:32px}}.instagram-app{background-color:#fff;height:100%;display:flex;flex-direction:column;overflow:hidden;color:#262626}.insta-header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #dbdbdb;background-color:#fff;flex-shrink:0;height:44px}.insta-header .header-left{display:flex;align-items:center;margin-bottom:-10px}.insta-header .logo-text{margin-left:10px;color:#262626}.insta-header .actions{display:flex;align-items:center}.insta-header .actions .icon{margin-left:20px;cursor:pointer}.insta-stories{display:flex;padding:10px 0 10px 12px;border-bottom:1px solid #dbdbdb;overflow-x:auto;background-color:#fff;flex-shrink:0;-ms-overflow-style:none;scrollbar-width:none}.insta-stories::-webkit-scrollbar{display:none}.story-item{text-align:center;margin-right:12px;flex-shrink:0;position:relative}
 .story-image-wrapper { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0.25px; position: relative; z-index: 1; background-color: #fff; }
 .story-image-wrapper::before { content: ""; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 50%; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); z-index: -1; }
 .story-item img { width: 100%; height: 100%; border-radius: 50%; display: block; background-color: #efefef; }
@@ -2082,7 +2082,7 @@ end
 local function changeSNSHybrid(triggerId, data)
     local originalData = data
 
-    -- Patterns to find the full SNS tags
+    -- 패턴을 사용해 SNS 패턴을 찾기
     local fullTwitterTagPattern = "(TWITTER%[([^%]]*)%])"
     local fullInstaTagPattern = "(INSTA%[([^%]]*)%])"
 
@@ -2092,22 +2092,22 @@ local function changeSNSHybrid(triggerId, data)
     local twitterFullHtmlOutput = nil
     local instaFullHtmlOutput = nil
 
-    -- Generate HTML for Twitter if tag exists
+    -- 트위터 존재 시 changeTwitter 호출
     if twitterTagFound then
         -- Pass only the matched tag to changeTwitter to get its specific HTML output
         twitterFullHtmlOutput = changeTwitter(triggerId, twitterTagFound)
     end
 
-    -- Generate HTML for Instagram if tag exists
+    -- 인스타 존재시 changeInsta 호출
     if instaTagFound then
         instaFullHtmlOutput = changeInsta(triggerId, instaTagFound)
     end
 
     local finalTwitterBody = nil
     local finalInstaBody = nil
-    local styleBlocks = {} -- Use a table to store unique style blocks
+    local styleBlocks = {} -- 유니크 스타일 블록 추가
 
-    -- Helper to add unique style content
+    -- 헬퍼 함수
     local function addUniqueStyle(styleContent)
         if styleContent and styleContent ~= "" then
             local found = false
@@ -2126,7 +2126,7 @@ local function changeSNSHybrid(triggerId, data)
     if twitterFullHtmlOutput then
         local styleContent = twitterFullHtmlOutput:match("<style>(.-)</style>")
         addUniqueStyle(styleContent)
-        -- Remove style block and the trailing <br> specific to changeTwitter's output
+        -- <style> 태그를 제거하고 changeTwitter의 출력에 특정한 <br> 태그를 제거
         finalTwitterBody = twitterFullHtmlOutput:gsub("<style>.-</style>", ""):gsub("<br%s*/?%s*>$", "")
     end
 
@@ -2141,7 +2141,7 @@ local function changeSNSHybrid(triggerId, data)
         combinedStyles = "<style>\n" .. table.concat(styleBlocks, "\n\n") .. "\n</style>\n"
     end
 
-    -- Remove original tags from the main data stream (only the first occurrence of each)
+    -- 데이터에서 태그 제거
     local cleanedData = originalData
     if twitterTagFound then
         cleanedData = string.gsub(cleanedData, fullTwitterTagPattern, "", 1)
@@ -2150,63 +2150,66 @@ local function changeSNSHybrid(triggerId, data)
         cleanedData = string.gsub(cleanedData, fullInstaTagPattern, "", 1)
     end
     
-    -- Trim whitespace and remove common empty tags that might be left after tag removal
+    -- 사이의 빈 메시지 제거
     cleanedData = cleanedData:gsub("<p>%s*</p>", ""):gsub("^(%s*<br%s*/?%s*>)*%s*", ""):gsub("(%s*<br%s*/?%s*>)*%s*$", "")
     cleanedData = cleanedData:match("^%s*(.-)%s*$") or "" -- Final trim
 
-    -- Case 1: Both Twitter and Instagram content are available
+    -- 상황1, 성공적일 경우
     if finalTwitterBody and finalInstaBody then
         local hybridSpecificCss = [[
 <style>
 .sns-hybrid-container {
     display: flex;
-    justify-content: center; 
-    align-items: flex-start; 
-    gap: 20px; 
-    padding: 20px 0; 
-    max-width: 800px; 
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+    max-width: 800px;
     margin: 0 auto;
-    flex-wrap: nowrap; 
+    flex-wrap: wrap; /* Changed to wrap */
 }
 
 .sns-column {
-    flex: 1 1 360px; 
-    min-width: 300px; 
-    max-width: 380px; 
-    display: flex; 
-    justify-content: center; 
+    flex: 0 1 360px; /* Changed flex-grow to 0 to prevent stretching */
+    width: 100%; /* Added full width */
+    max-width: 375px;
+    display: flex;
+    justify-content: center;
 }
 
 .sns-column .iphone-frame-container {
-    margin: 0 !important; /* Override individual template margins */
-    width: 100% !important; /* Take width of sns-column */
-    max-width: 375px !important; /* Standardized max width for the phone frame itself */
-    /* height will be auto or set by individual templates */
-}
-/* Ensure the body styling from templates doesn't make hybrid page too dark by default */
-/* This is a general override, specific dark mode classes within components are fine */
-body.hybrid-sns-active { 
-    background-color: #fafafa; /* A light neutral background for the page */
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 375px !important;
 }
 
+body.hybrid-sns-active {
+    background-color: #fafafa;
+}
 
-@media (max-width: 799px) { 
+@media screen and (max-width: 799px) {
     .sns-hybrid-container {
-        flex-direction: column; 
-        align-items: center; 
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        gap: 10px; /* Reduced gap for mobile */
     }
+    
     .sns-column {
-        width: 100%; 
-        max-width: 380px; 
-        margin-bottom: 20px; 
+        width: 100%;
+        max-width: 375px;
+        margin: 0;
     }
-    .sns-column:last-child {
-        margin-bottom: 0;
+}
+
+@media screen {
+    .sns-hybrid-container {
+        padding: 5px;
     }
 }
 </style>
 ]]
-        -- Add a class to body when hybrid view is active to control page background
+        -- css 추가
         local hybridLayout = combinedStyles .. hybridSpecificCss .. [[
 <script>document.body.classList.add('hybrid-sns-active');</script>
 <div class="sns-hybrid-container">
@@ -2224,24 +2227,25 @@ body.hybrid-sns-active {
             return cleanedData .. "\n" .. hybridLayout
         end
 
-    -- Case 2: Only Twitter content is available
+    -- 상황 2, 트위터만 존재할 경우
     elseif finalTwitterBody then
         if cleanedData == "" then
-            return twitterFullHtmlOutput -- Return original full HTML (includes its own style)
+            return twitterFullHtmlOutput -- 원래 데이터 반환
         else
             return cleanedData .. "\n" .. twitterFullHtmlOutput
         end
 
-    -- Case 3: Only Instagram content is available
+    -- 상황 3, 인스타그램만 존재할 경우
     elseif finalInstaBody then
         if cleanedData == "" then
-            return instaFullHtmlOutput -- Return original full HTML (includes its own style)
+            return instaFullHtmlOutput -- 원래 데이터 반환
         else
             return cleanedData .. "\n" .. instaFullHtmlOutput
         end
     end
 
-    -- Case 4: No SNS tags were found or processed, return original data as is
+    -- 상황4, 트위터와 인스타그램 모두 존재하지 않을 경우
+    -- 원래 데이터 반환
     return originalData
 end
 
@@ -2741,7 +2745,7 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
     table.insert(html, '</div>')
     table.insert(html, '</div>')
     table.insert(html, '</div>')
-    
+
     -- inlay::가 존재할 경우
     local inlayTag = string.match(message, "{{inlay::[^}]+}}")
     if inlayTag and NAIMESSENGERNOIMAGE == "0" then
