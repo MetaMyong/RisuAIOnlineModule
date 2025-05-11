@@ -125,8 +125,8 @@ end
 
 local function convertDialogue(triggerId, data)
     print("convertDialogue is in PROCESS!")
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
 
     local lineToModify = data 
 
@@ -243,8 +243,8 @@ local function convertDialogue(triggerId, data)
 end
 
 local function inputEroStatus(triggerId, data)
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
-    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET") or "0"
 
     data = data .. [[
 ## Status Interface
@@ -404,8 +404,8 @@ local function inputEroStatus(triggerId, data)
 end
 
 local function changeEroStatus(triggerId, data)
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
-    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET") or "0"
 
     local erostatusPattern = "EROSTATUS%[([^%]]*)%]"
     data = string.gsub(data, erostatusPattern, function(replacements)
@@ -666,7 +666,7 @@ opacity: 0;
 end
 
 local function inputSimulCard(triggerId, data)
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
 
     data = data .. [[
 ## Status Interface
@@ -728,7 +728,7 @@ local function inputSimulCard(triggerId, data)
 end
 
 local function changeSimulCard(triggerId, data)
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
 
     local simulPattern = "(SIMULSTATUS)%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
     data = string.gsub(data, simulPattern, function(
@@ -797,8 +797,8 @@ body { background-color: #f0f0f0;padding: 20px;}
 end
 
 local function inputStatusHybrid(triggerId, data)
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
-    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET") or "0"
 
     data = data .. [[
 ## Status Interface
@@ -1012,8 +1012,8 @@ local function inputStatusHybrid(triggerId, data)
 end
 
 local function inputInlayOnly(triggerId, data)
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
-    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET") or "0"
 
     data = data .. [[
 ## Status Interface
@@ -1042,7 +1042,7 @@ local function inputInlayOnly(triggerId, data)
 end
 
 local function changeInlayOnly(triggerId, data)
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
 
     local inlayPattern = "(INLAY)%[([^%]]*)%]"
     data = string.gsub(data, inlayPattern, function(
@@ -1079,9 +1079,9 @@ local function changeInlayOnly(triggerId, data)
 end
 
 local function inputTwitter(triggerId, data)
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
-    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET") or "0"
+    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL") or "0"
 
     data = data .. [[
 ## SNS Interface
@@ -1203,8 +1203,8 @@ local function inputTwitter(triggerId, data)
 end
 
 local function changeTwitter(triggerId, data)
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET") or "0"
 
     local snsPattern = "TWITTER%[([^%]]*)%]"
     data = string.gsub(data, snsPattern, function(replacements)
@@ -1521,9 +1521,9 @@ body, .tweet-card { font-size: 15px; }
 end
 
 local function inputInsta(triggerId, data)
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
-    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET") or "0"
+    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL") or "0"
 
     data = data .. [[
 ## SNS Interface
@@ -1640,8 +1640,8 @@ local function inputInsta(triggerId, data)
 end
 
 local function changeInsta(triggerId, data)
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET") or "0"
 
     -- INSTA[NAME:(Real Name)|IID:(Instagram ID)|IPROFILE:(Profile Image)|POST:(Post Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date)|LIKES:(Likes Count)|REPLY:(Reply Count)|SHARE:(Share Count)]
 
@@ -1838,9 +1838,9 @@ html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;m
 end
 
 local function inputSNSHybrid(triggerId, data)
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
-    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET") or "0"
+    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL") or "0"
 
     data = data .. [[
 ## SNS Interface
@@ -2249,9 +2249,9 @@ body.hybrid-sns-active {
 end
 
 local function inputDCInside(triggerId, data)
-    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
-    local OMDCPOSTNUMBER = getGlobalVar(triggerId, "toggle_OMDCPOSTNUMBER")
-    local OMDCNOSTALKER = getGlobalVar(triggerId, "toggle_OMDCNOSTALKER")
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
+    local OMDCPOSTNUMBER = getGlobalVar(triggerId, "toggle_OMDCPOSTNUMBER") or "0"
+    local OMDCNOSTALKER = getGlobalVar(triggerId, "toggle_OMDCNOSTALKER") or "0"
 
     data = data .. [[
 ## Community Interface
@@ -2323,7 +2323,7 @@ local function inputDCInside(triggerId, data)
 end
 
 local function changeDCInside(triggerId, data)
-    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
     local function parseAuthor(raw_author)
         if not raw_author or raw_author == "" then
             return { name = "ㅇㅇ", type = "floating", ip = nil, html = "ㅇㅇ" }
@@ -2505,21 +2505,21 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     local postContentDisplayHtml = ""
                     local last_end = 1
                     rawPostContent = string.gsub(rawPostContent, "<!%-%-.-%-%->", "")
-                    local nai_pattern = "(<OM%d+>)"
+                    local om_pattern = "(<OM%d+>)"
 
                     while true do
-                        local naiStart, naiEnd, naiTag = string.find(rawPostContent, nai_pattern, last_end)
-                        if not naiStart then
+                        local omStart, omEnd, omTag = string.find(rawPostContent, om_pattern, last_end)
+                        if not omStart then
                             break
                         end
 
-                        local text_part = string.sub(rawPostContent, last_end, naiStart - 1)
+                        local text_part = string.sub(rawPostContent, last_end, omStart - 1)
                         local processed_text = escapeHtml(text_part)
                         processed_text = string.gsub(processed_text, "\n", "<br>")
                         processed_text = string.gsub(processed_text, "\r", "")
-                        postContentDisplayHtml = postContentDisplayHtml .. processed_text .. naiTag
+                        postContentDisplayHtml = postContentDisplayHtml .. processed_text .. omTag
 
-                        last_end = naiEnd + 1
+                        last_end = omEnd + 1
                     end
 
                     local remaining_text = string.sub(rawPostContent, last_end)
@@ -2627,7 +2627,7 @@ end
 
 
 local function inputKAKAOTalk(triggerId, data)
-    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
 
     data = data .. [[
 ## Messenger Interface
@@ -2668,7 +2668,7 @@ local function inputKAKAOTalk(triggerId, data)
 end
 
 local function changeKAKAOTalk(triggerId, data)
-    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
     data = string.gsub(data, "TALK%[(.-)|(.-)%]", function(message, timestamp)
         local userMessageTemplate = [[
 <style>
@@ -2763,34 +2763,35 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
 end
 
 local function inputImage(triggerId, data)
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
-    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
+    local OMNSFW = getGlobalVar(triggerId, "toggle_OMNSFW") or "0"
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET") or "0"
 
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
-    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL")
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET") or "0"
+    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL") or "0"
 
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
-    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
 
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
-    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
 
-    local OMCOMPATIBILITY = getGlobalVar(triggerId, "toggle_OMCOMPATIBILITY")
-    local OMORIGINAL = getGlobalVar(triggerId, "toggle_OMORIGINAL")
-    local OMORIGINALTEXT = getGlobalVar(triggerId, "toggle_OMORIGINALTEXT")
+    local OMCOMPATIBILITY = getGlobalVar(triggerId, "toggle_OMCOMPATIBILITY") or "0"
+    local OMORIGINAL = getGlobalVar(triggerId, "toggle_OMORIGINAL") or "0"
+    local OMORIGINALTEXT = getGlobalVar(triggerId, "toggle_OMORIGINALTEXT") or "0"
     
     
     data = data .. [[
 ## Image Prompt
 - This prompt must describe situations, settings, and actions related to the Character in vivid and detailed language.
 
-### Image Prompt Extraction
+### Image Prompt: Extraction
 - From the narrative, extract details to construct a comprehensive Prompt.
 
-### Image Prompt Placeholder
+### Image Prompt: Placeholder
 - Focus on the situation the Character is in.
 - The Image Prompt must be written in English and be detailed and descriptive.
 - REPLACE the PLACEHOLDER in the PROMPT:
@@ -2893,7 +2894,7 @@ local function inputImage(triggerId, data)
     end
 
     data = data .. [[
-### NEGATIVE PROMPT Template
+### Image Prompt: Negative Template
 - Write up to 30 keywords that should be avoided by Image as a negative prompt.
 - You must print out carefully to increase the accuracy rate of the prompts.
 - EXAMPLE: If the Character's hairstyle is long twin-tail.
@@ -2901,7 +2902,7 @@ local function inputImage(triggerId, data)
 - Example:
 	- [NEG_PROMPTPLACEHOLDER: 1girl,female,...]
 
-### Image Prompt Usage
+### Image Prompt: Usage
 - DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER
 - NEVER refer to the past chat history when outputting the prompt below:
 ]]
@@ -3067,7 +3068,7 @@ local function inputImage(triggerId, data)
     end
 
     data = data .. [[
-#### IMPORTANT
+## Image Prompt: CRITICAL
 - This Image Prompt must be suitable for generating an image.
 - Use quick, simple keywords or short descriptive phrases.
 - Always keep the prompt output in English.
@@ -3089,6 +3090,14 @@ local function inputImage(triggerId, data)
 ]]
     end
 
+    if OMNSFW == "0" then
+        data = data .. [[
+- NSFW content is disabled.
+- DO NOT USE NSFW SITUATION in the IMAGE PROMPT.
+    - PRINT {{{NSFW, UNCENSORED}}} in the NEGATIVE PROMPT.
+]]
+    end
+
     if tonumber(OMCOMPATIBILITY) >= 1 then
         data = data .. [[
 - REPLACE { and } to ( and ) in IMAGE PROMPT!!!
@@ -3101,11 +3110,11 @@ local function inputImage(triggerId, data)
 end
 
 local function inputImportant(triggerId, data)
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
-    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
 
     data = data .. [[
 
@@ -3151,15 +3160,15 @@ listenEdit("editInput", function(triggerId, data)
     local artistPrompt = nil
     local qualityPrompt = nil
     local negativePrompt = nil
-    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT")
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
-    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
+    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT") or "0"
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
     
     print("ONLINEMODULE: editInput: called with data: " .. tostring(data))
 
@@ -3195,12 +3204,12 @@ end)
 listenEdit("editRequest", function(triggerId, data)
     print("---------------------------------editREQUEST---------------------------------------")
     print("ONLINEMODULE: editRequest: Triggered with ID:", triggerId)
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
-    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL")
-    local UTILFORCEOUTPUT = getGlobalVar(triggerId, "toggle_UTILFORCEOUTPUT")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
+    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL") or "0"
+    local UTILFORCEOUTPUT = getGlobalVar(triggerId, "toggle_UTILFORCEOUTPUT") or "0"
 
     local currentInput = nil
     local currentIndex = nil
@@ -3321,10 +3330,10 @@ end)
 listenEdit("editDisplay", function(triggerId, data)
     if not data or data == "" then return "" end
 
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
     
     local rerollTemplate = [[
 <style>
@@ -3384,7 +3393,7 @@ end)
 
 listenEdit("editOutput", function(triggerId, data)
     if not data or data == "" then return "" end
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
 
     if OMMESSENGER == "1" then
         print("ONLINEMODULE: editOutput: OMMESSENGER == 1, filtering to keep only KAKAO blocks")
@@ -3425,14 +3434,14 @@ function onInput(triggerId)
     print("----- ANALYZING VALUABLES -----")
     print("ONLINEMODULE: onInput: Triggered with ID:", triggerId)
 
-    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL")
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
-    local UTILREMOVEPREVIOUSDISPLAY = getGlobalVar(triggerId, "toggle_UTILREMOVEPREVIOUSDISPLAY")
+    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL") or "0"
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET") or "0"
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
+    local UTILREMOVEPREVIOUSDISPLAY = getGlobalVar(triggerId, "toggle_UTILREMOVEPREVIOUSDISPLAY") or "0"
 
     if OMSNS ~= "0" then
         if OMSNSNOIMAGE == "1" then
@@ -3552,7 +3561,7 @@ end
 
 onOutput = async(function (triggerId)
     print("onOutput: Triggered with ID:", triggerId)
-    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL")
+    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL") or "0"
     if OMGLOBAL == "0" then
         return
     end
@@ -3560,20 +3569,20 @@ onOutput = async(function (triggerId)
 	local artistPrompt = nil
     local qualityPrompt = nil
     local negativePrompt = nil
-    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT")
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
-    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
-    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
+    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT") or "0"
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
 	
 	if OMPRESETPROMPT == "0" then
-        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT")
-        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT")
-        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT")
+        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT") or "0"
+        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or "0"
+        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or "0"
     elseif OMPRESETPROMPT == "1" then
 		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
 		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
@@ -3711,16 +3720,16 @@ onOutput = async(function (triggerId)
                         end
 
                         local blockContent = string.sub(currentLine, e_status_prefix + 1, e_status_suffix - 1)
-                        local naiSearchPosInContent = 1
-                        local naiTagsFoundInBlock = 0
+                        local omSearchPosInContent = 1
+                        local omTagsFoundInBlock = 0
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(blockContent, "<OM(%d+)>", naiSearchPosInContent)
-                            if not s_nai_in_content then break end
-                            naiTagsFoundInBlock = naiTagsFoundInBlock + 1
-                            local naiIndex = tonumber(naiIndexStr)
-                            if naiIndex then
-                                local statusPromptFindPattern = "%[OMSTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                local statusNegPromptFindPattern = "%[NEG_OMSTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(blockContent, "<OM(%d+)>", omSearchPosInContent)
+                            if not s_om_in_content then break end
+                            omTagsFoundInBlock = omTagsFoundInBlock + 1
+                            local omIndex = tonumber(omIndexStr)
+                            if omIndex then
+                                local statusPromptFindPattern = "%[OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                local statusNegPromptFindPattern = "%[NEG_OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
                                 local _, _, foundStatusPrompt = string.find(currentLine, statusPromptFindPattern)
                                 local _, _, foundStatusNegPrompt = string.find(currentLine, statusNegPromptFindPattern)
                                 local currentNegativePromptStatus = negativePrompt
@@ -3733,14 +3742,14 @@ onOutput = async(function (triggerId)
                                     local finalPromptStatus = artistPrompt .. foundStatusPrompt .. qualityPrompt
                                     local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
                                     if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and not string.find(inlayStatus, "fail", 1, true) and not string.find(inlayStatus, "error", 1, true) and not string.find(inlayStatus, "실패", 1, true) then
-                                        local erostatusIdentifier = "EROSTATUS_" .. naiIndex
+                                        local erostatusIdentifier = "EROSTATUS_" .. omIndex
                                         local content_offset = e_status_prefix
-                                        local nai_abs_start = content_offset + s_nai_in_content
-                                        local nai_abs_end = content_offset + e_nai_in_content
+                                        local om_abs_start = content_offset + s_om_in_content
+                                        local om_abs_end = content_offset + e_om_in_content
                                         table.insert(statusReplacements, {
-                                            start = nai_abs_start,
-                                            finish = nai_abs_end,
-                                            inlay = "<OM" .. naiIndex .. ">" .. inlayStatus
+                                            start = om_abs_start,
+                                            finish = om_abs_end,
+                                            inlay = "<OM" .. omIndex .. ">" .. inlayStatus
                                         })
                                         local infoEro = {
                                             type = "EROSTATUS",
@@ -3757,10 +3766,10 @@ onOutput = async(function (triggerId)
                                     end
                                 else
                                     ERR(triggerId, "EROSTATUS", 0)
-                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. naiIndex .. " in currentLine.")
+                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. omIndex .. " in currentLine.")
                                 end
                             end
-                            naiSearchPosInContent = e_nai_in_content + 1
+                            omSearchPosInContent = e_om_in_content + 1
                         end
                         searchPos = e_status_suffix + 1
                     else
@@ -3848,63 +3857,63 @@ onOutput = async(function (triggerId)
                         end
 
                         local simulContent = string.sub(currentLine, e_simul_prefix + 1, e_simul_suffix - 1)
-                        local naiSearchPosInContent = 1
-                        local naiTagsFoundInBlock = 0
+                        local omSearchPosInContent = 1
+                        local omTagsFoundInBlock = 0
 
                         if existingInlay and trimmedBlockName then
                             print("ONLINEMODULE: onOutput: Processing with existing inlay for block #" .. statusBlocksFound)
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<OM(%d+)>", naiSearchPosInContent)
-                            if not s_nai_in_content then break end
-                            naiTagsFoundInBlock = naiTagsFoundInBlock + 1
-                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..naiTagsFoundInBlock.." (using existing inlay)")
-                            local naiIndex = tonumber(naiIndexStr)
-                            if naiIndex then
+                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(simulContent, "<OM(%d+)>", omSearchPosInContent)
+                            if not s_om_in_content then break end
+                            omTagsFoundInBlock = omTagsFoundInBlock + 1
+                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..omTagsFoundInBlock.." (using existing inlay)")
+                            local omIndex = tonumber(omIndexStr)
+                            if omIndex then
                                 local content_offset = e_simul_prefix
-                                local nai_abs_start = content_offset + s_nai_in_content
-                                local nai_abs_end = content_offset + e_nai_in_content
-                                table.insert(simulReplacements, { start = nai_abs_start, finish = nai_abs_end, inlay = existingInlay })
-                                print("ONLINEMODULE: onOutput: Adding existing inlay replacement for OM" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
+                                local om_abs_start = content_offset + s_om_in_content
+                                local om_abs_end = content_offset + e_om_in_content
+                                table.insert(simulReplacements, { start = om_abs_start, finish = om_abs_end, inlay = existingInlay })
+                                print("ONLINEMODULE: onOutput: Adding existing inlay replacement for OM" .. omIndex .. " at absolute pos " .. om_abs_start .. "-" .. om_abs_end)
                             end
-                            naiSearchPosInContent = e_nai_in_content + 1
+                            omSearchPosInContent = e_om_in_content + 1
                         end
                         else
                             print("ONLINEMODULE: onOutput: Processing by generating new image for block #" .. statusBlocksFound)
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<OM(%d+)>", naiSearchPosInContent)
-                            if not s_nai_in_content then
+                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(simulContent, "<OM(%d+)>", omSearchPosInContent)
+                            if not s_om_in_content then
                                 print("ONLINEMODULE: onOutput: No more <OM> tags found in block #".. statusBlocksFound .." content search.")
                                 break
                             end
-                            naiTagsFoundInBlock = naiTagsFoundInBlock + 1
-                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..naiTagsFoundInBlock.." (generating new)")
-                            local naiIndex = tonumber(naiIndexStr)
-                            if naiIndex then
-                                local simulPromptPattern = "%[OMSIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                local negSimulPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                            omTagsFoundInBlock = omTagsFoundInBlock + 1
+                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..omTagsFoundInBlock.." (generating new)")
+                            local omIndex = tonumber(omIndexStr)
+                            if omIndex then
+                                local simulPromptPattern = "%[OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                local negSimulPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
                                 local _, _, foundSimulPrompt = string.find(currentLine, simulPromptPattern)
                                 local _, _, foundNegSimulPrompt = string.find(currentLine, negSimulPromptPattern)
 
                                 if foundSimulPrompt then
-                                    print("ONLINEMODULE: onOutput: Found prompt for OM" .. naiIndex .. ": [" .. string.sub(foundSimulPrompt, 1, 50) .. "...]")
+                                    print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundSimulPrompt, 1, 50) .. "...]")
                                     local currentNegativePromptSimul = negativePrompt
                                     local storedNegPrompt = ""
                                     if foundNegSimulPrompt then currentNegativePromptSimul = foundNegSimulPrompt .. ", " .. currentNegativePromptSimul; storedNegPrompt = foundNegSimulPrompt end
                                     local finalPromptSimul = artistPrompt .. foundSimulPrompt .. qualityPrompt
                                     local inlaySimul = generateImage(triggerId, finalPromptSimul, currentNegativePromptSimul):await()
-                                    print("ONLINEMODULE: onOutput: generateImage result for OM"..naiIndex..": ["..tostring(inlaySimul).."]")
+                                    print("ONLINEMODULE: onOutput: generateImage result for OM"..omIndex..": ["..tostring(inlaySimul).."]")
                                     local isSuccess = (inlaySimul ~= nil) and (type(inlaySimul) == "string") and (string.len(inlaySimul) > 10) and not string.find(inlaySimul, "fail", 1, true) and not string.find(inlaySimul, "error", 1, true) and not string.find(inlaySimul, "실패", 1, true)
                                     if isSuccess then
-                                        print("ONLINEMODULE: onOutput: Image generation SUCCESS for OM"..naiIndex)
+                                        print("ONLINEMODULE: onOutput: Image generation SUCCESS for OM"..omIndex)
                                         local content_offset = e_simul_prefix 
-                                        local nai_abs_start = content_offset + s_nai_in_content
-                                        local nai_abs_end = content_offset + e_nai_in_content -1
+                                        local om_abs_start = content_offset + s_om_in_content
+                                        local om_abs_end = content_offset + e_om_in_content -1
                                         table.insert(simulReplacements, {
-                                            start = nai_abs_start,
-                                            finish = nai_abs_end,
-                                            inlay = "<OM" .. naiIndex .. ">" .. inlaySimul
+                                            start = om_abs_start,
+                                            finish = om_abs_end,
+                                            inlay = "<OM" .. omIndex .. ">" .. inlaySimul
                                         })
-                                        print("ONLINEMODULE: onOutput: Adding new inlay replacement for OM" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
+                                        print("ONLINEMODULE: onOutput: Adding new inlay replacement for OM" .. omIndex .. " at absolute pos " .. om_abs_start .. "-" .. om_abs_end)
 
                                         if trimmedBlockName then
                                             setState(triggerId, trimmedBlockName, inlaySimul)
@@ -3939,17 +3948,17 @@ onOutput = async(function (triggerId)
                                         end
                                     else
                                         ERR(triggerId, "SIMULCARD", 2)
-                                        print("ONLINEMODULE: onOutput: Image generation FAILED or invalid result for OM"..naiIndex)
+                                        print("ONLINEMODULE: onOutput: Image generation FAILED or invalid result for OM"..omIndex)
                                     end
                                 else
                                     ERR(triggerId, "SIMULCARD", 0)
-                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. naiIndex .. " in currentLine.")
+                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. omIndex .. " in currentLine.")
                                 end
                             end
-                            naiSearchPosInContent = e_nai_in_content + 1
+                            omSearchPosInContent = e_om_in_content + 1
                         end
                     end
-                    if naiTagsFoundInBlock == 0 then
+                    if omTagsFoundInBlock == 0 then
                         ERR(triggerId, "SIMULCARD", 3)
                         print("ONLINEMODULE: onOutput: No <OM> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
                     end
@@ -4056,39 +4065,39 @@ onOutput = async(function (triggerId)
                             end
                         end
 
-                        local naiSearchPosInContent = 1
-                        local naiTagsFoundInBlock = 0
+                        local omSearchPosInContent = 1
+                        local omTagsFoundInBlock = 0
 
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndex = string.find(blockContent, "<OM(%d+)>", naiSearchPosInContent)
-                            if not s_nai_in_content then break end
-                            naiTagsFoundInBlock = naiTagsFoundInBlock + 1
-                            naiIndex = tonumber(naiIndex)
+                            local s_om_in_content, e_om_in_content, omIndex = string.find(blockContent, "<OM(%d+)>", omSearchPosInContent)
+                            if not s_om_in_content then break end
+                            omTagsFoundInBlock = omTagsFoundInBlock + 1
+                            omIndex = tonumber(omIndex)
 
-                            if naiIndex then
+                            if omIndex then
                                 local content_offset = e_status_prefix
-                                local nai_abs_start = content_offset + s_nai_in_content
-                                local nai_abs_end = content_offset + e_nai_in_content
+                                local om_abs_start = content_offset + s_om_in_content
+                                local om_abs_end = content_offset + e_om_in_content
 
                                 -- 시뮬레이션이고 캐시된 이미지가 있으면 재사용
                                 if not isEroStatus and cachedInlay then
                                     print("ONLINEMODULE: onOutput: Reusing cached image for character: " .. trimmedBlockName)
                                     table.insert(replacements, {
-                                        start = nai_abs_start,
-                                        finish = nai_abs_end,
-                                        inlay = "<OM" .. naiIndex .. ">" .. cachedInlay
+                                        start = om_abs_start,
+                                        finish = om_abs_end,
+                                        inlay = "<OM" .. omIndex .. ">" .. cachedInlay
                                     })
                                 else
                                     -- 새 이미지 생성
                                     local promptPattern, negPromptPattern, promptType, identifier
                                     if isEroStatus then
-                                        promptPattern = "%[OMSTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                        negPromptPattern = "%[NEG_OMSTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        promptPattern = "%[OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                        negPromptPattern = "%[NEG_OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
                                         promptType = "EROSTATUS"
-                                        identifier = "EROSTATUS_" .. naiIndex
+                                        identifier = "EROSTATUS_" .. omIndex
                                     else
-                                        promptPattern = "%[OMSIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                        negPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        promptPattern = "%[OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                        negPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
                                         promptType = "SIMULCARD"
                                         identifier = trimmedBlockName
                                     end
@@ -4118,9 +4127,9 @@ onOutput = async(function (triggerId)
                                             end
 
                                             table.insert(replacements, {
-                                                start = nai_abs_start,
-                                                finish = nai_abs_end,
-                                                inlay = "<OM" .. naiIndex .. ">" .. inlay
+                                                start = om_abs_start,
+                                                finish = om_abs_end,
+                                                inlay = "<OM" .. omIndex .. ">" .. inlay
                                             })
 
                                             local info = {
@@ -4157,10 +4166,10 @@ onOutput = async(function (triggerId)
                                     end
                                 end
                             end
-                            naiSearchPosInContent = e_nai_in_content + 1
+                            omSearchPosInContent = e_om_in_content + 1
                         end
 
-                        if naiTagsFoundInBlock == 0 then
+                        if omTagsFoundInBlock == 0 then
                             ERR(triggerId, isEroStatus and "EROSTATUS" or "SIMULCARD", 3)
                         end
                         searchPos = e_status_suffix + 1
@@ -4202,18 +4211,18 @@ onOutput = async(function (triggerId)
                     print("ONLINEMODULE: onOutput: Found INLAY block #" .. inlayBlocksFound .. " starting at index " .. s_inlay)
 
                     local inlayContent = string.sub(currentLine, s_inlay, e_inlay)
-                    local _, _, naiIndexStr = string.find(inlayContent, "<OM(%d+)>")
-                    local naiIndex = tonumber(naiIndexStr)
+                    local _, _, omIndexStr = string.find(inlayContent, "<OM(%d+)>")
+                    local omIndex = tonumber(omIndexStr)
 
-                    if naiIndex then
-                        print("ONLINEMODULE: onOutput: Found OM index: " .. naiIndex)
-                        local promptPattern = "%[OMINLAYPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                        local negPromptPattern = "%[NEG_OMINLAYPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                    if omIndex then
+                        print("ONLINEMODULE: onOutput: Found OM index: " .. omIndex)
+                        local promptPattern = "%[OMINLAYPROMPT" .. omIndex .. ":([^%]]*)%]"
+                        local negPromptPattern = "%[NEG_OMINLAYPROMPT" .. omIndex .. ":([^%]]*)%]"
                         local _, _, foundInlayPrompt = string.find(currentLine, promptPattern)
                         local _, _, foundInlayNegPrompt = string.find(currentLine, negPromptPattern)
 
                         if foundInlayPrompt then
-                            print("ONLINEMODULE: onOutput: Found prompt for OM" .. naiIndex .. ": [" .. string.sub(foundInlayPrompt, 1, 50) .. "...]")
+                            print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundInlayPrompt, 1, 50) .. "...]")
                             local currentNegativePromptInlay = negativePrompt
                             local storedNegInlayPrompt = ""
                             if foundInlayNegPrompt then 
@@ -4230,7 +4239,7 @@ onOutput = async(function (triggerId)
                                not string.find(inlayImage, "실패", 1, true) then
                                 
                                 -- 기존 INLAY[<OM>] 블록을 새로운 inlay로 교체
-                                local replacement = "INLAY[<OM" .. naiIndex .. ">" .. inlayImage .. "]"
+                                local replacement = "INLAY[<OM" .. omIndex .. ">" .. inlayImage .. "]"
                                 
                                 table.insert(inlayReplacements, {
                                     start = s_inlay,
@@ -4241,7 +4250,7 @@ onOutput = async(function (triggerId)
                                 -- 이미지 정보 저장
                                 local infoInlay = {
                                     type = "INLAY",
-                                    identifier = "INLAY_" .. naiIndex,
+                                    identifier = "INLAY_" .. omIndex,
                                     inlay = inlayImage,
                                     prompt = foundInlayPrompt,
                                     negPrompt = storedNegInlayPrompt
@@ -4249,9 +4258,9 @@ onOutput = async(function (triggerId)
                                 table.insert(generatedImagesInfo, infoInlay)
                                 
                                 -- ChatVar에 정보 저장
-                                setState(triggerId, "INLAY_" .. naiIndex .. "_PROMPT", foundInlayPrompt)
-                                setState(triggerId, "INLAY_" .. naiIndex .. "_NEGPROMPT", storedNegInlayPrompt)
-                                setState(triggerId, "INLAY_" .. naiIndex, inlayImage)
+                                setState(triggerId, "INLAY_" .. omIndex .. "_PROMPT", foundInlayPrompt)
+                                setState(triggerId, "INLAY_" .. omIndex .. "_NEGPROMPT", storedNegInlayPrompt)
+                                setState(triggerId, "INLAY_" .. omIndex, inlayImage)
                                 
                                 print("ONLINEMODULE: onOutput: Successfully processed INLAY block #" .. inlayBlocksFound)
                                 lineModifiedInThisPass = true
@@ -4914,21 +4923,21 @@ onOutput = async(function (triggerId)
                     end
                     if foundClosingBracket then
                         local dcContent = string.sub(currentLine, e_dc_prefix + 1, e_dc_suffix - 1)
-                        local naiSearchPosInContent = 1
+                        local omSearchPosInContent = 1
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(dcContent, "<OM(%d+)>", naiSearchPosInContent)
-                            if not s_nai_in_content then break end
-                            local naiIndex = tonumber(naiIndexStr)
+                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(dcContent, "<OM(%d+)>", omSearchPosInContent)
+                            if not s_om_in_content then break end
+                            local omIndex = tonumber(omIndexStr)
 
                             local content_start_abs = e_dc_prefix + 1
-                            local nai_abs_start = content_start_abs + s_nai_in_content - 1
-                            local nai_abs_end = content_start_abs + e_nai_in_content - 1
+                            local om_abs_start = content_start_abs + s_om_in_content - 1
+                            local om_abs_end = content_start_abs + e_om_in_content - 1
 
                             local postId = nil
                             local postIdPattern = "PID:([^|]*)"
-                            local s_post, e_post, capturedPostId = findLastPatternBefore(dcContent, postIdPattern, s_nai_in_content)
+                            local s_post, e_post, capturedPostId = findLastPatternBefore(dcContent, postIdPattern, s_om_in_content)
                             if not capturedPostId then
-                                local s_post2, e_post2, capturedPostId2 = findLastPatternBefore(dcContent, "PN:([^|]*)", s_nai_in_content)
+                                local s_post2, e_post2, capturedPostId2 = findLastPatternBefore(dcContent, "PN:([^|]*)", s_om_in_content)
                                 capturedPostId = capturedPostId2
                             end
                             if capturedPostId and type(capturedPostId) == "string" then
@@ -4936,9 +4945,9 @@ onOutput = async(function (triggerId)
                                 if postId == "" then postId = nil end
                             end
 
-                            if naiIndex and postId then
-                                local dcPromptPattern = "%[OMDCPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                local negDcPromptPattern = "%[NEG_OMDCPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                            if omIndex and postId then
+                                local dcPromptPattern = "%[OMDCPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                local negDcPromptPattern = "%[NEG_OMDCPROMPT" .. omIndex .. ":([^%]]*)%]"
                                 local _, _, foundDcPrompt = string.find(currentLine, dcPromptPattern)
                                 local _, _, foundNegDcPrompt = string.find(currentLine, negDcPromptPattern)
                                 local currentNegativePromptDc = negativePrompt
@@ -4952,9 +4961,9 @@ onOutput = async(function (triggerId)
                                         local dcIdentifier = postId
 
                                         table.insert(dcReplacements, {
-                                            start = nai_abs_start,
-                                            finish = nai_abs_end,
-                                            inlay = "<OM" .. naiIndex .. ">" .. inlayDc
+                                            start = om_abs_start,
+                                            finish = om_abs_end,
+                                            inlay = "<OM" .. omIndex .. ">" .. inlayDc
                                         })
 
                                         local infoDC = {
@@ -4992,9 +5001,9 @@ onOutput = async(function (triggerId)
                                 end
                             else
                                 ERR(triggerId, "DCINSIDE", 3)
-                                if not postId then print("ONLINEMODULE: onOutput: WARN - Could not determine Post ID for <OM" .. (naiIndex or "??") .. "> tag at position " .. nai_abs_start .. ". Skipping.") end
+                                if not postId then print("ONLINEMODULE: onOutput: WARN - Could not determine Post ID for <OM" .. (omIndex or "??") .. "> tag at position " .. om_abs_start .. ". Skipping.") end
                             end
-                            naiSearchPosInContent = e_nai_in_content + 1
+                            omSearchPosInContent = e_om_in_content + 1
                         end
                         searchPos = e_dc_suffix + 1
                     else
@@ -5153,13 +5162,13 @@ onButtonClick = async(function(triggerId, data)
         return
     end
 
-    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT")
+    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT") or "0"
 
     local artistPrompt, qualityPrompt, negativePrompt = nil, nil, nil
 	if OMPRESETPROMPT == "0" then
-        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT")
-        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT")
-        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT")
+        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT") or "0"
+        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or "0"
+        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or "0"
     elseif OMPRESETPROMPT == "1" then
 		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
 		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
