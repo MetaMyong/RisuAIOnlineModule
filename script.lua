@@ -1864,21 +1864,22 @@ local function inputSNSHybrid(triggerId, data)
     if NAISNSTARGET == "0" then
         data = data .. [[
 - MAKE a {{user}}'s TWITTER INTERFACE
-- MUST INCLUDE THE {{user}}'s NSFW POST
+- MUST INCLUDE THE {{user}}'s PRIVATE NSFW POST
 ]]
     elseif NAISNSTARGET == "1" then
         data = data .. [[
 - MAKE a {{char}}'s TWITTER INTERFACE
-- MUST INCLUDE THE {{char}}'s NSFW POST
+- MUST INCLUDE THE {{char}}'s PRIVATE NSFW POST
 ]]
     elseif NAISNSTARGET == "2" then
         data = data .. [[
 - MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE
-- MUST INCLUDE THE (RANDOM OPPONENT NPC)'s NSFW POST
+- MUST INCLUDE THE (RANDOM OPPONENT NPC)'s PRIVATE NSFW POST
 ]]
     end
 
     data = data .. [[
+    - NO SFW ALLOWED AT HERE
 #### Twitter Interface Template
 - AI must follow this template:
     - TWITTER[NAME:(Real Name)|TNAME:(Twitter Nickname)|TID:(Twitter ID)|TPROFILE:(Profile Image)|TWEET:(Tweet Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date/Time)|VIEW:(Viewer Count)|REPLY:(Reply Count)|RETWEET:(Retweet Count)|LIKES:(Likes Count)|COMMENT:(Viewer Nickname1)|(Comment Body1)|(Viewer Nickname2)|(Comment Body2)|...]
@@ -1982,24 +1983,22 @@ local function inputSNSHybrid(triggerId, data)
     if NAISNSTARGET == "0" then
         data = data .. [[
 - MAKE a {{user}}'s INSTAGRAM INTERFACE
-- MUST INCLUDE THE {{user}}'s SFW POST
-    - NO NSFW
+- MUST INCLUDE THE {{user}}'s PUBLIC SFW POST
 ]]
     elseif NAISNSTARGET == "1" then
         data = data .. [[
 - MAKE a {{char}}'s INSTAGRAM INTERFACE
-- MUST INCLUDE THE {{char}}'s SFW POST
-    - NO NSFW
+- MUST INCLUDE THE {{char}}'s PUBLIC SFW POST
 ]]
     elseif NAISNSTARGET == "2" then
         data = data .. [[
 - MAKE a (RANDOM OPPONENT NPC)'s INSTAGRAM INTERFACE
-- MUST INCLUDE THE (RANDOM OPPONENT NPC)'s SFW POST
-    - NO NSFW
+- MUST INCLUDE THE (RANDOM OPPONENT NPC)'s PUBLIC SFW POST
 ]]
     end
 
     data = data .. [[
+    - NO NSFW ALLOWED AT HERE
 #### Instagram Interface Template
 - AI must follow this template:
     - INSTA[NAME:(Real Name)|IID:(Instagram ID)|IPROFILE:(Profile Image)|POST:(Post Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date)|LIKES:(Likes Count)|REPLY:(Reply Count)|SHARE:(Share Count)]
