@@ -2727,9 +2727,9 @@ onOutput = async(function (triggerId)
 		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     elseif NAIPRESETPROMPT == "4" then
-        artistPrompt = "{artist:Goldcan9, artist:shiba}, artist:sakurai norio,,artist: torino, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{artist:ciloranko}, {artist:kawakami rokkaku}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow)]], artist:healthyman, artist:baffu, [[artist:deadnooodles]], [[artist:jyt]], artist:yd (orange maru), [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], 0.9::artist:taesi ::, 0.7::artist:shiratama (shiratamaco) ::,1.2::artist:ningen mame ::, 1.7::artist:tianliang duohe fangdongye ::, 1.7::artist:shuz ::, 1.2::artist:wlop ::, 1.5::artist:kase daiki ::, 0.6::artist:chobi (penguin paradise) ::"
+        artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}, dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     elseif NAIPRESETPROMPT == "5" then
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
@@ -2890,9 +2890,9 @@ onOutput = async(function (triggerId)
                                             negPrompt = storedNegPrompt
                                         }
                                         table.insert(generatedImagesInfo, infoEro)
-                                        setChatVar(triggerId, erostatusIdentifier .. "_PROMPT", infoEro.prompt)
-                                        setChatVar(triggerId, erostatusIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
-                                        setChatVar(triggerId, erostatusIdentifier, infoEro.inlay)
+                                        setState(triggerId, erostatusIdentifier .. "_PROMPT", infoEro.prompt)
+                                        setState(triggerId, erostatusIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
+                                        setState(triggerId, erostatusIdentifier, infoEro.inlay)
                                         print("ONLINEMODULE: onOutput: Stored info for generated EROSTATUS image. Identifier: " .. erostatusIdentifier)
                                     end
                                 else
@@ -2978,7 +2978,7 @@ onOutput = async(function (triggerId)
                             trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
                             if trimmedBlockName ~= "" then
                                 print("ONLINEMODULE: onOutput: Trimmed NAME: [" .. trimmedBlockName .. "]")
-                                existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
+                                existingInlay = getState(triggerId, trimmedBlockName) or "null"
                                 if existingInlay == "null" then existingInlay = nil end
                                 print("ONLINEMODULE: onOutput: Existing inlay found from chatVar: [" .. tostring(existingInlay) .. "]")
                             else
@@ -3046,11 +3046,11 @@ onOutput = async(function (triggerId)
                                         print("ONLINEMODULE: onOutput: Adding new inlay replacement for NAI" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
 
                                         if trimmedBlockName then
-                                            setChatVar(triggerId, trimmedBlockName, inlaySimul)
-                                            setChatVar(triggerId, trimmedBlockName .. "_SIMULPROMPT", foundSimulPrompt)
-                                            setChatVar(triggerId, trimmedBlockName .. "_NEGSIMULPROMPT", storedNegPrompt)
+                                            setState(triggerId, trimmedBlockName, inlaySimul)
+                                            setState(triggerId, trimmedBlockName .. "_SIMULPROMPT", foundSimulPrompt)
+                                            setState(triggerId, trimmedBlockName .. "_NEGSIMULPROMPT", storedNegPrompt)
 
-                                            local currentList = getChatVar(triggerId, listKey) or "null"
+                                            local currentList = getState(triggerId, listKey) or "null"
                                             if currentList == "null" then currentList = "" end
                                                 print("ONLINEMODULE: onOutput: Current list for key '" .. listKey .. "': [" .. currentList .. "]")
                                             local newList = currentList
@@ -3060,7 +3060,7 @@ onOutput = async(function (triggerId)
                                                 else
                                                     newList = currentList .. "," .. trimmedBlockName
                                                 end
-                                                setChatVar(triggerId, listKey, newList)
+                                                setState(triggerId, listKey, newList)
                                                 print("ONLINEMODULE: onOutput: Added SimCard ID '" .. trimmedBlockName .. "' to stored list (" .. listKey .. "). New list: [" .. newList .. "]")
                                             else
                                                 print("ONLINEMODULE: onOutput: SimCard ID '" .. trimmedBlockName .. "' already exists in stored list (" .. listKey .. ").")
@@ -3187,7 +3187,7 @@ onOutput = async(function (triggerId)
                         if not isEroStatus and trimmedBlockName then
                             cachedInlay = characterImageCache[trimmedBlockName]
                             if not cachedInlay then
-                                local existingInlay = getChatVar(triggerId, trimmedBlockName) or "null"
+                                local existingInlay = getState(triggerId, trimmedBlockName) or "null"
                                 if existingInlay ~= "null" then
                                     characterImageCache[trimmedBlockName] = existingInlay
                                     cachedInlay = existingInlay
@@ -3273,20 +3273,20 @@ onOutput = async(function (triggerId)
                                             table.insert(generatedImagesInfo, info)
 
                                             if isEroStatus then
-                                                setChatVar(triggerId, identifier .. "_PROMPT", info.prompt)
-                                                setChatVar(triggerId, identifier .. "_NEGPROMPT", info.negPrompt)
-                                                setChatVar(triggerId, identifier, info.inlay)
+                                                setState(triggerId, identifier .. "_PROMPT", info.prompt)
+                                                setState(triggerId, identifier .. "_NEGPROMPT", info.negPrompt)
+                                                setState(triggerId, identifier, info.inlay)
                                             else
-                                                setChatVar(triggerId, identifier, inlay)
-                                                setChatVar(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
-                                                setChatVar(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
+                                                setState(triggerId, identifier, inlay)
+                                                setState(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
+                                                setState(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
 
-                                                local currentList = getChatVar(triggerId, listKey) or "null"
+                                                local currentList = getState(triggerId, listKey) or "null"
                                                 if currentList == "null" then currentList = "" end
                                                 
                                                 if not string.find("," .. currentList .. ",", "," .. identifier .. ",", 1, true) then
                                                     local newList = currentList == "" and identifier or (currentList .. "," .. identifier)
-                                                    setChatVar(triggerId, listKey, newList)
+                                                    setState(triggerId, listKey, newList)
                                                 end
                                             end
                                         else
@@ -3349,7 +3349,7 @@ onOutput = async(function (triggerId)
 
                 if twitterId then
                     print("ONLINEMODULE: onOutput: Processing Twitter ID:", twitterId)
-                    local existingProfileInlay = getChatVar(triggerId, twitterId) or "null"
+                    local existingProfileInlay = getState(triggerId, twitterId) or "null"
                     print("ONLINEMODULE: onOutput: Existing profile inlay:", existingProfileInlay)
 
                     if existingProfileInlay == "null" or not existingProfileInlay then
@@ -3385,10 +3385,10 @@ onOutput = async(function (triggerId)
                             if isSuccessProfile then
                                 print("ONLINEMODULE: onOutput: Profile image generation successful")
                                 profileInlayToUse = inlayProfile
-                                setChatVar(triggerId, twitterId, profileInlayToUse)
-                                setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
-                                setChatVar(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
-                                setChatVar(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
+                                setState(triggerId, twitterId, profileInlayToUse)
+                                setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                                setState(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
+                                setState(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
 
                                 local infoProfile = {
                                     type = "PROFILE",
@@ -3407,7 +3407,7 @@ onOutput = async(function (triggerId)
                     else
                         print("ONLINEMODULE: onOutput: Using existing profile inlay")
                         profileInlayToUse = existingProfileInlay
-                        setChatVar(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                        setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
                     end
                 end
 
@@ -3464,9 +3464,9 @@ onOutput = async(function (triggerId)
                         }
 
                         table.insert(generatedImagesInfo, infoTweet)
-                        setChatVar(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
-                        setChatVar(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
-                        setChatVar(triggerId, twitterId .. "_TWEET", infoTweet.inlay)
+                        setState(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
+                        setState(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
+                        setState(triggerId, twitterId .. "_TWEET", infoTweet.inlay)
                         print("ONLINEMODULE: onOutput: Stored generated tweet info")
                     elseif profileInlayToUse then
                         print("ONLINEMODULE: onOutput: Using profile-only replacement")
@@ -3609,9 +3609,9 @@ onOutput = async(function (triggerId)
                                             table.insert(generatedImagesInfo, infoDC)
                                         end
 
-                                        setChatVar(triggerId, "DC_" .. dcIdentifier .. "_PROMPT", infoDC.prompt)
-                                        setChatVar(triggerId, "DC_" .. dcIdentifier .. "_NEGPROMPT", infoDC.negPrompt)
-                                        setChatVar(triggerId, "DC_" .. dcIdentifier, inlayDc) 
+                                        setState(triggerId, "DC_" .. dcIdentifier .. "_PROMPT", infoDC.prompt)
+                                        setState(triggerId, "DC_" .. dcIdentifier .. "_NEGPROMPT", infoDC.negPrompt)
+                                        setState(triggerId, "DC_" .. dcIdentifier, inlayDc) 
                                     else
                                         ERR(triggerId, "DCINSIDE", 2)
                                         print("ONLINEMODULE: onOutput: ERROR - DC image generation failed...")
@@ -3674,9 +3674,9 @@ onOutput = async(function (triggerId)
         
                         local infoEro = { type = "KAKAO", identifier = kakaoIdentifier, inlay = inlayKakao, prompt = foundKakaoPrompt, negPrompt = storedNegPrompt }
                         table.insert(generatedImagesInfo, infoEro)
-                        setChatVar(triggerId, kakaoIdentifier .. "_PROMPT", infoEro.prompt)
-                        setChatVar(triggerId, kakaoIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
-                        setChatVar(triggerId, kakaoIdentifier, infoEro.inlay)
+                        setState(triggerId, kakaoIdentifier .. "_PROMPT", infoEro.prompt)
+                        setState(triggerId, kakaoIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
+                        setState(triggerId, kakaoIdentifier, infoEro.inlay)
                         print("ONLINEMODULE: onOutput: Stored info for generated KAKAO image. Identifier: " .. kakaoIdentifier)
                     else
                         ERR(triggerId, "KAKAOTALK", 2)
@@ -3775,13 +3775,22 @@ onButtonClick = async(function(triggerId, data)
         artistPrompt = getGlobalVar(triggerId, "toggle_NAIARTISTPROMPT")
         qualityPrompt = getGlobalVar(triggerId, "toggle_NAIQUALITYPROMPT")
         negativePrompt = getGlobalVar(triggerId, "toggle_NAINEGPROMPT")
-    elseif NAIPRESETPROMPT == "1" then artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}" qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres" negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
-    elseif NAIPRESETPROMPT == "2" then artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}" qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres" negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "3" then artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}" qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres" negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+    elseif NAIPRESETPROMPT == "1" then
+		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
+		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
+		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
+	elseif NAIPRESETPROMPT == "2" then
+		artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}"
+		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
+		negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+	elseif NAIPRESETPROMPT == "3" then
+		artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}"
+		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
+		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     elseif NAIPRESETPROMPT == "4" then
-        artistPrompt = "{artist:Goldcan9, artist:shiba}, artist:sakurai norio,,artist: torino, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{artist:ciloranko}, {artist:kawakami rokkaku}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow)]], artist:healthyman, artist:baffu, [[artist:deadnooodles]], [[artist:jyt]], artist:yd (orange maru), [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], 0.9::artist:taesi::, 0.7::artist:shiratama (shiratamaco)::,1.2::artist:ningen mame::, 1.7::artist:tianliang duohe fangdongye::, 1.7::artist:shuz::, 1.2::artist:wlop::, 1.5::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::"
+        artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-        negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}, dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     elseif NAIPRESETPROMPT == "5" then
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
@@ -3792,9 +3801,9 @@ onButtonClick = async(function(triggerId, data)
         negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
     end
 
-    local foundSpecificPrompt = getChatVar(triggerId, specificPromptKey) or "null"
+    local foundSpecificPrompt = getState(triggerId, specificPromptKey) or "null"
     if foundSpecificPrompt == "null" then foundSpecificPrompt = "" end
-    local foundSpecificNegPrompt = getChatVar(triggerId, specificNegPromptKey) or "null"
+    local foundSpecificNegPrompt = getState(triggerId, specificNegPromptKey) or "null"
     if foundSpecificNegPrompt == "null" then foundSpecificNegPrompt = "" end
 
     local finalPrompt = (artistPrompt or "") .. (foundSpecificPrompt or "") .. (qualityPrompt or "")
@@ -3805,7 +3814,7 @@ onButtonClick = async(function(triggerId, data)
 
     print("ONLINEMODULE: Generating new image for " .. rerollType .. " Identifier: " .. identifier)
     local successCall, newInlay = pcall(function() return generateImage(triggerId, finalPrompt, currentNegativePrompt):await() end)
-    local oldInlay = getChatVar(triggerId, chatVarKeyForInlay) or "null"
+    local oldInlay = getState(triggerId, chatVarKeyForInlay) or "null"
 
     local isSuccess = successCall and newInlay and type(newInlay) == "string" and string.len(newInlay) > 10 and not string.find(newInlay, "fail", 1, true) and not string.find(newInlay, "error", 1, true) and not string.find(newInlay, "실패", 1, true)
 
@@ -3813,7 +3822,7 @@ onButtonClick = async(function(triggerId, data)
         alertNormal(triggerId, "이미지 리롤 완료")
         print("ONLINEMODULE: New " .. rerollType .. " image generated successfully for Identifier: " .. identifier)
 
-        setChatVar(triggerId, chatVarKeyForInlay, newInlay)
+        setState(triggerId, chatVarKeyForInlay, newInlay)
         print("ONLINEMODULE: Updated chat variable for Identifier: " .. identifier .. " with new inlay.")
 
         local chatHistoryTable = getFullChat(triggerId)
