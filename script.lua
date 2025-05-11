@@ -3548,7 +3548,7 @@ function onInput(triggerId)
     local originalLine = targetMessageData.data
     local modifiedLine = originalLine
     local historyModifiedByWrapping = false
-    local prefixesToWrap = {"EROSTATUS", "SIMULSTATUS", "TWITTER", "DC", "KAKAO"}
+    local prefixesToWrap = {"EROSTATUS", "SIMULSTATUS", "TWITTER", "INSTA", "DC"}
     local replacementFormat = "<details><summary><span>(열기/접기)</span></summary>%s</details>"
     local checkAlreadyWrappedStart = "<details><summary><span>(열기/접기)</span></summary>"
 
