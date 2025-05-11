@@ -3092,9 +3092,13 @@ local function inputImage(triggerId, data)
 
     if OMNSFW == "0" then
         data = data .. [[
-- NSFW content is disabled.
-- DO NOT USE NSFW SITUATION in the IMAGE PROMPT.
-    - PRINT {{{NSFW, UNCENSORED}}} in the NEGATIVE PROMPT.
+- UNLESS STATED OTHERWISE, DO NOT USE NSFW SITUATION in the IMAGE PROMPT.
+    - THEN ADD {{{NSFW, UNCENSORED}}} in the NEGATIVE PROMPT.
+]]
+    elseif OMNSFW == "1" then
+        data = data .. [[
+- ALWAYS USE NSFW SITUATION in the IMAGE PROMPT.
+    - ALWAYS ADD {{{CENSORED}}} in the NEGATIVE PROMPT.
 ]]
     end
 
