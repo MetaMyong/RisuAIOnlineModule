@@ -125,8 +125,8 @@ end
 
 local function convertDialogue(triggerId, data)
     print("convertDialogue is in PROCESS!")
-    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
 
     local lineToModify = data 
 
@@ -144,7 +144,7 @@ local function convertDialogue(triggerId, data)
     local prefixSimulStatus = "SIMULSTATUS[NAME:NAME_PLACEHOLDER|DIALOGUE:"
     local suffixSimulStatus = "|TIME:TIME_PLACEHOLDER|LOCATION:LOCATION_PLACEHOLDER|INLAY:INLAY_PLACEHOLDER]"
 
-    if NAICARD ~= "0" then
+    if OMCARD ~= "0" then
         local modifiedString = ""
         local currentIndex = 1
         local madeChange = false
@@ -171,10 +171,10 @@ local function convertDialogue(triggerId, data)
                 modifiedString = modifiedString .. string.sub(lineToModify, currentIndex, earliest_s - 1)
 
                 local replacementText
-                if NAICARD == "1" then
+                if OMCARD == "1" then
                     replacementText = prefixEroStatus .. earliest_captured .. suffixEroStatus
                     madeChange = true
-                elseif NAICARD == "2" or NAICARD == "3" then
+                elseif OMCARD == "2" or OMCARD == "3" then
                     replacementText = prefixSimulStatus .. earliest_captured .. suffixSimulStatus
                     madeChange = true
                 end
@@ -188,11 +188,11 @@ local function convertDialogue(triggerId, data)
 
         if madeChange then
             lineToModify = modifiedString
-            print("ONLINEMODULE: convertDialogue: Dialogues were modified based on NAICARD setting.")
+            print("ONLINEMODULE: convertDialogue: Dialogues were modified based on OMCARD setting.")
         else
             print("ONLINEMODULE: convertDialogue: No dialogue modifications applied (no matching dialogues found).")
         end
-    elseif NAIMESSENGER == "1" then
+    elseif OMMESSENGER == "1" then
         local modifiedString = ""
         local currentIndex = 1
         local madeChange = false
@@ -234,7 +234,7 @@ local function convertDialogue(triggerId, data)
             print("ONLINEMODULE: convertDialogue: No dialogue modifications applied (no matching dialogues found).")
         end
     else
-        print("ONLINEMODULE: convertDialogue: NAICARD and NAIMESSENGER are not enabled, skipping dialogue modification.")
+        print("ONLINEMODULE: convertDialogue: OMCARD and OMMESSENGER are not enabled, skipping dialogue modification.")
     end
 
     data = lineToModify 
@@ -243,8 +243,8 @@ local function convertDialogue(triggerId, data)
 end
 
 local function inputEroStatus(triggerId, data)
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
-    local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
 
     data = data .. [[
 ## Status Interface
@@ -253,19 +253,19 @@ local function inputEroStatus(triggerId, data)
 - Female's Erotic Status Interface, NOT THE MALE.
 ]]
         
-    if NAICARDTARGET == "0" then
+    if OMCARDTARGET == "0" then
         data = data .. [[
 - PRINT OUT {{user}}'s Erotic Status Interface.
 - DO NOT PRINT other NPC's Status Interface.
 - PRINT OUT with ONE-SENTENCE ONLY.
 ]]
-    elseif NAICARDTARGET == "1" then
+    elseif OMCARDTARGET == "1" then
         data = data .. [[
 - PRINT OUT {{char}}'s Erotic Status Interface.
 - DO NOT PRINT other NPC's Status Interface.
 - PRINT OUT with ONE-SENTENCE ONLY.
 ]]
-    elseif NAICARDTARGET == "2" then
+    elseif OMCARDTARGET == "2" then
         data = data .. [[
 - DO NOT PRINT "DIALOGUE" OUTSIDE OF EROSTATUS BLOCK.
 - PRINT OUT ALL FEMALE CHARACTER's Erotic Status Interface.
@@ -337,19 +337,19 @@ local function inputEroStatus(triggerId, data)
                     - Anal intercourse count: Total count of penis round trips, 0~99999 times
                     - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
                     - ...
-                - EACH ITEMS MUST NOT OVER 15 CHAR.
-                    - Korean: 1 char.
-                    - English: 0.5 char.
-                    - Blank space: 0.5 char.
+                - EACH ITEMS MUST NOT OVER 20 LETTERS.
+                    - Korean: 1 LETTER.
+                    - English: 0.5 LETTER.
+                    - Blank space: 0.5 LETTER.
         - Please print out the total count from birth to now.
         - If character has no experience, state that character has no experience.
     - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
     - LOCATION: Current NPC's location and detail location.
     - OUTFITS: Current NPC's OUTFITS List.
-        - EACH ITEMS MUST NOT OVER 15 CHAR.
-            - Korean: 1 char.
-            - English: 0.5 char.
-            - Blank space: 0.5 char.
+        - EACH ITEMS MUST NOT OVER 20 LETTERS.
+            - Korean: 1 LETTER.
+            - English: 0.5 LETTER.
+            - Blank space: 0.5 LETTER.
         - NO () BRACKET ALLOWED.
         - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
                 - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
@@ -364,32 +364,32 @@ local function inputEroStatus(triggerId, data)
     - INLAY: This is a Flag.  
 ]]
 
-    if NAICARDNOIMAGE == "0" then
+    if OMCARDNOIMAGE == "0" then
         data = data .. [[
-        - Just print <NAI(INDEX)> Exactly.
+        - Just print <OM(INDEX)> Exactly.
 ]]
-    elseif NAICARDNOIMAGE == "1" then
+    elseif OMCARDNOIMAGE == "1" then
         data = data .. [[
         - Just print <NOIMAGE> Exactly.        
 ]]
     end
             
-    if NAICARDNOIMAGE == "0" then
+    if OMCARDNOIMAGE == "0" then
         data = data .. [[
         - Example:
-            - If the status interface is the first one, print '<NAI1>'.
-            - If the status interface is the second one, print '<NAI2>'.
-            - If the status interface is the third one, print '<NAI3>'.
+            - If the status interface is the first one, print '<OM1>'.
+            - If the status interface is the second one, print '<OM2>'.
+            - If the status interface is the third one, print '<OM3>'.
             - ...
 ]]
     end
 
-    if NAICARDNOIMAGE == "0" then
+    if OMCARDNOIMAGE == "0" then
         data = data .. [[
         - Example:
-            - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+            - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<OM1>]
 ]]
-    elseif NAICARDNOIMAGE == "1" then
+    elseif OMCARDNOIMAGE == "1" then
         data = data .. [[
         - Example:
             - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Menstual: Ovulation cycle↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|State: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
@@ -397,15 +397,15 @@ local function inputEroStatus(triggerId, data)
     end
     data = data .. [[
             - If Character is MALE.
-                - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|MALE|NIPPLES:MALE|Ha?|MALE||TERUS:MALE|I don't have one.|MALE|VAGINAL:MALE|I don't have one.|MALE|ANAL:MALE|I don't have one.|MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<NAI1>]
+                - EROSTATUS[NAME:Siwoo|DIALOGUE:Hmmm|MOUTH:MALE|Noway. I can't believe it.|MALE|NIPPLES:MALE|Ha?|MALE||TERUS:MALE|I don't have one.|MALE|VAGINAL:MALE|I don't have one.|MALE|ANAL:MALE|I don't have one.|MALE|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: Black sharp hair←→Top: Black Suit←→Bottom: Black suit pants←→Panties: Gray trunk panties, Not visible←→Penis: 18cm, Not visible←→Legs: Gray socks←→Feet: Black shoes←|INLAY:<OM1>]
 ]]
 
     return data
 end
 
 local function changeEroStatus(triggerId, data)
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
-    local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
 
     local erostatusPattern = "EROSTATUS%[([^%]]*)%]"
     data = string.gsub(data, erostatusPattern, function(replacements)
@@ -556,8 +556,8 @@ opacity: 0;
         local outfitsText = parsed["OUTFITS"]
         local inlayContent = parsed["INLAY"]
 
-        -- INLAY 에서 <NAI(INDEX)> 를 찾아서 INDEX 번호만 추출
-        local inlayIndex = string.match(inlayContent, "<NAI(%d+)>")
+        -- INLAY 에서 <OM(INDEX)> 를 찾아서 INDEX 번호만 추출
+        local inlayIndex = string.match(inlayContent, "<OM(%d+)>")
 
         local mouthImg   = getPart("MOUTH", 0)
         local mouthText  = getPart("MOUTH", 1)
@@ -586,15 +586,15 @@ opacity: 0;
         table.insert(html, "</div>")
         table.insert(html, "<div class=\"image-area\">")
             
-        if NAICARDNOIMAGE == "0" then
+        if OMCARDNOIMAGE == "0" then
             local temp_content = ""
             if inlayContent then
                 temp_content = string.gsub(inlayContent, "<!%-%-.-%-%->", "")
             end
             table.insert(html, temp_content)
-        elseif NAICARDNOIMAGE == "1" then
+        elseif OMCARDNOIMAGE == "1" then
             local target = "user"
-            if tostring(NAICARDTARGET) == "1" then target = "char" end
+            if tostring(OMCARDTARGET) == "1" then target = "char" end
             table.insert(html, "<img src='{{source::" .. target .. "}}'>")
         end
 
@@ -666,7 +666,7 @@ opacity: 0;
 end
 
 local function inputSimulCard(triggerId, data)
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
 
     data = data .. [[
 ## Status Interface
@@ -695,25 +695,25 @@ local function inputSimulCard(triggerId, data)
 - LOCATION: The location of the NPC.
 - INLAY: This is a Flag.
 ]] 
-    if NAICARDNOIMAGE == "0" then
+    if OMCARDNOIMAGE == "0" then
         data = data .. [[
-    - Just print <NAI(INDEX)> Exactly.
+    - Just print <OM(INDEX)> Exactly.
 ]]
-    elseif NAICARDNOIMAGE == "1" then
+    elseif OMCARDNOIMAGE == "1" then
         data = data .. [[
     - Just print <NOIMAGE> Exactly.   
 ]]             
     end
 
-    if NAICARDNOIMAGE == "0" then
+    if OMCARDNOIMAGE == "0" then
         data = data .. [[  
     - Example:
-        - If the status interface is the first one, print '<NAI1>'.
-        - If the status interface is the second one, print '<NAI2>'.
-        - If the status interface is the third one, print '<NAI3>'.
+        - If the status interface is the first one, print '<OM1>'.
+        - If the status interface is the second one, print '<OM2>'.
+        - If the status interface is the third one, print '<OM3>'.
         - ...
 - Example:
-    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NAI1>]
+    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<OM1>]
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]  
     else
@@ -728,7 +728,7 @@ local function inputSimulCard(triggerId, data)
 end
 
 local function changeSimulCard(triggerId, data)
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
 
     local simulPattern = "(SIMULSTATUS)%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
     data = string.gsub(data, simulPattern, function(
@@ -756,9 +756,9 @@ body { background-color: #f0f0f0;padding: 20px;}
         table.insert(html, "<div class=\"status-card\">")
         table.insert(html, "<div class=\"content-area\">")
 
-        if NAICARDNOIMAGE == "0" then
+        if OMCARDNOIMAGE == "0" then
             table.insert(html, "    <div class=\"placeholder-content\">" .. (inlayContent or "") .. "</div>")
-        elseif NAICARDNOIMAGE == "1" then
+        elseif OMCARDNOIMAGE == "1" then
             local styleAttribute = " style=\"background-image: url('{{source::char}}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-color: transparent;\""
             table.insert(html, "    <div class=\"placeholder-content\"" .. styleAttribute .. "></div>")
         end
@@ -797,8 +797,8 @@ body { background-color: #f0f0f0;padding: 20px;}
 end
 
 local function inputStatusHybrid(triggerId, data)
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
-    local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
 
     data = data .. [[
 ## Status Interface
@@ -807,19 +807,19 @@ local function inputStatusHybrid(triggerId, data)
 - Female's Status Interface, NOT THE MALE.
 ]]
         
-    if NAICARDTARGET == "0" then
+    if OMCARDTARGET == "0" then
         data = data .. [[
 - PRINT OUT {{user}}'s Erotic Status Interface.
 - DO NOT PRINT other NPC's Status Interface.
 - PRINT OUT with ONE-SENTENCE ONLY.
 ]]
-    elseif NAICARDTARGET == "1" then
+    elseif OMCARDTARGET == "1" then
         data = data .. [[
 - PRINT OUT {{char}}'s Erotic Status Interface.
 - DO NOT PRINT other NPC's Status Interface.
 - PRINT OUT with ONE-SENTENCE ONLY.
 ]]
-    elseif NAICARDTARGET == "2" then
+    elseif OMCARDTARGET == "2" then
         data = data .. [[
 - DO NOT PRINT "DIALOGUE" OUTSIDE OF EROSTATUS BLOCK.
 - PRINT OUT ALL FEMALE CHARACTER's Erotic Status Interface.
@@ -891,19 +891,19 @@ local function inputStatusHybrid(triggerId, data)
                     - Anal intercourse count: Total count of penis round trips, 0~99999 times
                     - Injected cum amount: Total amount of cum injected into the anal, 0~99999 ml
                     - ...
-                - EACH ITEMS MUST NOT OVER 15 CHAR.
-                    - Korean: 1 char.
-                    - English: 0.5 char.
-                    - Blank space: 0.5 char.
+                - EACH ITEMS MUST NOT OVER 20 LETTERS.
+                    - Korean: 1 LETTER.
+                    - English: 0.5 LETTER.
+                    - Blank space: 0.5 LETTER.
         - Please print out the total count from birth to now.
         - If character has no experience, state that character has no experience.
     - TIME: Current YYYY/MM/DD day hh:mm AP/PM (e.g., 2025/05/01 Thursday 02:12PM)
     - LOCATION: Current NPC's location and detail location.
     - OUTFITS: Current NPC's OUTFITS List.
-        - EACH ITEMS MUST NOT OVER 15 CHAR.
-            - Korean: 1 char.
-            - English: 0.5 char.
-            - Blank space: 0.5 char.
+        - EACH ITEMS MUST NOT OVER 20 LETTERS.
+            - Korean: 1 LETTER.
+            - English: 0.5 LETTER.
+            - Blank space: 0.5 LETTER.
         - NO () BRACKET ALLOWED.
         - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
                 - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
@@ -918,32 +918,32 @@ local function inputStatusHybrid(triggerId, data)
     - INLAY: This is a Flag.  
 ]]
 
-    if NAICARDNOIMAGE == "0" then
+    if OMCARDNOIMAGE == "0" then
         data = data .. [[
-        - Just print <NAI(INDEX)> Exactly.
+        - Just print <OM(INDEX)> Exactly.
 ]]
-    elseif NAICARDNOIMAGE == "1" then
+    elseif OMCARDNOIMAGE == "1" then
         data = data .. [[
         - Just print <NOIMAGE> Exactly.        
 ]]
     end
             
-    if NAICARDNOIMAGE == "0" then
+    if OMCARDNOIMAGE == "0" then
         data = data .. [[
         - Example:
-            - If the status interface is the first one, print '<NAI1>'.
-            - If the status interface is the second one, print '<NAI2>'.
-            - If the status interface is the third one, print '<NAI3>'.
+            - If the status interface is the first one, print '<OM1>'.
+            - If the status interface is the second one, print '<OM2>'.
+            - If the status interface is the third one, print '<OM3>'.
             - ...
 ]]
     end
 
-    if NAICARDNOIMAGE == "0" then
+    if OMCARDNOIMAGE == "0" then
         data = data .. [[
         - Example:
-            - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NAI1>]
+            - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose Garden Tea Table at Marquis Mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neckline and shoulders←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, small light pink nipples and areolas, Not visible←→Bottom: Voluminous white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, tightly closed straight pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<OM1>]
 ]]
-    elseif NAICARDNOIMAGE == "1" then
+    elseif OMCARDNOIMAGE == "1" then
         data = data .. [[
         - Example:
             - EROSTATUS[NAME:Diana|DIALOGUE:Dear {{user}}, is the tea to your liking?|MOUTH:MOUTH_0|I just took a sip of tea. There's still only the fragrance of the tea water remaining.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything special.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change at all. Of course!|Menstual: Ovulation cycle↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Aah, brother {{user}}.|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal penetration count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! It's sacrilegious to even think about this place!|State: Undeveloped↔Anal penetration count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times|TIME:0000/07/15 Monday, 02:30 PM|LOCATION:Rose garden tea table at the Marquis mansion|OUTFITS:→Hair: White wavy hair←→Top: Elegant white dress revealing neck and shoulder lines←→Bra: White silk brassiere, Not visible←→Breasts: Modest C-cup breasts, light pink small nipples and areolas, Not visible←→Bottom: Full white dress skirt←→Panties: White silk panties, Not visible←→Pussy: Neatly maintained pubic hair, firmly closed straight-line pussy, Not visible←→Legs: White stockings←→Feet: White strap shoes←|INLAY:<NOIMAGE>]
@@ -954,7 +954,7 @@ local function inputStatusHybrid(triggerId, data)
 ## Status Interface
 ### Simulation Status Interface
 - If the character is NOT a FEMALE, PRINT OUT the Simulation Status Interface.
-    - If the character is not a human type(e.g., robot, monster, etc.), PRINT OUT the Simulation Status Interface.
+    - Example: MALE, Monster, etc.
 - DO NOT PRINT CHARACTER's DIALOGUE via "" or 「」, REPLACE ALL CHARACTER's DIALOGUE to SIMULSTATUS BLOCK.
     - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - PRINT SIMULSTATUS[...] INSTEAD.
@@ -979,25 +979,25 @@ local function inputStatusHybrid(triggerId, data)
 - LOCATION: The location of the CHARACTER.
 - INLAY: This is a Flag.
 ]] 
-        if NAICARDNOIMAGE == "0" then
+        if OMCARDNOIMAGE == "0" then
             data = data .. [[
-    - Just print <NAI(INDEX)> Exactly.
+    - Just print <OM(INDEX)> Exactly.
 ]]
-        elseif NAICARDNOIMAGE == "1" then
+        elseif OMCARDNOIMAGE == "1" then
             data = data .. [[
     - Just print <NOIMAGE> Exactly.   
 ]]             
         end
     
-        if NAICARDNOIMAGE == "0" then
+        if OMCARDNOIMAGE == "0" then
             data = data .. [[  
     - Example:
-        - If the status interface is the first one, print '<NAI1>'.
-        - If the status interface is the second one, print '<NAI2>'.
-        - If the status interface is the third one, print '<NAI3>'.
+        - If the status interface is the first one, print '<OM1>'.
+        - If the status interface is the second one, print '<OM2>'.
+        - If the status interface is the third one, print '<OM3>'.
         - ...
 - Example:
-    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NAI1>]
+    - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<OM1>]
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]  
         else
@@ -1012,18 +1012,18 @@ local function inputStatusHybrid(triggerId, data)
 end
 
 local function inputInlayOnly(triggerId, data)
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
-    local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
 
     data = data .. [[
 ## Status Interface
 
 ### Inlay Interface
-- ALWAYS PRINT THE INLAY INTERFACE VIA INLAY[<NAI(INDEX)>].
+- ALWAYS PRINT THE INLAY INTERFACE VIA INLAY[<OM(INDEX)>].
     - Example:
-        - IF THE INLAY BLOCK IS THE FIRST ONE, PRINT OUT <NAI1>.
-        - IF THE INLAY BLOCK IS THE SECOND ONE, PRINT OUT <NAI2>.
-        - IF THE INLAY BLOCK IS THE THIRD ONE, PRINT OUT <NAI3>.
+        - IF THE INLAY BLOCK IS THE FIRST ONE, PRINT OUT <OM1>.
+        - IF THE INLAY BLOCK IS THE SECOND ONE, PRINT OUT <OM2>.
+        - IF THE INLAY BLOCK IS THE THIRD ONE, PRINT OUT <OM3>.
         - ...
 - YOU MUST INSERT THE INLAY INTERFACE BLOCK BEFORE THE DIALOGUE.
     - Example:
@@ -1032,9 +1032,9 @@ local function inputInlayOnly(triggerId, data)
             - "Oh, Siwoo! How long have you been standing there~? You scared me half to death! My heart skipped a beat~!" She exaggeratedly clutched at her chest and made a fuss, but quickly returned to her usual cheerful tone. Her eyes darted around, as if trying to quickly assess the situation.
             - ...
         - Valid:
-            - INLAY[<NAI1>]
+            - INLAY[<OM1>]
             - "Eek?!" The sudden voice startled Moya-mo so badly she almost dropped her Smart Rotom. She whirled around, a yellow oversized hoodie sleeve fluttering behind her. Her eyes, wide with surprise at the unexpected presence, glittered with her signature heart-shaped highlights.
-            - INLAY[<NAI2>]
+            - INLAY[<OM2>]
             - "Oh, Siwoo! How long have you been standing there~? You scared me half to death! My heart skipped a beat~!" She exaggeratedly clutched at her chest and made a fuss, but quickly returned to her usual cheerful tone. Her eyes darted around, as if trying to quickly assess the situation.
             - ...
 ]]
@@ -1042,7 +1042,7 @@ local function inputInlayOnly(triggerId, data)
 end
 
 local function changeInlayOnly(triggerId, data)
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
 
     local inlayPattern = "(INLAY)%[([^%]]*)%]"
     data = string.gsub(data, inlayPattern, function(
@@ -1051,7 +1051,7 @@ local function changeInlayOnly(triggerId, data)
         -- Inlay only 옵션은 {{inlay::uuid}}만 출력하면 됨
         -- INLAY[{{inlay::uuid}}] 에서 블록만 제거 후 리롤만 추가
         -- 인덱스를 따로 추출해야 함
-        local inlayIndex = string.match(inlayContent, "<NAI(%d+)>")
+        local inlayIndex = string.match(inlayContent, "<OM(%d+)>")
         if inlayIndex == nil then
             inlayIndex = "1"
         end
@@ -1079,35 +1079,35 @@ local function changeInlayOnly(triggerId, data)
 end
 
 local function inputTwitter(triggerId, data)
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAISNSTARGET = getGlobalVar(triggerId, "toggle_NAISNSTARGET")
-    local NAISNSREAL = getGlobalVar(triggerId, "toggle_NAISNSREAL")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
+    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL")
 
     data = data .. [[
 ## SNS Interface
 ### Twitter Interface
 ]]
-    if NAISNSREAL == "1" then
+    if OMSNSREAL == "1" then
         data = data .. [[
 - PRINT OUT EXACTLY ONE TWITTER INTERFACE ONLY AFTER UPLOADING TWITTER POST
 ]]
-    elseif NAISNSREAL == "0" then
+    elseif OMSNSREAL == "0" then
         data = data .. [[
 - ALWAYS PRINT OUT EXACTLY ONE TWITTER INTERFACE
 ]]               
     end
 
-    if NAISNSTARGET == "0" then
+    if OMSNSTARGET == "0" then
         data = data .. [[
 - MAKE a {{user}}'s TWITTER INTERFACE
 - MUST INCLUDE THE {{user}}'s NSFW POST
 ]]
-    elseif NAISNSTARGET == "1" then
+    elseif OMSNSTARGET == "1" then
         data = data .. [[
 - MAKE a {{char}}'s TWITTER INTERFACE
 - MUST INCLUDE THE {{char}}'s NSFW POST
 ]]
-    elseif NAISNSTARGET == "2" then
+    elseif OMSNSTARGET == "2" then
         data = data .. [[
 - MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE
 - MUST INCLUDE THE (RANDOM OPPONENT NPC)'s NSFW POST
@@ -1128,17 +1128,17 @@ local function inputTwitter(triggerId, data)
                 - Valid: TWITTER[NAME:Iono|TNAME:⚡Moyamo⚡|TID:Moyamo_PaldeaQueen|...]
     - TPROFILE: The profile image of the character on Twitter.
 ]]  
-    if NAISNSNOIMAGE == "0" then
+    if OMSNSNOIMAGE == "0" then
         data = data .. [[
-        - Print '<NAI>' Exactly.
+        - Print '<OM>' Exactly.
     - TWEET: Content of the Tweet.
         - MUST INLUDE the character's NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
     - MEDIA: Media of the post
-        - Print '<NAI>' Exactly.
+        - Print '<OM>' Exactly.
 ]]
-    elseif NAISNSNOIMAGE == "1" then
-        if NAISNSTARGET == "0" then
+    elseif OMSNSNOIMAGE == "1" then
+        if OMSNSTARGET == "0" then
             data = data .. [[
         - Print {{source::user}} Exactly.
     - TWEET: Content of the Tweet.
@@ -1147,7 +1147,7 @@ local function inputTwitter(triggerId, data)
     - MEDIA: Media of the post
         - Describe the situation of the twitter post.
 ]]
-        elseif NAISNSTARGET == "1" then
+        elseif OMSNSTARGET == "1" then
             data = data .. [[
         - Print {{source::char}} Exactly.
     - TWEET: Content of the Tweet.
@@ -1183,16 +1183,16 @@ local function inputTwitter(triggerId, data)
                     - Valid: Damn this is so fucking arousing bitch! lol
     - Example:
 ]]
-    if NAISNSNOIMAGE == "0" then
+    if OMSNSNOIMAGE == "0" then
         data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<NAI>|TWEET:Wanna see more?|MEDIA:<NAI>|HASH:→섹트←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<OM>|TWEET:Wanna see more?|MEDIA:<OM>|HASH:→섹트←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
 ]]
-    elseif NAISNSNOIMAGE == "1" then
-        if NAISNSTARGET == "0" then
+    elseif OMSNSNOIMAGE == "1" then
+        if OMSNSTARGET == "0" then
             data = data .. [[
     - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::user}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→섹트←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
-        elseif NAISNSTARGET == "1" then
+        elseif OMSNSTARGET == "1" then
             data = data .. [[
     - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::char}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→섹트←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
@@ -1203,8 +1203,8 @@ local function inputTwitter(triggerId, data)
 end
 
 local function changeTwitter(triggerId, data)
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAISNSTARGET = getGlobalVar(triggerId, "toggle_NAISNSTARGET")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
 
     local snsPattern = "TWITTER%[([^%]]*)%]"
     data = string.gsub(data, snsPattern, function(replacements)
@@ -1374,10 +1374,10 @@ body, .tweet-card { font-size: 15px; }
             reply_block_raw = table.concat(reply_parts, "|")
         end
 
-        -- TPROFILE에서 <NAI(INDEX)> 플레이스홀더 제거
-        twitter_profile_image_raw = string.gsub(twitter_profile_image_raw, "<NAI%d*>", "")
-        -- TWEET에서 <NAI(INDEX)> 플레이스홀더 제거
-        tweet_body = string.gsub(tweet_body, "<NAI%d*>", "")
+        -- TPROFILE에서 <OM(INDEX)> 플레이스홀더 제거
+        twitter_profile_image_raw = string.gsub(twitter_profile_image_raw, "<OM%d*>", "")
+        -- TWEET에서 <OM(INDEX)> 플레이스홀더 제거
+        tweet_body = string.gsub(tweet_body, "<OM%d*>", "")
 
         local html = {}
         table.insert(html, TwitterTemplate)
@@ -1391,16 +1391,16 @@ body, .tweet-card { font-size: 15px; }
         table.insert(html, "<div class=\"tweet-profile-pic-link\">")
         local profileImageInput = ""
 
-        if NAISNSNOIMAGE == "0" then
+        if OMSNSNOIMAGE == "0" then
             profileImageInput = twitter_profile_image_raw
-        elseif NAISNSNOIMAGE == "1" then
-            if NAISNSTARGET == "0" then
+        elseif OMSNSNOIMAGE == "1" then
+            if OMSNSTARGET == "0" then
                 profileImageInput = twitter_profile_image_raw or "{{source::user}}"
             end
-            if NAISNSTARGET == "1" then
+            if OMSNSTARGET == "1" then
                 profileImageInput = twitter_profile_image_raw or "{{source::char}}"
             end
-            if NAISNSTARGET == "2" then
+            if OMSNSTARGET == "2" then
                 profileImageInput = twitter_profile_image_raw or ""
             end
         end
@@ -1521,38 +1521,38 @@ body, .tweet-card { font-size: 15px; }
 end
 
 local function inputInsta(triggerId, data)
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAISNSTARGET = getGlobalVar(triggerId, "toggle_NAISNSTARGET")
-    local NAISNSREAL = getGlobalVar(triggerId, "toggle_NAISNSREAL")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
+    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL")
 
     data = data .. [[
 ## SNS Interface
 
 ### Instagram Interface
 ]]
-    if NAISNSREAL == "1" then
+    if OMSNSREAL == "1" then
         data = data .. [[
 - PRINT OUT EXACTLY ONE INSTAGRAM INTERFACE ONLY AFTER UPLOADING INSTAGRAM POST
 ]]
-    elseif NAISNSREAL == "0" then
+    elseif OMSNSREAL == "0" then
         data = data .. [[
 - ALWAYS PRINT OUT EXACTLY ONE INSTAGRAM INTERFACE
 ]]
     end
 
-    if NAISNSTARGET == "0" then
+    if OMSNSTARGET == "0" then
         data = data .. [[
 - MAKE a {{user}}'s INSTAGRAM INTERFACE
 - MUST INCLUDE THE {{user}}'s SFW POST
     - NO NSFW
 ]]
-    elseif NAISNSTARGET == "1" then
+    elseif OMSNSTARGET == "1" then
         data = data .. [[
 - MAKE a {{char}}'s INSTAGRAM INTERFACE
 - MUST INCLUDE THE {{char}}'s SFW POST
     - NO NSFW
 ]]
-    elseif NAISNSTARGET == "2" then
+    elseif OMSNSTARGET == "2" then
         data = data .. [[
 - MAKE a (RANDOM OPPONENT NPC)'s INSTAGRAM INTERFACE
 - MUST INCLUDE THE (RANDOM OPPONENT NPC)'s SFW POST
@@ -1573,17 +1573,17 @@ local function inputInsta(triggerId, data)
                 - Valid: INSTA[NAME:Iono|IID:Moyamo_PaldeaQueen|...]
     - IPROFILE: The profile image of the character on Instagram.
 ]]  
-    if NAISNSNOIMAGE == "0" then
+    if OMSNSNOIMAGE == "0" then
         data = data .. [[
-        - Print '<NAI>' Exactly.
+        - Print '<OM>' Exactly.
     - POST: Content of the Post.
         - MUST INCLUDE the character's SFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
     - MEDIA: Media of the post
-        - Print '<NAI>' Exactly.
+        - Print '<OM>' Exactly.
 ]]
-    elseif NAISNSNOIMAGE == "1" then
-        if NAISNSTARGET == "0" then
+    elseif OMSNSNOIMAGE == "1" then
+        if OMSNSTARGET == "0" then
             data = data .. [[
         - Print {{source::user}} Exactly.
     - POST: Content of the Post.
@@ -1592,7 +1592,7 @@ local function inputInsta(triggerId, data)
     - MEDIA: Media of the post
         - Describe the situation of the instagram post.
 ]]
-        elseif NAISNSTARGET == "1" then
+        elseif OMSNSTARGET == "1" then
             data = data .. [[
         - Print {{source::char}} Exactly.
     - POST: Content of the Post.
@@ -1620,16 +1620,16 @@ local function inputInsta(triggerId, data)
     - SHARE: The number of shares of the post.
     - Example:
 ]]
-    if NAISNSNOIMAGE == "0" then
+    if OMSNSNOIMAGE == "0" then
         data = data .. [[
-    - INSTA[NAME:Lee Ye-Eun|IID:YeEunLove_|IPROFILE:<NAI>|POST:I'm going to the park today!|MEDIA:<NAI>|HASH:→Travelstagram←→Happy←→With Boyfriend←|TIME:5 minutes ago|LIKES:172|REPLY:168|SHARE:102]
+    - INSTA[NAME:Lee Ye-Eun|IID:YeEunLove_|IPROFILE:<OM>|POST:I'm going to the park today!|MEDIA:<OM>|HASH:→Travelstagram←→Happy←→With Boyfriend←|TIME:5 minutes ago|LIKES:172|REPLY:168|SHARE:102]
 ]]
-    elseif NAISNSNOIMAGE == "1" then
-        if NAISNSTARGET == "0" then
+    elseif OMSNSNOIMAGE == "1" then
+        if OMSNSTARGET == "0" then
             data = data .. [[
     - INSTA[NAME:Lee Ye-Eun|IID:YeEunLove_|IPROFILE:{{source::user}}|POST:I'm going to the park today!|MEDIA:Ye-Eun is taking a selfie with her boy friend|HASH:→Travelstagram←→Happy←→With Boyfriend←|TIME:5 minutes ago|LIKES:172|REPLY:168|SHARE:102]
 ]]
-        elseif NAISNSTARGET == "1" then
+        elseif OMSNSTARGET == "1" then
             data = data .. [[
     - INSTA[NAME:Lee Ye-Eun|IID:YeEunLove_|IPROFILE:{{source::char}}|POST:I'm going to the park today!|MEDIA:Ye-Eun is taking a selfie with her boy friend|HASH:→Travelstagram←→Happy←→With Boyfriend←|TIME:5 minutes ago|LIKES:172|REPLY:168|SHARE:102]
 ]]
@@ -1640,8 +1640,8 @@ local function inputInsta(triggerId, data)
 end
 
 local function changeInsta(triggerId, data)
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAISNSTARGET = getGlobalVar(triggerId, "toggle_NAISNSTARGET")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
 
     -- INSTA[NAME:(Real Name)|IID:(Instagram ID)|IPROFILE:(Profile Image)|POST:(Post Content)|MEDIA:(Media)|HASH:(Hashtags)|TIME:(Posted Date)|LIKES:(Likes Count)|REPLY:(Reply Count)|SHARE:(Share Count)]
 
@@ -1738,12 +1738,12 @@ html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;m
         table.insert(html, "<article class='post-item'>")
         table.insert(html, "<div class='post-header'>")
 
-        if NAISNSNOIMAGE == "0" then
+        if OMSNSNOIMAGE == "0" then
             table.insert(html, iprofile_raw)
-        elseif NAISNSNOIMAGE == "1" then
-            if NAISNSTARGET == "0" then
+        elseif OMSNSNOIMAGE == "1" then
+            if OMSNSTARGET == "0" then
                 table.insert(html, "<img src='" .. "{{source::user}}" .. "' alt='PROFILE IMAGE'>")
-            elseif NAISNSTARGET == "1" then
+            elseif OMSNSTARGET == "1" then
                 table.insert(html, "<img src='" .. "{{source::char}}" .. "' alt='PROFILE IMAGE'>")
             end
         end
@@ -1838,9 +1838,9 @@ html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;m
 end
 
 local function inputSNSHybrid(triggerId, data)
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAISNSTARGET = getGlobalVar(triggerId, "toggle_NAISNSTARGET")
-    local NAISNSREAL = getGlobalVar(triggerId, "toggle_NAISNSREAL")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
+    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL")
 
     data = data .. [[
 ## SNS Interface
@@ -1851,27 +1851,27 @@ local function inputSNSHybrid(triggerId, data)
 
 ### Twitter Interface
 ]]
-    if NAISNSREAL == "1" then
+    if OMSNSREAL == "1" then
         data = data .. [[
 - PRINT OUT EXACTLY ONE TWITTER INTERFACE ONLY AFTER UPLOADING TWITTER POST
 ]]
-    elseif NAISNSREAL == "0" then
+    elseif OMSNSREAL == "0" then
         data = data .. [[
 - ALWAYS PRINT OUT EXACTLY ONE TWITTER INTERFACE
 ]]        
     end
 
-    if NAISNSTARGET == "0" then
+    if OMSNSTARGET == "0" then
         data = data .. [[
 - MAKE a {{user}}'s TWITTER INTERFACE
 - MUST INCLUDE THE {{user}}'s PRIVATE NSFW POST
 ]]
-    elseif NAISNSTARGET == "1" then
+    elseif OMSNSTARGET == "1" then
         data = data .. [[
 - MAKE a {{char}}'s TWITTER INTERFACE
 - MUST INCLUDE THE {{char}}'s PRIVATE NSFW POST
 ]]
-    elseif NAISNSTARGET == "2" then
+    elseif OMSNSTARGET == "2" then
         data = data .. [[
 - MAKE a (RANDOM OPPONENT NPC)'s TWITTER INTERFACE
 - MUST INCLUDE THE (RANDOM OPPONENT NPC)'s PRIVATE NSFW POST
@@ -1893,17 +1893,17 @@ local function inputSNSHybrid(triggerId, data)
                 - Valid: TWITTER[NAME:Iono|TNAME:⚡Moyamo⚡|TID:Moyamo_PaldeaQueen|...]
     - TPROFILE: The profile image of the character on Twitter.
 ]]  
-    if NAISNSNOIMAGE == "0" then
+    if OMSNSNOIMAGE == "0" then
         data = data .. [[
-        - Print '<NAI>' Exactly.
+        - Print '<OM>' Exactly.
     - TWEET: Content of the Tweet.
         - MUST INLUDE the character's NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
     - MEDIA: Media of the post
-        - Print '<NAI>' Exactly.
+        - Print '<OM>' Exactly.
 ]]
-    elseif NAISNSNOIMAGE == "1" then
-        if NAISNSTARGET == "0" then
+    elseif OMSNSNOIMAGE == "1" then
+        if OMSNSTARGET == "0" then
             data = data .. [[
         - Print {{source::user}} Exactly.
     - TWEET: Content of the Tweet.
@@ -1912,7 +1912,7 @@ local function inputSNSHybrid(triggerId, data)
     - MEDIA: Media of the post
         - Describe the situation of the twitter post.
 ]]
-        elseif NAISNSTARGET == "1" then
+        elseif OMSNSTARGET == "1" then
             data = data .. [[
         - Print {{source::char}} Exactly.
     - TWEET: Content of the Tweet.
@@ -1948,16 +1948,16 @@ local function inputSNSHybrid(triggerId, data)
                     - Valid: Damn this is so fucking arousing bitch! lol
     - Example:
 ]]
-    if NAISNSNOIMAGE == "0" then
+    if OMSNSNOIMAGE == "0" then
         data = data .. [[
-    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<NAI>|TWEET:Wanna see more?|MEDIA:<NAI>|HASH:→섹트←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
+    - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️Flame Heart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:<OM>|TWEET:Wanna see more?|MEDIA:<OM>|HASH:→섹트←→MagicalGirl←→FlameHeart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartFlutter|Who did you meet??|MagicalGirlFan|Omg is this a real-time tweet from Flame Heart?!|SexHunter|What happened? Post pics]
 ]]
-    elseif NAISNSNOIMAGE == "1" then
-        if NAISNSTARGET == "0" then
+    elseif OMSNSNOIMAGE == "1" then
+        if OMSNSTARGET == "0" then
             data = data .. [[
     - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::user}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→섹트←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
-        elseif NAISNSTARGET == "1" then
+        elseif OMSNSTARGET == "1" then
             data = data .. [[
     - TWITTER[NAME:Lee Ye-Eun|TNAME:❤️FlameHeart Ye-Eun❤️|TID:FlameHeart_eun|TPROFILE:{{source::char}}|TWEET:Wanna see more?|MEDIA:A magical girl showing her panties|HASH:→섹트←→Magicalgirl←→Flameheart←|TIME:11:58 PM·2024. 06. 12|VIEW:182|REPLY:3|RETWEET:8|LIKES:21|COMMENT:HeartThrobbing|Did you meet someone??|MagicalGirlFan|Wow FlameHeart real-time tweet?!|SexHunter|What happened? Show us pics]
 ]]
@@ -1968,29 +1968,29 @@ local function inputSNSHybrid(triggerId, data)
 ### Instagram Interface
 ]]
 
-    if NAISNSREAL == "1" then
+    if OMSNSREAL == "1" then
         data = data .. [[
 - PRINT OUT THE SAME CHARACTER OF THE ABOVE TWITTER INTERFACE
 - PRINT OUT EXACTLY ONE INSTAGRAM INTERFACE ONLY AFTER UPLOADING INSTAGRAM POST
 ]]
-    elseif NAISNSREAL == "0" then
+    elseif OMSNSREAL == "0" then
         data = data .. [[
 - PRINT OUT THE SAME CHARACTER OF THE ABOVE TWITTER INTERFACE
 - ALWAYS PRINT EXACTLY ONE INSTAGRAM INTERFACE
 ]]          
     end
 
-    if NAISNSTARGET == "0" then
+    if OMSNSTARGET == "0" then
         data = data .. [[
 - MAKE a {{user}}'s INSTAGRAM INTERFACE
 - MUST INCLUDE THE {{user}}'s PUBLIC SFW POST
 ]]
-    elseif NAISNSTARGET == "1" then
+    elseif OMSNSTARGET == "1" then
         data = data .. [[
 - MAKE a {{char}}'s INSTAGRAM INTERFACE
 - MUST INCLUDE THE {{char}}'s PUBLIC SFW POST
 ]]
-    elseif NAISNSTARGET == "2" then
+    elseif OMSNSTARGET == "2" then
         data = data .. [[
 - MAKE a (RANDOM OPPONENT NPC)'s INSTAGRAM INTERFACE
 - MUST INCLUDE THE (RANDOM OPPONENT NPC)'s PUBLIC SFW POST
@@ -2011,17 +2011,17 @@ local function inputSNSHybrid(triggerId, data)
                 - Valid: INSTA[NAME:Iono|IID:Moyamo_PaldeaQueen|...]
     - IPROFILE: The profile image of the character on Instagram.
 ]]  
-    if NAISNSNOIMAGE == "0" then
+    if OMSNSNOIMAGE == "0" then
         data = data .. [[
-        - Print '<NAI>' Exactly.
+        - Print '<OM>' Exactly.
     - POST: Content of the Post.
         - MUST INCLUDE the character's SFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
     - MEDIA: Media of the post
-        - Print '<NAI>' Exactly.
+        - Print '<OM>' Exactly.
 ]]
-    elseif NAISNSNOIMAGE == "1" then
-        if NAISNSTARGET == "0" then
+    elseif OMSNSNOIMAGE == "1" then
+        if OMSNSTARGET == "0" then
             data = data .. [[
         - Print {{source::user}} Exactly.
     - POST: Content of the Post.
@@ -2030,7 +2030,7 @@ local function inputSNSHybrid(triggerId, data)
     - MEDIA: Media of the post
         - Describe the situation of the instagram post.
 ]]
-        elseif NAISNSTARGET == "1" then
+        elseif OMSNSTARGET == "1" then
             data = data .. [[
         - Print {{source::char}} Exactly.
     - POST: Content of the Post.
@@ -2058,16 +2058,16 @@ local function inputSNSHybrid(triggerId, data)
     - SHARE: The number of shares of the post.
     - Example:
 ]]
-    if NAISNSNOIMAGE == "0" then
+    if OMSNSNOIMAGE == "0" then
         data = data .. [[
-    - INSTA[NAME:Lee Ye-Eun|IID:YeEunLove_|IPROFILE:<NAI>|POST:I'm going to the park today!|MEDIA:<NAI>|HASH:→Travelstagram←→Happy←→With Boyfriend←|TIME:5 minutes ago|LIKES:172|REPLY:168|SHARE:102]
+    - INSTA[NAME:Lee Ye-Eun|IID:YeEunLove_|IPROFILE:<OM>|POST:I'm going to the park today!|MEDIA:<OM>|HASH:→Travelstagram←→Happy←→With Boyfriend←|TIME:5 minutes ago|LIKES:172|REPLY:168|SHARE:102]
 ]]
-    elseif NAISNSNOIMAGE == "1" then
-        if NAISNSTARGET == "0" then
+    elseif OMSNSNOIMAGE == "1" then
+        if OMSNSTARGET == "0" then
             data = data .. [[
     - INSTA[NAME:Lee Ye-Eun|IID:YeEunLove_|IPROFILE:{{source::user}}|POST:I'm going to the park today!|MEDIA:Ye-Eun is taking a selfie with her boy friend|HASH:→Travelstagram←→Happy←→With Boyfriend←|TIME:5 minutes ago|LIKES:172|REPLY:168|SHARE:102]
 ]]
-        elseif NAISNSTARGET == "1" then
+        elseif OMSNSTARGET == "1" then
             data = data .. [[
     - INSTA[NAME:Lee Ye-Eun|IID:YeEunLove_|IPROFILE:{{source::char}}|POST:I'm going to the park today!|MEDIA:Ye-Eun is taking a selfie with her boy friend|HASH:→Travelstagram←→Happy←→With Boyfriend←|TIME:5 minutes ago|LIKES:172|REPLY:168|SHARE:102]
 ]]
@@ -2249,19 +2249,19 @@ body.hybrid-sns-active {
 end
 
 local function inputDCInside(triggerId, data)
-    local NAICOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_NAICOMMUNITYNOIMAGE")
-    local NAIDCPOSTNUMBER = getGlobalVar(triggerId, "toggle_NAIDCPOSTNUMBER")
-    local NAIDCNOSTALKER = getGlobalVar(triggerId, "toggle_NAIDCNOSTALKER")
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
+    local OMDCPOSTNUMBER = getGlobalVar(triggerId, "toggle_OMDCPOSTNUMBER")
+    local OMDCNOSTALKER = getGlobalVar(triggerId, "toggle_OMDCNOSTALKER")
 
     data = data .. [[
 ## Community Interface
 ### DCInside Gallery Interface
 - PRINT OUT EXACTLY ONE DCINSIDE GALLERY INTERFACE at the BOTTOM of the RESPONSE
-- MAKE ]] .. NAIDCPOSTNUMBER .. [[ POSTS EXACTLY
+- MAKE ]] .. OMDCPOSTNUMBER .. [[ POSTS EXACTLY
 
 #### DCInside Gallery Interface Template
 - AI must follow this template:
-    - DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. NAIDCPOSTNUMBER ..[[ TIMES MORE ]
+    - DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. OMDCPOSTNUMBER ..[[ TIMES MORE ]
     - GN: The name of the gallery where the post is located.
     - PID: The unique identifier for the post in the gallery.
     - PN: The unique number of the post in the gallery.
@@ -2275,9 +2275,9 @@ local function inputDCInside(triggerId, data)
     - BODY: The content of the post.
         - Do not include ', ", [, |, ] in the content.
 ]]
-    if NAICOMMUNITYNOIMAGE == "0" then
+    if OMCOMMUNITYNOIMAGE == "0" then
         data = data .. [[
-            - If the post includes an image, print a specific keyword (e.g., '<NAI1>', '<NAI2>', etc.) to indicate where the prompt should be generated.
+            - If the post includes an image, print a specific keyword (e.g., '<OM1>', '<OM2>', etc.) to indicate where the prompt should be generated.
 ]]
     end
 
@@ -2287,11 +2287,11 @@ local function inputDCInside(triggerId, data)
         - Do not include ', ", [, |, ] in the content.
     - Example:
 ]]
-    if NAICOMMUNITYNOIMAGE == "0" then
+    if OMCOMMUNITYNOIMAGE == "0" then
         data = data .. [[
-        - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:<NAI1>I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:<NAI7>The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
+        - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:<OM1>I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:<OM7>The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
 ]]
-    elseif NAICOMMUNITYNOIMAGE == "1" then
+    elseif OMCOMMUNITYNOIMAGE == "1" then
         data = data .. [[
         - DC[GN:MapleStory Gallery|PID:maple-110987|PN:587432|PT:When the hell will I get my Dominator 22-star!!!!|PC:77|PW:Anonymous(118.235)|PD:21:07|PV:1534|PR:88|BODY:I'm really pissed off. Who the fuck created StarForce? Today I blew 20 billion mesos and couldn't even recover my 21-star item. I was planning to get my Dominator to 22-star before going to Arcane, but now I feel like my life is ruined. Sigh... I need a drink|COMMENT:Explode(211.36)|How much are you burning just to get on the hot posts? lol|PongPongBrother(121.171)|200 billion is lucky, I spent 500 billion and only got 20-star, fuck off|▷Mesungie◁|Hang in there... You'll get it someday... But not today lol|DestroyerKing(223.38)|Nope~ Mine is one-tap~^^|Anonymous(110.70)|Did someone hold a knife to your throat and force you to spend mesos? lol|NaJeBul(1.234)|If you don't like it, quit the game, idiot lol|.............|PID:maple-111007|PN:587451|PT:Honestly, is this event really the best ever?|PC:55|PW:Veteran(1.234)|PD:21:41|PV:2511|PR:48|BODY:The rewards are terrible, nothing worth buying in the coin shop, they just increased the EXP requirements... I find it outrageous that they're forcing us to grind more! Isn't Kang Won-gi going too far? There should be limits to deceiving users|COMMENT:Rekka(118.41)|Yeah, but you'll still play it~|NotABot(220.85)|It's basically a non-event update, what did you expect|TruthSpeaker(175.223)|Agreed, it's always the same lol|NewUser(112.158)|I actually like it...? (just my honest opinion)|Anonymous(61.77)|What are you expecting from MapleStory?|GotComplaints(106.101)|If you don't like it, quit the game! Why do you keep struggling? lol]
 ]]
@@ -2312,7 +2312,7 @@ local function inputDCInside(triggerId, data)
 			-Example:
 				'ㅇㅇ(118.235)', '렉카(121.123)', '고닉죽이기(211.36)', '익명의 유동(223.38)'
 ]]
-    if NAIDCNOSTALKER == "1" then
+    if OMDCNOSTALKER == "1" then
         data = data .. [[
 ### DCInside Gallery CRITICAL
 - DO NOT MENTION {{user}} and {{char}} in DCInside     
@@ -2323,7 +2323,7 @@ local function inputDCInside(triggerId, data)
 end
 
 local function changeDCInside(triggerId, data)
-    local NAICOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_NAICOMMUNITYNOIMAGE")
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
     local function parseAuthor(raw_author)
         if not raw_author or raw_author == "" then
             return { name = "ㅇㅇ", type = "floating", ip = nil, html = "ㅇㅇ" }
@@ -2505,7 +2505,7 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     local postContentDisplayHtml = ""
                     local last_end = 1
                     rawPostContent = string.gsub(rawPostContent, "<!%-%-.-%-%->", "")
-                    local nai_pattern = "(<NAI%d+>)"
+                    local nai_pattern = "(<OM%d+>)"
 
                     while true do
                         local naiStart, naiEnd, naiTag = string.find(rawPostContent, nai_pattern, last_end)
@@ -2627,7 +2627,7 @@ end
 
 
 local function inputKAKAOTalk(triggerId, data)
-    local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
 
     data = data .. [[
 ## Messenger Interface
@@ -2638,12 +2638,12 @@ local function inputKAKAOTalk(triggerId, data)
     - NO '[', '|', ']' ALLOWED at HERE!!!
 ]]
 
-    if NAIMESSENGERNOIMAGE == "0" then
+    if OMMESSENGERNOIMAGE == "0" then
         data = data .. [[
-	- When {{char}} sends a picture or photo, exactly output '<NAI>'.
+	- When {{char}} sends a picture or photo, exactly output '<OM>'.
         - ONLY when {{char}} sends a picture or photo.
-        - if not, DO NOT PRINT <NAI>.
-    - DO NOT PRINT <NAI> with message, and more than once.
+        - if not, DO NOT PRINT <OM>.
+    - DO NOT PRINT <OM> with message, and more than once.
 ]]
     end
 
@@ -2658,9 +2658,9 @@ local function inputKAKAOTalk(triggerId, data)
     - KAKAO[Would you like to chat with me for a bit? Hehe|01:46 AM]
 ]]
 
-    if NAIMESSENGERNOIMAGE == "0" then
+    if OMMESSENGERNOIMAGE == "0" then
         data = data .. [[
-	- KAKAO[<NAI>|01:46 AM]        
+	- KAKAO[<OM>|01:46 AM]        
 ]]
     end
 
@@ -2668,7 +2668,7 @@ local function inputKAKAOTalk(triggerId, data)
 end
 
 local function changeKAKAOTalk(triggerId, data)
-    local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
     data = string.gsub(data, "TALK%[(.-)|(.-)%]", function(message, timestamp)
         local userMessageTemplate = [[
 <style>
@@ -2747,7 +2747,7 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
 
     -- inlay::가 존재할 경우
     local inlayTag = string.match(message, "{{inlay::[^}]+}}")
-    if inlayTag and NAIMESSENGERNOIMAGE == "0" then
+    if inlayTag and OMMESSENGERNOIMAGE == "0" then
         local buttonJsonBody = '{"action":"KAKAO_REROLL", "identifier":"KAKAO_' .. timestamp .. '"}'
         table.insert(html, '<div class="reroll-button-wrapper" style="margin-top: 10px; z-index: 2;">')
         table.insert(html, '<div class="global-reroll-controls">')
@@ -2763,24 +2763,24 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
 end
 
 local function inputImage(triggerId, data)
-    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
-    local NAICARDTARGET = getGlobalVar(triggerId, "toggle_NAICARDTARGET")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET")
 
-    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAISNSTARGET = getGlobalVar(triggerId, "toggle_NAISNSTARGET")
-    local NAISNSREAL = getGlobalVar(triggerId, "toggle_NAISNSREAL")
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
+    local OMSNSREAL = getGlobalVar(triggerId, "toggle_OMSNSREAL")
 
-    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
-    local NAICOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_NAICOMMUNITYNOIMAGE")
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
 
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
-    local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
 
-    local NAICOMPATIBILITY = getGlobalVar(triggerId, "toggle_NAICOMPATIBILITY")
-    local NAIORIGINAL = getGlobalVar(triggerId, "toggle_NAIORIGINAL")
-    local NAIORIGINALTEXT = getGlobalVar(triggerId, "toggle_NAIORIGINALTEXT")
+    local OMCOMPATIBILITY = getGlobalVar(triggerId, "toggle_OMCOMPATIBILITY")
+    local OMORIGINAL = getGlobalVar(triggerId, "toggle_OMORIGINAL")
+    local OMORIGINALTEXT = getGlobalVar(triggerId, "toggle_OMORIGINALTEXT")
     
     
     data = data .. [[
@@ -2802,7 +2802,7 @@ local function inputImage(triggerId, data)
 				- Breasts or nipples exposed: Print '{{NSFW}}'
 				- Pussy exposed: Print '{{NSFW, Uncensored}}'
 		- (LABEL):
-			- ONLY 1 Character.
+			- ONLY 1 LETTERacter.
 			- Example:
 				- If Character is a male: 
 					- PROMPT: "1boy"
@@ -2831,64 +2831,64 @@ local function inputImage(triggerId, data)
 		- (SCENE): Summarize Character's current narrative scene into a concise description.
 		- (PROMPTPLACEHOLDER):    
 ]]
-    if NAICARD == "1" then
+    if OMCARD == "1" then
         data = data .. [[
-			- NAISTATUSPROMPT + INDEX
-			- NEG_NAISTATUSPROMPT + INDEX
+			- OMSTATUSPROMPT + INDEX
+			- NEG_OMSTATUSPROMPT + INDEX
 ]]
-    elseif NAICARD == "2" then
+    elseif OMCARD == "2" then
         data = data .. [[
-			- NAISIMULCARDPROMPT + INDEX
-			- NEG_NAISIMULCARDPROMPT + INDEX
+			- OMSIMULCARDPROMPT + INDEX
+			- NEG_OMSIMULCARDPROMPT + INDEX
 ]] 
-    elseif NAICARD == "3" then
+    elseif OMCARD == "3" then
         data = data .. [[
             - For female:
-                - NAISTATUSPROMPT + INDEX
-                - NEG_NAISTATUSPROMPT + INDEX
+                - OMSTATUSPROMPT + INDEX
+                - NEG_OMSTATUSPROMPT + INDEX
             - For male:
-                - NAISIMULCARDPROMPT + INDEX
-                - NEG_NAISIMULCARDPROMPT + INDEX
+                - OMSIMULCARDPROMPT + INDEX
+                - NEG_OMSIMULCARDPROMPT + INDEX
 ]]
-    elseif NAICARD == "4" then
+    elseif OMCARD == "4" then
         data = data .. [[
-            - NAIINLAYPROMPT + INDEX
-            - NEG_NAIINLAYPROMPT + INDEX
+            - OMINLAYPROMPT + INDEX
+            - NEG_OMINLAYPROMPT + INDEX
 ]]
     end
 
-    if NAISNS == "1" then
+    if OMSNS == "1" then
         data = data .. [[
-			- NAITWITTERPROMPT
-			- NEG_NAITWITTERPROMPT
+			- OMTWITTERPROMPT
+			- NEG_OMTWITTERPROMPT
 ]]
-    elseif NAISNS == "2" then
+    elseif OMSNS == "2" then
         data = data .. [[
-            - NAIINSTAPROMPT
-            - NEG_NAIINSTAPROMPT
+            - OMINSTAPROMPT
+            - NEG_OMINSTAPROMPT
 ]]
-    elseif NAISNS == "3" then
+    elseif OMSNS == "3" then
         data = data .. [[
             - For NSFW Post:
-                - NAITWITTERPROMPT
-                - NEG_NAITWITTERPROMPT
+                - OMTWITTERPROMPT
+                - NEG_OMTWITTERPROMPT
             - For SFW Post:
-                - NAIINSTAPROMPT
-                - NEG_NAIINSTAPROMPT
+                - OMINSTAPROMPT
+                - NEG_OMINSTAPROMPT
 ]]
     end
 
-    if NAICOMMUNITY == "1" then
+    if OMCOMMUNITY == "1" then
         data = data .. [[
-			- NAIDCPROMPT + INDEX
-			- NEG_NAIDCPROMPT + INDEX
+			- OMDCPROMPT + INDEX
+			- NEG_OMDCPROMPT + INDEX
 ]]
     end
 
-    if NAIMESSENGER == "1" then
+    if OMMESSENGER == "1" then
         data = data .. [[
-			- NAIKAKAOPROMPT
-			- NEG_NAIKAKAOPROMPT
+			- OMKAKAOPROMPT
+			- NEG_OMKAKAOPROMPT
 ]]
     end
 
@@ -2906,65 +2906,65 @@ local function inputImage(triggerId, data)
 - NEVER refer to the past chat history when outputting the prompt below:
 ]]
 
-    if NAICARDNOIMAGE == "0" then
-        if NAICARD == "1" then
+    if OMCARDNOIMAGE == "0" then
+        if OMCARD == "1" then
             data = data .. [[
     - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE
     - Output Format:
-        - EROSTATUS[...|INLAY:<NAI1>]
-        - [NAISTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-        - EROSTATUS[...|INLAY:<NAI2>]
-        - [NAISTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAISTATUSPROMPT2:(NEGATIVE PROMPT)]
+        - EROSTATUS[...|INLAY:<OM1>]
+        - [OMSTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMSTATUSPROMPT1:(NEGATIVE PROMPT)]
+        - EROSTATUS[...|INLAY:<OM2>]
+        - [OMSTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMSTATUSPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
-        elseif NAICARD == "2" then
+        elseif OMCARD == "2" then
             data = data .. [[
     - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
-        - SIMULSTATUS[...|INLAY:<NAI1>]
-        - [NAISIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAISIMULCARDPROMPT1:(NEGATIVE PROMPT)]
-        - SIMULSTATUS[...|INLAY:<NAI2>]
-        - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<OM1>]
+        - [OMSIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMSIMULCARDPROMPT1:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<OM2>]
+        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
-        elseif NAICARD == "3" then
+        elseif OMCARD == "3" then
             data = data .. [[
     - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
-        - EROSTATUS[...|INLAY:<NAI1>]  --> FEMALE
-        - [NAISTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAISTATUSPROMPT1:(NEGATIVE PROMPT)]
-        - SIMULSTATUS[...|INLAY:<NAI2>]  --> MALE
-        - [NAISIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAISIMULCARDPROMPT2:(NEGATIVE PROMPT)]
+        - EROSTATUS[...|INLAY:<OM1>]  --> FEMALE
+        - [OMSTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMSTATUSPROMPT1:(NEGATIVE PROMPT)]
+        - SIMULSTATUS[...|INLAY:<OM2>]  --> MALE
+        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]] 
-        elseif NAICARD == "4" then
+        elseif OMCARD == "4" then
             data = data .. [[
     - ALWAYS PRINT OUT INLAY INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the INLAY INTERFACE
     - Output Format:
-        - INLAY[...|INLAY:<NAI1>]
-        - [NAIINLAYPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAIINLAYPROMPT1:(NEGATIVE PROMPT)]
-        - INLAY[...|INLAY:<NAI2>]
-        - [NAIINLAYPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAIINLAYPROMPT2:(NEGATIVE PROMPT)]
+        - INLAY[...|INLAY:<OM1>]
+        - [OMINLAYPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMINLAYPROMPT1:(NEGATIVE PROMPT)]
+        - INLAY[...|INLAY:<OM2>]
+        - [OMINLAYPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMINLAYPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
         end
     end
 
-    if NAISNSNOIMAGE == "0" then
-        if NAISNS == "1" then
-            if NAISNSREAL == "1" then
+    if OMSNSNOIMAGE == "0" then
+        if OMSNS == "1" then
+            if OMSNSREAL == "1" then
                 data = data .. [[
     - PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT when the Character UPLOADS a TWEET.                
 ]]  
-            elseif NAISNSREAL == "0" then
+            elseif OMSNSREAL == "0" then
                 data = data .. [[
     - ALWAYS PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the TWITTER INTERFACE                    
 ]]
@@ -2972,20 +2972,20 @@ local function inputImage(triggerId, data)
             
             data = data .. [[
     - Output Format:
-        - TWITTER[...|<NAI>|...|<NAI>|...]
-        - [NAITWITTERPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAITWITTERPROMPT:(NEGATIVE PROMPT)]
+        - TWITTER[...|<OM>|...|<OM>|...]
+        - [OMTWITTERPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMTWITTERPROMPT:(NEGATIVE PROMPT)]
         - If Character does not have own profile image:
-            - [NAITWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
-            - [NEG_NAITWITTERPROFILEPROMPT:(NEGATIVE PROMPT)]
+            - [OMTWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+            - [NEG_OMTWITTERPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]
         
-        elseif NAISNS == "2" then
-            if NAISNSREAL == "1" then
+        elseif OMSNS == "2" then
+            if OMSNSREAL == "1" then
                 data = data .. [[
     - PRINT OUT INSTAGRAM INTERFACE PROMPT and NEGATIVE PROMPT when the Character UPLOADS a POST.                
 ]]  
-            elseif NAISNSREAL == "0" then
+            elseif OMSNSREAL == "0" then
                 data = data .. [[
     - ALWAYS PRINT OUT INSTAGRAM INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the INSTAGRAM INTERFACE                    
 ]]
@@ -2993,20 +2993,20 @@ local function inputImage(triggerId, data)
             data = data .. [[
     - ALWAYS PRINT OUT INSTAGRAM INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the INSTAGRAM INTERFACE
     - Output Format:
-        - INSTA[...|<NAI>|...|<NAI>|...]
-        - [NAIINSTAPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAIINSTAPROMPT:(NEGATIVE PROMPT)]
+        - INSTA[...|<OM>|...|<OM>|...]
+        - [OMINSTAPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMINSTAPROMPT:(NEGATIVE PROMPT)]
         - If Character does not have own profile image:
-            - [NAIINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
-            - [NEG_NAIINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
+            - [OMINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+            - [NEG_OMINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]
-        elseif NAISNS == "3" then
-            if NAISNSREAL == "1" then
+        elseif OMSNS == "3" then
+            if OMSNSREAL == "1" then
                 data = data .. [[
     - PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT when the Character UPLOADS a TWEET.  
     - PRINT OUT INSTAGRAM INTERFACE PROMPT and NEGATIVE PROMPT when the Character UPLOADS a POST.                
 ]]  
-            elseif NAISNSREAL == "0" then
+            elseif OMSNSREAL == "0" then
                 data = data .. [[ 
     - ALWAYS PRINT OUT TWITTER INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the TWITTER INTERFACE       
     - ALWAYS PRINT OUT INSTAGRAM INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the INSTAGRAM INTERFACE             
@@ -3016,52 +3016,52 @@ local function inputImage(triggerId, data)
             data = data .. [[
     - TWITTER PROMPT MUST INCLUDE NSFW SITUATION
         - Output Format:
-            - TWITTER[...|<NAI>|...|<NAI>|...]
-            - [NAITWITTERPROMPT:{{{NSFW,UNCENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-            - [NEG_NAITWITTERPROMPT:{{{CENSORED}}},(NEGATIVE PROMPT)]
+            - TWITTER[...|<OM>|...|<OM>|...]
+            - [OMTWITTERPROMPT:{{{NSFW,UNCENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
+            - [NEG_OMTWITTERPROMPT:{{{CENSORED}}},(NEGATIVE PROMPT)]
             - If Character does not have own profile image:
-                - [NAITWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
-                - [NEG_NAITWITTERPROFILEPROMPT:(NEGATIVE PROMPT)]
+                - [OMTWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+                - [NEG_OMTWITTERPROFILEPROMPT:(NEGATIVE PROMPT)]
     - INSTAGRAM PROMPT MUST INCLUDE SFW SITUATION
         - Output Format:
-            - INSTA[...|<NAI>|...|<NAI>|...]
-            - [NAIINSTAPROMPT:{{{CENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-            - [NEG_NAIINSTAPROMPT:{{{NSFW, UNCENSORED}}},(NEGATIVE PROMPT)]
+            - INSTA[...|<OM>|...|<OM>|...]
+            - [OMINSTAPROMPT:{{{CENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
+            - [NEG_OMINSTAPROMPT:{{{NSFW, UNCENSORED}}},(NEGATIVE PROMPT)]
             - If Character does not have own profile image:
-                - [NAIINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
-                - [NEG_NAIINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
+                - [OMINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+                - [NEG_OMINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]  
         end
     end
 
-    if NAICOMMUNITYNOIMAGE == "0" then
-        if NAICOMMUNITY == "1" then
+    if OMCOMMUNITYNOIMAGE == "0" then
+        if OMCOMMUNITY == "1" then
             data = data .. [[
     - ALWAYS PRINT OUT DCINSIDE INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the DCINSIDE INTERFACE
     - Output Format:
-        - DC[...|<NAI1>...|<NAI2>...]
+        - DC[...|<OM1>...|<OM2>...]
         - If the post is normal:
-            - [NAIDCPROMPT:(Describe the situation of the normal post)]
+            - [OMDCPROMPT:(Describe the situation of the normal post)]
         - If the post is Selfie:
-            - [NAIDCPROMPT:(SITUATION),(LABEL),(ANGLE),(ACTIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAIDCPROMPT:(NEGATIVE PROMPT)]
-    - The number of the POST CONTENT including '<NAI>' and the number of the prompt must match.
-        - Example: If 3rd POST CONTENT is including '<NAI3>'.
-            - [NAIDCPROMPT3:3rd Post's '<NAI3>' Prompt Generated]
-            - [NEG_NAIDCPROMPT3:3rd Post's '<NAI3>' (NEGATIVE PROMPT)]
+            - [OMDCPROMPT:(SITUATION),(LABEL),(ANGLE),(ACTIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMDCPROMPT:(NEGATIVE PROMPT)]
+    - The number of the POST CONTENT including '<OM>' and the number of the prompt must match.
+        - Example: If 3rd POST CONTENT is including '<OM3>'.
+            - [OMDCPROMPT3:3rd Post's '<OM3>' Prompt Generated]
+            - [NEG_OMDCPROMPT3:3rd Post's '<OM3>' (NEGATIVE PROMPT)]
 ]]
         end
     end
 
-    if NAIMESSENGERNOIMAGE == "0" then
-        if NAIMESSENGER == "1" then
+    if OMMESSENGERNOIMAGE == "0" then
+        if OMMESSENGER == "1" then
             data = data .. [[
     - ALWAYS PRINT OUT KAKAOTALK INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the KAKAOTALK INTERFACE
-    - Print <NAI> Exactly once when {{char}} sends a picture or image.
+    - Print <OM> Exactly once when {{char}} sends a picture or image.
     - Output Format:
-        - KAKAO[<NAI>|...]
-        - [NAIKAKAOPROMPT:(SITUATION),(LABEL),Selfie,portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
-        - [NEG_NAIKAKAOPROMPT:(NEGATIVE PROMPT)]
+        - KAKAO[<OM>|...]
+        - [OMKAKAOPROMPT:(SITUATION),(LABEL),Selfie,portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [NEG_OMKAKAOPROMPT:(NEGATIVE PROMPT)]
 ]]
         end
     end
@@ -3072,9 +3072,9 @@ local function inputImage(triggerId, data)
 - Use quick, simple keywords or short descriptive phrases.
 - Always keep the prompt output in English.
 ]]
-    if NAIORIGINAL == "1" then
+    if OMORIGINAL == "1" then
         data = data .. [[
-- The original creation exists: ]] .. NAIORIGINALTEXT .. [[
+- The original creation exists: ]] .. OMORIGINALTEXT .. [[
 
 - When describing a character, use the name of the creation and character instead of pronouns.
 	- Example:
@@ -3089,7 +3089,7 @@ local function inputImage(triggerId, data)
 ]]
     end
 
-    if tonumber(NAICOMPATIBILITY) >= 1 then
+    if tonumber(OMCOMPATIBILITY) >= 1 then
         data = data .. [[
 - REPLACE { and } to ( and ) in IMAGE PROMPT!!!
 	- Example:
@@ -3101,11 +3101,11 @@ local function inputImage(triggerId, data)
 end
 
 local function inputImportant(triggerId, data)
-    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
-    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
-    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
-    local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
 
     data = data .. [[
 
@@ -3113,20 +3113,20 @@ local function inputImportant(triggerId, data)
 - FROM NOW ON, YOU MUST FOLLOW THE BELOW RULES WHEN YOU ARE PRINTING DIALOGUES
 ]]
 
-    if NAICARD == "1" then
+    if OMCARD == "1" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
 - DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK
     - MUST REPLACE ALL FEMALE CHARACTER's "MESSAGE" to EROSTATUS[...|DIALOGUE:MESSAGE|...]
 - BODYINFO and OUTFITS MUST BE PRINTED with USER's PREFERRED LANGUAGE
 ]]
-    elseif NAICARD == "2" then
+    elseif OMCARD == "2" then
         data = data .. [[
 ## CRITICAL: SIMULATION STATUS INTERFACE
 - DO NOT PRINT "MESSAGE" OUTSIDE of the SIMULSTATUS[...] BLOCK
     - MUST REPLACE "MESSAGE" to SIMULSTATUS[...|DIALOGUE:MESSAGE|...]
 ]]
-    elseif NAICARD == "3" then
+    elseif OMCARD == "3" then
         data = data .. [[
 ## CRITICAL: EROTIC STATUS INTERFACE
 - DO NOT PRINT FEMALE CHARACTER's "MESSAGE" OUTSIDE of the EROSTATUS[...] BLOCK
@@ -3138,7 +3138,7 @@ local function inputImportant(triggerId, data)
 ]]
     end
 
-    if NAIMESSENGER == "1" then
+    if OMMESSENGER == "1" then
         data = inputKAKAOTalk(triggerId, data)
     end
     return data
@@ -3151,19 +3151,19 @@ listenEdit("editInput", function(triggerId, data)
     local artistPrompt = nil
     local qualityPrompt = nil
     local negativePrompt = nil
-    local NAIPRESETPROMPT = getGlobalVar(triggerId, "toggle_NAIPRESETPROMPT")
-    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
-    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
-    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAICOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_NAICOMMUNITYNOIMAGE")
-    local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
+    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
     
     print("ONLINEMODULE: editInput: called with data: " .. tostring(data))
 
-    if NAIMESSENGER == "1" then
+    if OMMESSENGER == "1" then
         data = string.gsub(data, "  ", "\n")
         print("ONLINEMODULE: editInput: Replaced double spaces with newlines BEFORE line processing.")
 
@@ -3195,11 +3195,11 @@ end)
 listenEdit("editRequest", function(triggerId, data)
     print("---------------------------------editREQUEST---------------------------------------")
     print("ONLINEMODULE: editRequest: Triggered with ID:", triggerId)
-    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
-    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
-    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
-    local NAIGLOBAL = getGlobalVar(triggerId, "toggle_NAIGLOBAL")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
+    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL")
     local UTILFORCEOUTPUT = getGlobalVar(triggerId, "toggle_UTILFORCEOUTPUT")
 
     local currentInput = nil
@@ -3224,7 +3224,7 @@ listenEdit("editRequest", function(triggerId, data)
         end
     end
     
-    if NAICARD == "1" or NAICARD == "2" or NAICARD == "3" or NAIMESSENGER == "1" then
+    if OMCARD == "1" or OMCARD == "2" or OMCARD == "3" or OMMESSENGER == "1" then
         -- 만약 inputImportant가 필요하다면
         for i = 1, #data, 1 do
             -- 이후, 앞에서부터 role이 "system"인 경우에 1회 한정으로 inputImportant 삽입
@@ -3250,43 +3250,43 @@ listenEdit("editRequest", function(triggerId, data)
 
 ]]
 
-    if NAIMESSENGER == "0" then
-        if NAICARD == "1" then
+    if OMMESSENGER == "0" then
+        if OMCARD == "1" then
             currentInput = inputEroStatus(triggerId, currentInput)
             changedValue = true
-        elseif NAICARD == "2" then
+        elseif OMCARD == "2" then
             currentInput = inputSimulCard(triggerId, currentInput)
             changedValue = true
-        elseif NAICARD == "3" then
+        elseif OMCARD == "3" then
             currentInput = inputStatusHybrid(triggerId, currentInput)
             changedValue = true
-        elseif NAICARD == "4" then
+        elseif OMCARD == "4" then
             currentInput = inputInlayOnly(triggerId, currentInput)
             changedValue = true
         end
         
-        if NAISNS == "1" then
+        if OMSNS == "1" then
             currentInput = inputTwitter(triggerId, currentInput)
             changedValue = true
-        elseif NAISNS == "2" then
+        elseif OMSNS == "2" then
             currentInput = inputInsta(triggerId, currentInput)
             changedValue = true
-        elseif NAISNS == "3" then
+        elseif OMSNS == "3" then
             currentInput = inputSNSHybrid(triggerId, currentInput)
             changedValue = true
         end
 
-        if NAICOMMUNITY == "1" then
+        if OMCOMMUNITY == "1" then
             currentInput = inputDCInside(triggerId, currentInput)
             changedValue = true
         end
         
-    elseif NAIMESSENGER == "1" then
+    elseif OMMESSENGER == "1" then
         currentInput = inputKAKAOTalk(triggerId, currentInput)
         changedValue = true
     end
 
-    if NAIGLOBAL == "1" then
+    if OMGLOBAL == "1" then
         currentInput = inputImage(triggerId, currentInput)
         changedValue = true
     end
@@ -3321,10 +3321,10 @@ end)
 listenEdit("editDisplay", function(triggerId, data)
     if not data or data == "" then return "" end
 
-    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
-    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
-    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
     
     local rerollTemplate = [[
 <style>
@@ -3350,30 +3350,30 @@ listenEdit("editDisplay", function(triggerId, data)
 
     data = rerollTemplate .. data
 
-    if NAICARD == "1" then
+    if OMCARD == "1" then
         data = changeEroStatus(triggerId, data)
-    elseif NAICARD == "2" then
+    elseif OMCARD == "2" then
         data = changeSimulCard(triggerId, data)
-    elseif NAICARD == "3" then
+    elseif OMCARD == "3" then
         data = changeEroStatus(triggerId, data)
         data = changeSimulCard(triggerId, data)
-    elseif NAICARD == "4" then
+    elseif OMCARD == "4" then
         data = changeInlayOnly(triggerId, data)
     end
 
-    if NAISNS == "1" then
+    if OMSNS == "1" then
         data = changeTwitter(triggerId, data)
-    elseif NAISNS == "2" then
+    elseif OMSNS == "2" then
         data = changeInsta(triggerId, data)
-    elseif NAISNS == "3" then
+    elseif OMSNS == "3" then
         data = changeSNSHybrid(triggerId, data)
     end
     
-    if NAICOMMUNITY == "1" then
+    if OMCOMMUNITY == "1" then
         data = changeDCInside(triggerId, data)
     end
     
-    if NAIMESSENGER == "1" then
+    if OMMESSENGER == "1" then
         data = changeKAKAOTalk(triggerId, data)
     end
 
@@ -3384,10 +3384,10 @@ end)
 
 listenEdit("editOutput", function(triggerId, data)
     if not data or data == "" then return "" end
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
 
-    if NAIMESSENGER == "1" then
-        print("ONLINEMODULE: editOutput: NAIMESSENGER == 1, filtering to keep only KAKAO blocks")
+    if OMMESSENGER == "1" then
+        print("ONLINEMODULE: editOutput: OMMESSENGER == 1, filtering to keep only KAKAO blocks")
         
         local lines = {}
         for line in (data .. "\n"):gmatch("([^\n]*)\n") do
@@ -3402,11 +3402,11 @@ listenEdit("editOutput", function(triggerId, data)
                 table.insert(filteredLines, line)
                 keepNextLines = true
             elseif keepNextLines and (
-                string.find(line, "^%[NAIKAKAOPROMPT:") or
-                string.find(line, "^%[NEG_NAIKAKAOPROMPT:")
+                string.find(line, "^%[OMKAKAOPROMPT:") or
+                string.find(line, "^%[NEG_OMKAKAOPROMPT:")
             ) then
                 table.insert(filteredLines, line)
-                if string.find(line, "^%[NEG_NAIKAKAOPROMPT:") then
+                if string.find(line, "^%[NEG_OMKAKAOPROMPT:") then
                     keepNextLines = false 
                 end
             elseif line:match("^%s*$") then
@@ -3425,31 +3425,31 @@ function onInput(triggerId)
     print("----- ANALYZING VALUABLES -----")
     print("ONLINEMODULE: onInput: Triggered with ID:", triggerId)
 
-    local NAIGLOBAL = getGlobalVar(triggerId, "toggle_NAIGLOBAL")
-    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
-    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAISNSTARGET = getGlobalVar(triggerId, "toggle_NAISNSTARGET")
-    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
+    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMSNSTARGET = getGlobalVar(triggerId, "toggle_OMSNSTARGET")
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
     local UTILREMOVEPREVIOUSDISPLAY = getGlobalVar(triggerId, "toggle_UTILREMOVEPREVIOUSDISPLAY")
 
-    if NAISNS ~= "0" then
-        if NAISNSNOIMAGE == "1" then
-            if NAISNSTARGET == "2" then
-                alertNormal(triggerId, "ERROR: SETTING: NAISNS~=0;NAISNSNOIMAGE=1;NAISNSTARGET=2;")
+    if OMSNS ~= "0" then
+        if OMSNSNOIMAGE == "1" then
+            if OMSNSTARGET == "2" then
+                alertNormal(triggerId, "ERROR: SETTING: OMSNS~=0;OMSNSNOIMAGE=1;OMSNSTARGET=2;")
                 return
             end
         end
     end
     
-    if NAIMESSENGER == "1" then
-        if tonumber(NAICARD) >= 1 then
-            alertNormal(triggerId, "ERROR: SETTING: NAIMESSENGER=1;NAICARD>=1;")
-        elseif tonumber(NAISNS) >= 1 then
-            alertNormal(triggerId, "ERROR: SETTING: NAIMESSENGER=1;NAISNS>=1;")
-        elseif tonumber(NAICOMMUNITY) >= 1 then
-            alertNormal(triggerId, "ERROR: SETTING: NAIMESSENGER=1;NAICOMMUNITY>=1;")
+    if OMMESSENGER == "1" then
+        if tonumber(OMCARD) >= 1 then
+            alertNormal(triggerId, "ERROR: SETTING: OMMESSENGER=1;OMCARD>=1;")
+        elseif tonumber(OMSNS) >= 1 then
+            alertNormal(triggerId, "ERROR: SETTING: OMMESSENGER=1;OMSNS>=1;")
+        elseif tonumber(OMCOMMUNITY) >= 1 then
+            alertNormal(triggerId, "ERROR: SETTING: OMMESSENGER=1;OMCOMMUNITY>=1;")
         end
     end
 
@@ -3552,49 +3552,49 @@ end
 
 onOutput = async(function (triggerId)
     print("onOutput: Triggered with ID:", triggerId)
-    local NAIGLOBAL = getGlobalVar(triggerId, "toggle_NAIGLOBAL")
-    if NAIGLOBAL == "0" then
+    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL")
+    if OMGLOBAL == "0" then
         return
     end
     
 	local artistPrompt = nil
     local qualityPrompt = nil
     local negativePrompt = nil
-    local NAIPRESETPROMPT = getGlobalVar(triggerId, "toggle_NAIPRESETPROMPT")
-    local NAICARD = getGlobalVar(triggerId, "toggle_NAICARD")
-    local NAISNS = getGlobalVar(triggerId, "toggle_NAISNS")
-    local NAICOMMUNITY = getGlobalVar(triggerId, "toggle_NAICOMMUNITY")
-    local NAIMESSENGER = getGlobalVar(triggerId, "toggle_NAIMESSENGER")
-    local NAICARDNOIMAGE = getGlobalVar(triggerId, "toggle_NAICARDNOIMAGE")
-    local NAISNSNOIMAGE = getGlobalVar(triggerId, "toggle_NAISNSNOIMAGE")
-    local NAICOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_NAICOMMUNITYNOIMAGE")
-    local NAIMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_NAIMESSENGERNOIMAGE")
+    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT")
+    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD")
+    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS")
+    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY")
+    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER")
+    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE")
+    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE")
+    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE")
+    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE")
 	
-	if NAIPRESETPROMPT == "0" then
-        artistPrompt = getGlobalVar(triggerId, "toggle_NAIARTISTPROMPT")
-        qualityPrompt = getGlobalVar(triggerId, "toggle_NAIQUALITYPROMPT")
-        negativePrompt = getGlobalVar(triggerId, "toggle_NAINEGPROMPT")
-    elseif NAIPRESETPROMPT == "1" then
+	if OMPRESETPROMPT == "0" then
+        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT")
+        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT")
+        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT")
+    elseif OMPRESETPROMPT == "1" then
 		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
 		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
-	elseif NAIPRESETPROMPT == "2" then
+	elseif OMPRESETPROMPT == "2" then
 		artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}"
 		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-	elseif NAIPRESETPROMPT == "3" then
+	elseif OMPRESETPROMPT == "3" then
 		artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}"
 		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "4" then
+    elseif OMPRESETPROMPT == "4" then
         artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "5" then
+    elseif OMPRESETPROMPT == "5" then
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
-    elseif NAIPRESETPROMPT == "6" then
+    elseif OMPRESETPROMPT == "6" then
         artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
         qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
         negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
@@ -3607,23 +3607,23 @@ onOutput = async(function (triggerId)
 	print("-----------------------ART PROMPT-----------------------")
 	
 
-    print("ONLINEMODULE: onOutput: NAICARD value:", NAICARD)
-    print("ONLINEMODULE: onOutput: NAISNS value:", NAISNS)
-	print("ONLINEMODULE: onOutput: NAICOMMUNITY value:", NAICOMMUNITY)
-    print("ONLINEMODULE: onOutput: NAIMESSENGER value:", NAIMESSENGER)
+    print("ONLINEMODULE: onOutput: OMCARD value:", OMCARD)
+    print("ONLINEMODULE: onOutput: OMSNS value:", OMSNS)
+	print("ONLINEMODULE: onOutput: OMCOMMUNITY value:", OMCOMMUNITY)
+    print("ONLINEMODULE: onOutput: OMMESSENGER value:", OMMESSENGER)
     
 
-    if NAIMESSENGER == "1" then
+    if OMMESSENGER == "1" then
         print("ONLINEMODULE: onOutput: FORCE SETTING VALUES to 0")
-        NAICARD = "0"
-        NAISNS = "0"
-        NAICOMMUNITY = "0"
+        OMCARD = "0"
+        OMSNS = "0"
+        OMCOMMUNITY = "0"
     end
 
-    local togglesActive = NAICARD ~= "0" or NAISNS ~= "0" or NAICOMMUNITY ~= "0" or NAIMESSENGER ~= "0"
+    local togglesActive = OMCARD ~= "0" or OMSNS ~= "0" or OMCOMMUNITY ~= "0" or OMMESSENGER ~= "0"
 
     if not togglesActive then
-        print("ONLINEMODULE: onOutput: Skipping NAI generation modifications as all relevant toggles are off.")
+        print("ONLINEMODULE: onOutput: Skipping OM generation modifications as all relevant toggles are off.")
     end
 
     print("ONLINEMODULE: onOutput: togglesActive: " .. tostring(togglesActive))
@@ -3646,15 +3646,15 @@ onOutput = async(function (triggerId)
     local historyModifiedByWrapping = false
     local lastIndex = #chatHistoryTable
     
-    local skipNAICARD = false
-    local skipNAISNS = false
-    local skipNAICOMMUNITY = false
-    local skipNAIMESSENGER = false
+    local skipOMCARD = false
+    local skipOMSNS = false
+    local skipOMCOMMUNITY = false
+    local skipOMMESSENGER = false
     
-    if NAICARDNOIMAGE == "1" then skipNAICARD = 1 end
-    if NAISNSNOIMAGE == "1" then skipNAISNS = 1 end
-    if NAICOMMUNITYNOIMAGE == "1" then skipNAICOMMUNITY = 1 end
-    if NAIMESSENGERNOIMAGE == "1" then skipNAIMESSENGER = 1 end
+    if OMCARDNOIMAGE == "1" then skipOMCARD = 1 end
+    if OMSNSNOIMAGE == "1" then skipOMSNS = 1 end
+    if OMCOMMUNITYNOIMAGE == "1" then skipOMCOMMUNITY = 1 end
+    if OMMESSENGERNOIMAGE == "1" then skipOMMESSENGER = 1 end
 
     local currentLine = ""
 
@@ -3664,11 +3664,11 @@ onOutput = async(function (triggerId)
             currentLine = messageData.data
             local lineModifiedInThisPass = false
 
-            print("ONLINEMODULE: onOutput: Processing last message (index " .. lastIndex .. ") for NAI Generation/Replacement")
+            print("ONLINEMODULE: onOutput: Processing last message (index " .. lastIndex .. ") for OM Generation/Replacement")
 
-            if NAICARD == "1" and not skipNAICARD then
+            if OMCARD == "1" and not skipOMCARD then
                 -- 에로스테만 사용할 때
-                print("ONLINEMODULE: onOutput: NAICARD == 1")
+                print("ONLINEMODULE: onOutput: OMCARD == 1")
                 local searchPos = 1
                 local statusBlocksFound = 0
                 local statusReplacements = {}
@@ -3714,13 +3714,13 @@ onOutput = async(function (triggerId)
                         local naiSearchPosInContent = 1
                         local naiTagsFoundInBlock = 0
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(blockContent, "<NAI(%d+)>", naiSearchPosInContent)
+                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(blockContent, "<OM(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then break end
                             naiTagsFoundInBlock = naiTagsFoundInBlock + 1
                             local naiIndex = tonumber(naiIndexStr)
                             if naiIndex then
-                                local statusPromptFindPattern = "%[NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                local statusNegPromptFindPattern = "%[NEG_NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                local statusPromptFindPattern = "%[OMSTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                local statusNegPromptFindPattern = "%[NEG_OMSTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
                                 local _, _, foundStatusPrompt = string.find(currentLine, statusPromptFindPattern)
                                 local _, _, foundStatusNegPrompt = string.find(currentLine, statusNegPromptFindPattern)
                                 local currentNegativePromptStatus = negativePrompt
@@ -3740,7 +3740,7 @@ onOutput = async(function (triggerId)
                                         table.insert(statusReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayStatus
+                                            inlay = "<OM" .. naiIndex .. ">" .. inlayStatus
                                         })
                                         local infoEro = {
                                             type = "EROSTATUS",
@@ -3757,7 +3757,7 @@ onOutput = async(function (triggerId)
                                     end
                                 else
                                     ERR(triggerId, "EROSTATUS", 0)
-                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for NAI" .. naiIndex .. " in currentLine.")
+                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. naiIndex .. " in currentLine.")
                                 end
                             end
                             naiSearchPosInContent = e_nai_in_content + 1
@@ -3784,9 +3784,9 @@ onOutput = async(function (triggerId)
                 end
             
 
-            elseif NAICARD == "2" and not skipNAICARD then
+            elseif OMCARD == "2" and not skipOMCARD then
                 -- 시뮬봇 상태창만 사용할 때
-                print("ONLINEMODULE: onOutput: NAICARD == 2 entered.")
+                print("ONLINEMODULE: onOutput: OMCARD == 2 entered.")
                 local searchPos = 1
                 local simulReplacements = {}
                 local statusBlocksFound = 0
@@ -3854,57 +3854,57 @@ onOutput = async(function (triggerId)
                         if existingInlay and trimmedBlockName then
                             print("ONLINEMODULE: onOutput: Processing with existing inlay for block #" .. statusBlocksFound)
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<NAI(%d+)>", naiSearchPosInContent)
+                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<OM(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then break end
                             naiTagsFoundInBlock = naiTagsFoundInBlock + 1
-                            print("ONLINEMODULE: onOutput: Found <NAI> tag #"..naiTagsFoundInBlock.." (using existing inlay)")
+                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..naiTagsFoundInBlock.." (using existing inlay)")
                             local naiIndex = tonumber(naiIndexStr)
                             if naiIndex then
                                 local content_offset = e_simul_prefix
                                 local nai_abs_start = content_offset + s_nai_in_content
                                 local nai_abs_end = content_offset + e_nai_in_content
                                 table.insert(simulReplacements, { start = nai_abs_start, finish = nai_abs_end, inlay = existingInlay })
-                                print("ONLINEMODULE: onOutput: Adding existing inlay replacement for NAI" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
+                                print("ONLINEMODULE: onOutput: Adding existing inlay replacement for OM" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
                             end
                             naiSearchPosInContent = e_nai_in_content + 1
                         end
                         else
                             print("ONLINEMODULE: onOutput: Processing by generating new image for block #" .. statusBlocksFound)
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<NAI(%d+)>", naiSearchPosInContent)
+                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(simulContent, "<OM(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then
-                                print("ONLINEMODULE: onOutput: No more <NAI> tags found in block #".. statusBlocksFound .." content search.")
+                                print("ONLINEMODULE: onOutput: No more <OM> tags found in block #".. statusBlocksFound .." content search.")
                                 break
                             end
                             naiTagsFoundInBlock = naiTagsFoundInBlock + 1
-                            print("ONLINEMODULE: onOutput: Found <NAI> tag #"..naiTagsFoundInBlock.." (generating new)")
+                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..naiTagsFoundInBlock.." (generating new)")
                             local naiIndex = tonumber(naiIndexStr)
                             if naiIndex then
-                                local simulPromptPattern = "%[NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                local negSimulPromptPattern = "%[NEG_NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                local simulPromptPattern = "%[OMSIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                local negSimulPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
                                 local _, _, foundSimulPrompt = string.find(currentLine, simulPromptPattern)
                                 local _, _, foundNegSimulPrompt = string.find(currentLine, negSimulPromptPattern)
 
                                 if foundSimulPrompt then
-                                    print("ONLINEMODULE: onOutput: Found prompt for NAI" .. naiIndex .. ": [" .. string.sub(foundSimulPrompt, 1, 50) .. "...]")
+                                    print("ONLINEMODULE: onOutput: Found prompt for OM" .. naiIndex .. ": [" .. string.sub(foundSimulPrompt, 1, 50) .. "...]")
                                     local currentNegativePromptSimul = negativePrompt
                                     local storedNegPrompt = ""
                                     if foundNegSimulPrompt then currentNegativePromptSimul = foundNegSimulPrompt .. ", " .. currentNegativePromptSimul; storedNegPrompt = foundNegSimulPrompt end
                                     local finalPromptSimul = artistPrompt .. foundSimulPrompt .. qualityPrompt
                                     local inlaySimul = generateImage(triggerId, finalPromptSimul, currentNegativePromptSimul):await()
-                                    print("ONLINEMODULE: onOutput: generateImage result for NAI"..naiIndex..": ["..tostring(inlaySimul).."]")
+                                    print("ONLINEMODULE: onOutput: generateImage result for OM"..naiIndex..": ["..tostring(inlaySimul).."]")
                                     local isSuccess = (inlaySimul ~= nil) and (type(inlaySimul) == "string") and (string.len(inlaySimul) > 10) and not string.find(inlaySimul, "fail", 1, true) and not string.find(inlaySimul, "error", 1, true) and not string.find(inlaySimul, "실패", 1, true)
                                     if isSuccess then
-                                        print("ONLINEMODULE: onOutput: Image generation SUCCESS for NAI"..naiIndex)
+                                        print("ONLINEMODULE: onOutput: Image generation SUCCESS for OM"..naiIndex)
                                         local content_offset = e_simul_prefix 
                                         local nai_abs_start = content_offset + s_nai_in_content
                                         local nai_abs_end = content_offset + e_nai_in_content -1
                                         table.insert(simulReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlaySimul
+                                            inlay = "<OM" .. naiIndex .. ">" .. inlaySimul
                                         })
-                                        print("ONLINEMODULE: onOutput: Adding new inlay replacement for NAI" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
+                                        print("ONLINEMODULE: onOutput: Adding new inlay replacement for OM" .. naiIndex .. " at absolute pos " .. nai_abs_start .. "-" .. nai_abs_end)
 
                                         if trimmedBlockName then
                                             setState(triggerId, trimmedBlockName, inlaySimul)
@@ -3935,15 +3935,15 @@ onOutput = async(function (triggerId)
                                             print("ONLINEMODULE: onOutput: Stored info for generated SIMULATIONCARD image: [" .. trimmedBlockName .. "]")
 
                                             existingInlay = inlaySimul
-                                            print("ONLINEMODULE: onOutput: Updated existingInlay for subsequent NAI tags in block #" .. statusBlocksFound)
+                                            print("ONLINEMODULE: onOutput: Updated existingInlay for subsequent OM tags in block #" .. statusBlocksFound)
                                         end
                                     else
                                         ERR(triggerId, "SIMULCARD", 2)
-                                        print("ONLINEMODULE: onOutput: Image generation FAILED or invalid result for NAI"..naiIndex)
+                                        print("ONLINEMODULE: onOutput: Image generation FAILED or invalid result for OM"..naiIndex)
                                     end
                                 else
                                     ERR(triggerId, "SIMULCARD", 0)
-                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for NAI" .. naiIndex .. " in currentLine.")
+                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. naiIndex .. " in currentLine.")
                                 end
                             end
                             naiSearchPosInContent = e_nai_in_content + 1
@@ -3951,7 +3951,7 @@ onOutput = async(function (triggerId)
                     end
                     if naiTagsFoundInBlock == 0 then
                         ERR(triggerId, "SIMULCARD", 3)
-                        print("ONLINEMODULE: onOutput: No <NAI> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
+                        print("ONLINEMODULE: onOutput: No <OM> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
                     end
                     searchPos = e_simul_suffix + 1
                     else
@@ -3979,9 +3979,9 @@ onOutput = async(function (triggerId)
                     print("ONLINEMODULE: onOutput: No simulcard replacements to apply.")
                 end
             
-            elseif NAICARD == "3" and not skipNAICARD then
+            elseif OMCARD == "3" and not skipOMCARD then
                 -- 상태창 하이브리드 모드 사용할 때
-                print("ONLINEMODULE: onOutput: NAICARD == 3 (Hybrid mode)")
+                print("ONLINEMODULE: onOutput: OMCARD == 3 (Hybrid mode)")
                 local searchPos = 1
                 local replacements = {}
                 local statusBlocksFound = 0
@@ -4060,7 +4060,7 @@ onOutput = async(function (triggerId)
                         local naiTagsFoundInBlock = 0
 
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndex = string.find(blockContent, "<NAI(%d+)>", naiSearchPosInContent)
+                            local s_nai_in_content, e_nai_in_content, naiIndex = string.find(blockContent, "<OM(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then break end
                             naiTagsFoundInBlock = naiTagsFoundInBlock + 1
                             naiIndex = tonumber(naiIndex)
@@ -4076,19 +4076,19 @@ onOutput = async(function (triggerId)
                                     table.insert(replacements, {
                                         start = nai_abs_start,
                                         finish = nai_abs_end,
-                                        inlay = "<NAI" .. naiIndex .. ">" .. cachedInlay
+                                        inlay = "<OM" .. naiIndex .. ">" .. cachedInlay
                                     })
                                 else
                                     -- 새 이미지 생성
                                     local promptPattern, negPromptPattern, promptType, identifier
                                     if isEroStatus then
-                                        promptPattern = "%[NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                        negPromptPattern = "%[NEG_NAISTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        promptPattern = "%[OMSTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        negPromptPattern = "%[NEG_OMSTATUSPROMPT" .. naiIndex .. ":([^%]]*)%]"
                                         promptType = "EROSTATUS"
                                         identifier = "EROSTATUS_" .. naiIndex
                                     else
-                                        promptPattern = "%[NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                        negPromptPattern = "%[NEG_NAISIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        promptPattern = "%[OMSIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                        negPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. naiIndex .. ":([^%]]*)%]"
                                         promptType = "SIMULCARD"
                                         identifier = trimmedBlockName
                                     end
@@ -4120,7 +4120,7 @@ onOutput = async(function (triggerId)
                                             table.insert(replacements, {
                                                 start = nai_abs_start,
                                                 finish = nai_abs_end,
-                                                inlay = "<NAI" .. naiIndex .. ">" .. inlay
+                                                inlay = "<OM" .. naiIndex .. ">" .. inlay
                                             })
 
                                             local info = {
@@ -4184,14 +4184,14 @@ onOutput = async(function (triggerId)
                         lineModifiedInThisPass = true
                     end
                 end
-            elseif NAICARD == "4" and not skipNAICARD then
+            elseif OMCARD == "4" and not skipOMCARD then
                 -- 인레이만 출력할 때
-                print("ONLINEMODULE: onOutput: NAICARD == 4 (Inlay only mode)")
+                print("ONLINEMODULE: onOutput: OMCARD == 4 (Inlay only mode)")
                 local searchPos = 1
                 local inlayReplacements = {}
                 local inlayBlocksFound = 0
                 
-                -- INLAY[<NAI(INDEX)>] 블록 검색
+                -- INLAY[<OM(INDEX)>] 블록 검색
                 while true do
                     local s_inlay, e_inlay = string.find(currentLine, "INLAY%[([^%]]*)%]", searchPos)
                     if not s_inlay then
@@ -4202,18 +4202,18 @@ onOutput = async(function (triggerId)
                     print("ONLINEMODULE: onOutput: Found INLAY block #" .. inlayBlocksFound .. " starting at index " .. s_inlay)
 
                     local inlayContent = string.sub(currentLine, s_inlay, e_inlay)
-                    local _, _, naiIndexStr = string.find(inlayContent, "<NAI(%d+)>")
+                    local _, _, naiIndexStr = string.find(inlayContent, "<OM(%d+)>")
                     local naiIndex = tonumber(naiIndexStr)
 
                     if naiIndex then
-                        print("ONLINEMODULE: onOutput: Found NAI index: " .. naiIndex)
-                        local promptPattern = "%[NAIINLAYPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                        local negPromptPattern = "%[NEG_NAIINLAYPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                        print("ONLINEMODULE: onOutput: Found OM index: " .. naiIndex)
+                        local promptPattern = "%[OMINLAYPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                        local negPromptPattern = "%[NEG_OMINLAYPROMPT" .. naiIndex .. ":([^%]]*)%]"
                         local _, _, foundInlayPrompt = string.find(currentLine, promptPattern)
                         local _, _, foundInlayNegPrompt = string.find(currentLine, negPromptPattern)
 
                         if foundInlayPrompt then
-                            print("ONLINEMODULE: onOutput: Found prompt for NAI" .. naiIndex .. ": [" .. string.sub(foundInlayPrompt, 1, 50) .. "...]")
+                            print("ONLINEMODULE: onOutput: Found prompt for OM" .. naiIndex .. ": [" .. string.sub(foundInlayPrompt, 1, 50) .. "...]")
                             local currentNegativePromptInlay = negativePrompt
                             local storedNegInlayPrompt = ""
                             if foundInlayNegPrompt then 
@@ -4229,8 +4229,8 @@ onOutput = async(function (triggerId)
                                not string.find(inlayImage, "error", 1, true) and 
                                not string.find(inlayImage, "실패", 1, true) then
                                 
-                                -- 기존 INLAY[<NAI>] 블록을 새로운 inlay로 교체
-                                local replacement = "INLAY[<NAI" .. naiIndex .. ">" .. inlayImage .. "]"
+                                -- 기존 INLAY[<OM>] 블록을 새로운 inlay로 교체
+                                local replacement = "INLAY[<OM" .. naiIndex .. ">" .. inlayImage .. "]"
                                 
                                 table.insert(inlayReplacements, {
                                     start = s_inlay,
@@ -4265,7 +4265,7 @@ onOutput = async(function (triggerId)
                         end
                     else
                         ERR(triggerId, "INLAY", 3)
-                        print("ONLINEMODULE: onOutput: No NAI index found in INLAY block #" .. inlayBlocksFound)
+                        print("ONLINEMODULE: onOutput: No OM index found in INLAY block #" .. inlayBlocksFound)
                     end
                     
                     searchPos = e_inlay + 1
@@ -4282,13 +4282,13 @@ onOutput = async(function (triggerId)
                 end
             end
 
-            if NAISNS == "1" and not skipNAISNS then
+            if OMSNS == "1" and not skipOMSNS then
                 -- 트위터 블록 처리
-                print("ONLINEMODULE: onOutput: NAISNS == 1")
+                print("ONLINEMODULE: onOutput: OMSNS == 1")
                 print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
                 
-                local twitterPromptFindPattern = "%[NAITWITTERPROMPT:([^%]]*)%]"
-                local twitterNegPromptFindPattern = "%[NEG_NAITWITTERPROMPT:([^%]]*)%]"
+                local twitterPromptFindPattern = "%[OMTWITTERPROMPT:([^%]]*)%]"
+                local twitterNegPromptFindPattern = "%[NEG_OMTWITTERPROMPT:([^%]]*)%]"
                 local twitterPattern = "(TWITTER)%[NAME:([^|]*)|TNAME:([^|]*)|TID:([^|]*)|TPROFILE:([^|]*)|TWEET:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|VIEW:([^|]*)|REPLY:([^|]*)|RETWEET:([^|]*)|LIKES:([^|]*)|COMMENT:(.-)%]"
                 
                 print("ONLINEMODULE: onOutput: Looking for Twitter pattern...")
@@ -4311,8 +4311,8 @@ onOutput = async(function (triggerId)
 
                     if existingProfileInlay == "null" or not existingProfileInlay then
                         print("ONLINEMODULE: onOutput: Need to generate new profile image")
-                        local profilePromptFindPattern = "%[NAITWITTERPROFILEPROMPT:([^%]]*)%]"
-                        local profileNegPromptFindPattern = "%[NEG_NAITWITTERPROFILEPROMPT:([^%]]*)%]"
+                        local profilePromptFindPattern = "%[OMTWITTERPROFILEPROMPT:([^%]]*)%]"
+                        local profileNegPromptFindPattern = "%[NEG_OMTWITTERPROFILEPROMPT:([^%]]*)%]"
                         
                         local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
                         local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
@@ -4343,7 +4343,7 @@ onOutput = async(function (triggerId)
                                 print("ONLINEMODULE: onOutput: Profile image generation successful")
                                 profileInlayToUse = inlayProfile
                                 setState(triggerId, twitterId, profileInlayToUse)
-                                setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                                setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
                                 setState(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
                                 setState(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
 
@@ -4364,7 +4364,7 @@ onOutput = async(function (triggerId)
                     else
                         print("ONLINEMODULE: onOutput: Using existing profile inlay")
                         profileInlayToUse = existingProfileInlay
-                        setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                        setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
                     end
                 end
 
@@ -4399,7 +4399,7 @@ onOutput = async(function (triggerId)
                             "|TID:" .. (twTid or "") .. 
                             "|TPROFILE:" .. (profileInlayToUse or twTprofile or "") .. 
                             "|TWEET:" .. (twTweet or "") .. 
-                            "|MEDIA:" .. "<NAI>" .. inlayTwitter ..
+                            "|MEDIA:" .. "<OM>" .. inlayTwitter ..
                             "|HASH:" .. (twHash or "") .. 
                             "|TIME:" .. (twTime or "") .. 
                             "|VIEW:" .. (twView or "") .. 
@@ -4430,7 +4430,7 @@ onOutput = async(function (triggerId)
                         local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. 
                             "|TNAME:" .. (twTname or "") .. 
                             "|TID:" .. (twTid or "") .. 
-                            "|TPROFILE:" .. "<NAI>" .. profileInlayToUse ..
+                            "|TPROFILE:" .. "<OM>" .. profileInlayToUse ..
                             "|TWEET:" .. (twTweet or "") .. 
                             "|MEDIA:" .. (twMedia or "") .. 
                             "|HASH:" .. (twHash or "") .. 
@@ -4448,7 +4448,7 @@ onOutput = async(function (triggerId)
                     local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. 
                         "|TNAME:" .. (twTname or "") .. 
                         "|TID:" .. (twTid or "") .. 
-                        "|TPROFILE:" .. "<NAI>" .. profileInlayToUse ..
+                        "|TPROFILE:" .. "<OM>" .. profileInlayToUse ..
                         "|TWEET:" .. (twTweet or "") .. 
                         "|MEDIA:" .. (twMedia or "") .. 
                         "|HASH:" .. (twHash or "") .. 
@@ -4463,13 +4463,13 @@ onOutput = async(function (triggerId)
                 end
             end
 
-            if NAISNS == "2" and not skipNAISNS then
+            if OMSNS == "2" and not skipOMSNS then
                 -- 인스타그램 블록 처리
-                print("ONLINEMODULE: onOutput: NAISNS == 2")
+                print("ONLINEMODULE: onOutput: OMSNS == 2")
                 print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
                 
-                local instaPromptFindPattern = "%[NAIINSTAPROMPT:([^%]]*)%]"
-                local instaNegPromptFindPattern = "%[NEG_NAIINSTAPROMPT:([^%]]*)%]"
+                local instaPromptFindPattern = "%[OMINSTAPROMPT:([^%]]*)%]"
+                local instaNegPromptFindPattern = "%[NEG_OMINSTAPROMPT:([^%]]*)%]"
                 local instaPattern = "(INSTA)%[NAME:([^|]*)|IID:([^|]*)|IPROFILE:([^|]*)|POST:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|LIKES:([^|]*)|REPLY:([^|]*)|SHARE:([^%]]*)%]"
                 
                 print("ONLINEMODULE: onOutput: Looking for Instagram pattern...")
@@ -4492,8 +4492,8 @@ onOutput = async(function (triggerId)
 
                     if existingProfileInlay == "null" or not existingProfileInlay then
                         print("ONLINEMODULE: onOutput: Need to generate new profile image")
-                        local profilePromptFindPattern = "%[NAIINSTAPROFILEPROMPT:([^%]]*)%]"
-                        local profileNegPromptFindPattern = "%[NEG_NAIINSTAPROFILEPROMPT:([^%]]*)%]"
+                        local profilePromptFindPattern = "%[OMINSTAPROFILEPROMPT:([^%]]*)%]"
+                        local profileNegPromptFindPattern = "%[NEG_OMINSTAPROFILEPROMPT:([^%]]*)%]"
                         
                         local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
                         local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
@@ -4524,7 +4524,7 @@ onOutput = async(function (triggerId)
                                 print("ONLINEMODULE: onOutput: Profile image generation successful")
                                 profileInlayToUse = inlayProfile
                                 setState(triggerId, instaId, profileInlayToUse)
-                                setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                                setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
                                 setState(triggerId, instaId .. "_INSTAPROFILEPROMPT", foundProfilePrompt)
                                 setState(triggerId, instaId .. "_NEGINSTAPROFILEPROMPT", storedNegProfilePrompt)
 
@@ -4545,7 +4545,7 @@ onOutput = async(function (triggerId)
                     else
                         print("ONLINEMODULE: onOutput: Using existing profile inlay")
                         profileInlayToUse = existingProfileInlay
-                        setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                        setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
                     end
                 end
 
@@ -4579,7 +4579,7 @@ onOutput = async(function (triggerId)
                             "|IID:" .. (instaIid or "") .. 
                             "|IPROFILE:" .. (profileInlayToUse or instaIprofile or "") .. 
                             "|POST:" .. (instaPost or "") .. 
-                            "|MEDIA:" .. "<NAI>" .. inlayInsta ..
+                            "|MEDIA:" .. "<OM>" .. inlayInsta ..
                             "|HASH:" .. (instaHash or "") .. 
                             "|TIME:" .. (instaTime or "") .. 
                             "|LIKES:" .. (instaLikes or "") .. 
@@ -4607,7 +4607,7 @@ onOutput = async(function (triggerId)
                         print("ONLINEMODULE: onOutput: Using profile-only replacement")
                         local originalBlockReplacement = "INSTA[NAME:" .. (instaName or "") .. 
                             "|IID:" .. (instaIid or "") .. 
-                            "|IPROFILE:" .. "<NAI>" .. profileInlayToUse ..
+                            "|IPROFILE:" .. "<OM>" .. profileInlayToUse ..
                             "|POST:" .. (instaPost or "") .. 
                             "|MEDIA:" .. (instaMedia or "") .. 
                             "|HASH:" .. (instaHash or "") .. 
@@ -4622,7 +4622,7 @@ onOutput = async(function (triggerId)
                     print("ONLINEMODULE: onOutput: Using profile-only replacement (no post prompt)")
                     local originalBlockReplacement = "INSTA[NAME:" .. (instaName or "") .. 
                         "|IID:" .. (instaIid or "") .. 
-                        "|IPROFILE:" .. "<NAI>" .. profileInlayToUse ..
+                        "|IPROFILE:" .. "<OM>" .. profileInlayToUse ..
                         "|POST:" .. (instaPost or "") .. 
                         "|MEDIA:" .. (instaMedia or "") .. 
                         "|HASH:" .. (instaHash or "") .. 
@@ -4635,14 +4635,14 @@ onOutput = async(function (triggerId)
                 end
             end
 
-            if NAISNS == "3" and not skipNAISNS then
+            if OMSNS == "3" and not skipOMSNS then
                 -- 하이브리드 모드 블록 처리
-                print("ONLINEMODULE: onOutput: NAISNS == 3 (Hybrid mode)")
+                print("ONLINEMODULE: onOutput: OMSNS == 3 (Hybrid mode)")
                 print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
 
                 -- 트위터 블록부터
-                local twitterPromptFindPattern = "%[NAITWITTERPROMPT:([^%]]*)%]"
-                local twitterNegPromptFindPattern = "%[NEG_NAITWITTERPROMPT:([^%]]*)%]"
+                local twitterPromptFindPattern = "%[OMTWITTERPROMPT:([^%]]*)%]"
+                local twitterNegPromptFindPattern = "%[NEG_OMTWITTERPROMPT:([^%]]*)%]"
                 local twitterPattern = "(TWITTER)%[NAME:([^|]*)|TNAME:([^|]*)|TID:([^|]*)|TPROFILE:([^|]*)|TWEET:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|VIEW:([^|]*)|REPLY:([^|]*)|RETWEET:([^|]*)|LIKES:([^|]*)|COMMENT:(.-)%]"
 
                 local _, _, foundTwitterPrompt = string.find(currentLine, twitterPromptFindPattern)
@@ -4655,8 +4655,8 @@ onOutput = async(function (triggerId)
                     if twitterId then
                         local existingProfileInlay = getState(triggerId, twitterId) or "null" 
                         if existingProfileInlay == "null" or not existingProfileInlay then
-                            local profilePromptFindPattern = "%[NAITWITTERPROFILEPROMPT:([^%]]*)%]"
-                            local profileNegPromptFindPattern = "%[NEG_NAITWITTERPROFILEPROMPT:([^%]]*)%]"
+                            local profilePromptFindPattern = "%[OMTWITTERPROFILEPROMPT:([^%]]*)%]"
+                            local profileNegPromptFindPattern = "%[NEG_OMTWITTERPROFILEPROMPT:([^%]]*)%]"
                             local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
                             local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
 
@@ -4679,7 +4679,7 @@ onOutput = async(function (triggerId)
                                     
                                     profileInlayToUse = inlayProfile
                                     setState(triggerId, twitterId, profileInlayToUse)
-                                    setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                                    setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
                                     setState(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
                                     setState(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
 
@@ -4697,7 +4697,7 @@ onOutput = async(function (triggerId)
                             end
                         else
                             profileInlayToUse = existingProfileInlay
-                            setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                            setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
                         end
                     end
 
@@ -4723,8 +4723,8 @@ onOutput = async(function (triggerId)
                             local replacementTwitter = string.format(
                                 "TWITTER[NAME:%s|TNAME:%s|TID:%s|TPROFILE:%s|TWEET:%s|MEDIA:%s|HASH:%s|TIME:%s|VIEW:%s|REPLY:%s|RETWEET:%s|LIKES:%s|COMMENT:%s]",
                                 twName or "", twTname or "", twTid or "",
-                                profileInlayToUse and "<NAI>" .. profileInlayToUse or (twTprofile or ""),
-                                twTweet or "", "<NAI>" .. inlayTwitter,
+                                profileInlayToUse and "<OM>" .. profileInlayToUse or (twTprofile or ""),
+                                twTweet or "", "<OM>" .. inlayTwitter,
                                 twHash or "", twTime or "", twView or "",
                                 twReply or "", twRetweet or "", twLikes or "",
                                 twCommentBlock or ""
@@ -4749,7 +4749,7 @@ onOutput = async(function (triggerId)
                         local replacementTwitter = string.format(
                             "TWITTER[NAME:%s|TNAME:%s|TID:%s|TPROFILE:%s|TWEET:%s|MEDIA:%s|HASH:%s|TIME:%s|VIEW:%s|REPLY:%s|RETWEET:%s|LIKES:%s|COMMENT:%s]",
                             twName or "", twTname or "", twTid or "",
-                            "<NAI>" .. profileInlayToUse,
+                            "<OM>" .. profileInlayToUse,
                             twTweet or "", twMedia or "",
                             twHash or "", twTime or "", twView or "",
                             twReply or "", twRetweet or "", twLikes or "",
@@ -4761,8 +4761,8 @@ onOutput = async(function (triggerId)
                 end
 
                 -- 그 다음은 인스타
-                local instaPromptFindPattern = "%[NAIINSTAPROMPT:([^%]]*)%]"
-                local instaNegPromptFindPattern = "%[NEG_NAIINSTAPROMPT:([^%]]*)%]"
+                local instaPromptFindPattern = "%[OMINSTAPROMPT:([^%]]*)%]"
+                local instaNegPromptFindPattern = "%[NEG_OMINSTAPROMPT:([^%]]*)%]"
                 local instaPattern = "(INSTA)%[NAME:([^|]*)|IID:([^|]*)|IPROFILE:([^|]*)|POST:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|LIKES:([^|]*)|REPLY:([^|]*)|SHARE:([^%]]*)%]"
 
                 local _, _, foundInstaPrompt = string.find(currentLine, instaPromptFindPattern)
@@ -4778,8 +4778,8 @@ onOutput = async(function (triggerId)
                     if instaId then
                         local existingProfileInlay = getState(triggerId, instaId) or "null"
                         if existingProfileInlay == "null" or not existingProfileInlay then
-                            local profilePromptFindPattern = "%[NAIINSTAPROFILEPROMPT:([^%]]*)%]"
-                            local profileNegPromptFindPattern = "%[NEG_NAIINSTAPROFILEPROMPT:([^%]]*)%]"
+                            local profilePromptFindPattern = "%[OMINSTAPROFILEPROMPT:([^%]]*)%]"
+                            local profileNegPromptFindPattern = "%[NEG_OMINSTAPROFILEPROMPT:([^%]]*)%]"
                             local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
                             local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
 
@@ -4801,7 +4801,7 @@ onOutput = async(function (triggerId)
                                     
                                     profileInlayToUse = inlayProfile
                                     setState(triggerId, instaId, profileInlayToUse)
-                                    setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                                    setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
                                     setState(triggerId, instaId .. "_INSTAPROFILEPROMPT", foundProfilePrompt)
                                     setState(triggerId, instaId .. "_NEGINSTAPROFILEPROMPT", storedNegProfilePrompt)
 
@@ -4819,7 +4819,7 @@ onOutput = async(function (triggerId)
                             end
                         else
                             profileInlayToUse = existingProfileInlay
-                            setState(triggerId, "NAISNSPROFILETEMP", profileInlayToUse)
+                            setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
                         end
                     end
 
@@ -4842,8 +4842,8 @@ onOutput = async(function (triggerId)
                         local replacementInsta = string.format(
                             "INSTA[NAME:%s|IID:%s|IPROFILE:%s|POST:%s|MEDIA:%s|HASH:%s|TIME:%s|LIKES:%s|REPLY:%s|SHARE:%s]",
                             instaName or "", instaIid or "",
-                            profileInlayToUse and "<NAI>" .. profileInlayToUse or (instaIprofile or ""),
-                            instaPost or "", "<NAI>" .. inlayInsta,
+                            profileInlayToUse and "<OM>" .. profileInlayToUse or (instaIprofile or ""),
+                            instaPost or "", "<OM>" .. inlayInsta,
                             instaHash or "", instaTime or "",
                             instaLikes or "", instaReply or "", instaShare or ""
                         )
@@ -4866,7 +4866,7 @@ onOutput = async(function (triggerId)
                         local replacementInsta = string.format(
                             "INSTA[NAME:%s|IID:%s|IPROFILE:%s|POST:%s|MEDIA:%s|HASH:%s|TIME:%s|LIKES:%s|REPLY:%s|SHARE:%s]",
                             instaName or "", instaIid or "",
-                            "<NAI>" .. profileInlayToUse,
+                            "<OM>" .. profileInlayToUse,
                             instaPost or "", instaMedia or "",
                             instaHash or "", instaTime or "",
                             instaLikes or "", instaReply or "", instaShare or ""
@@ -4877,8 +4877,8 @@ onOutput = async(function (triggerId)
                 end
             end
 
-            if NAICOMMUNITY == "1" and not skipNAICOMMUNITY then
-                print("ONLINEMODULE: onOutput: NAICOMMUNITY == 1")
+            if OMCOMMUNITY == "1" and not skipOMCOMMUNITY then
+                print("ONLINEMODULE: onOutput: OMCOMMUNITY == 1")
                 local searchPos = 1
                 local dcReplacements = {}
 
@@ -4916,7 +4916,7 @@ onOutput = async(function (triggerId)
                         local dcContent = string.sub(currentLine, e_dc_prefix + 1, e_dc_suffix - 1)
                         local naiSearchPosInContent = 1
                         while true do
-                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(dcContent, "<NAI(%d+)>", naiSearchPosInContent)
+                            local s_nai_in_content, e_nai_in_content, naiIndexStr = string.find(dcContent, "<OM(%d+)>", naiSearchPosInContent)
                             if not s_nai_in_content then break end
                             local naiIndex = tonumber(naiIndexStr)
 
@@ -4937,8 +4937,8 @@ onOutput = async(function (triggerId)
                             end
 
                             if naiIndex and postId then
-                                local dcPromptPattern = "%[NAIDCPROMPT" .. naiIndex .. ":([^%]]*)%]"
-                                local negDcPromptPattern = "%[NEG_NAIDCPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                local dcPromptPattern = "%[OMDCPROMPT" .. naiIndex .. ":([^%]]*)%]"
+                                local negDcPromptPattern = "%[NEG_OMDCPROMPT" .. naiIndex .. ":([^%]]*)%]"
                                 local _, _, foundDcPrompt = string.find(currentLine, dcPromptPattern)
                                 local _, _, foundNegDcPrompt = string.find(currentLine, negDcPromptPattern)
                                 local currentNegativePromptDc = negativePrompt
@@ -4954,7 +4954,7 @@ onOutput = async(function (triggerId)
                                         table.insert(dcReplacements, {
                                             start = nai_abs_start,
                                             finish = nai_abs_end,
-                                            inlay = "<NAI" .. naiIndex .. ">" .. inlayDc
+                                            inlay = "<OM" .. naiIndex .. ">" .. inlayDc
                                         })
 
                                         local infoDC = {
@@ -4988,11 +4988,11 @@ onOutput = async(function (triggerId)
                                     end
                                 else
                                     ERR(triggerId, "DCINSIDE", 0)
-                                    print("ONLINEMODULE: onOutput: WARN - Found <NAI...> tag but no corresponding prompt tag...")
+                                    print("ONLINEMODULE: onOutput: WARN - Found <OM...> tag but no corresponding prompt tag...")
                                 end
                             else
                                 ERR(triggerId, "DCINSIDE", 3)
-                                if not postId then print("ONLINEMODULE: onOutput: WARN - Could not determine Post ID for <NAI" .. (naiIndex or "??") .. "> tag at position " .. nai_abs_start .. ". Skipping.") end
+                                if not postId then print("ONLINEMODULE: onOutput: WARN - Could not determine Post ID for <OM" .. (naiIndex or "??") .. "> tag at position " .. nai_abs_start .. ". Skipping.") end
                             end
                             naiSearchPosInContent = e_nai_in_content + 1
                         end
@@ -5014,14 +5014,14 @@ onOutput = async(function (triggerId)
                 end
             end
             
-            if NAIMESSENGER == "1" and not skipNAIMESSENGER then
-                print("ONLINEMODULE: onOutput: NAIMESSENGER == 1 (KAKAO) processing...")
-                local kakaoPromptFindPattern = "%[NAIKAKAOPROMPT:([^%]]*)%]"
-                local kakaoNegPromptFindPattern = "%[NEG_NAIKAKAOPROMPT:([^%]]*)%]"
-                local kakaoPattern = "(KAKAO)%[(<NAI>)%|([^%]]*)%]"
+            if OMMESSENGER == "1" and not skipOMMESSENGER then
+                print("ONLINEMODULE: onOutput: OMMESSENGER == 1 (KAKAO) processing...")
+                local kakaoPromptFindPattern = "%[OMKAKAOPROMPT:([^%]]*)%]"
+                local kakaoNegPromptFindPattern = "%[NEG_OMKAKAOPROMPT:([^%]]*)%]"
+                local kakaoPattern = "(KAKAO)%[(<OM>)%|([^%]]*)%]"
                 local _, _, foundKakaoPrompt = string.find(currentLine, kakaoPromptFindPattern)
                 local s_kakao, e_kakao, cap1, cap2, cap3 = string.find(currentLine, kakaoPattern)
-                print("Found Prefix: " .. cap1 .. " Found NAI Value: " .. cap2 .. " Found Suffix: " .. cap3)
+                print("Found Prefix: " .. cap1 .. " Found OM Value: " .. cap2 .. " Found Suffix: " .. cap3)
        
                 if foundKakaoPrompt and s_kakao then
                     print("ONLINEMODULE: onOutput: Found KAKAO block and prompt. Generating image...")
@@ -5153,34 +5153,34 @@ onButtonClick = async(function(triggerId, data)
         return
     end
 
-    local NAIPRESETPROMPT = getGlobalVar(triggerId, "toggle_NAIPRESETPROMPT")
+    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT")
 
     local artistPrompt, qualityPrompt, negativePrompt = nil, nil, nil
-	if NAIPRESETPROMPT == "0" then
-        artistPrompt = getGlobalVar(triggerId, "toggle_NAIARTISTPROMPT")
-        qualityPrompt = getGlobalVar(triggerId, "toggle_NAIQUALITYPROMPT")
-        negativePrompt = getGlobalVar(triggerId, "toggle_NAINEGPROMPT")
-    elseif NAIPRESETPROMPT == "1" then
+	if OMPRESETPROMPT == "0" then
+        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT")
+        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT")
+        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT")
+    elseif OMPRESETPROMPT == "1" then
 		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
 		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
-	elseif NAIPRESETPROMPT == "2" then
+	elseif OMPRESETPROMPT == "2" then
 		artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}"
 		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-	elseif NAIPRESETPROMPT == "3" then
+	elseif OMPRESETPROMPT == "3" then
 		artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}"
 		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "4" then
+    elseif OMPRESETPROMPT == "4" then
         artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif NAIPRESETPROMPT == "5" then
+    elseif OMPRESETPROMPT == "5" then
         artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
-    elseif NAIPRESETPROMPT == "6" then
+    elseif OMPRESETPROMPT == "6" then
         artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
         qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
         negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
