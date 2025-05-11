@@ -351,16 +351,18 @@ local function inputEroStatus(triggerId, data)
             - English: 0.5 LETTER.
             - Blank space: 0.5 LETTER.
         - NO () BRACKET ALLOWED.
-        - Headwear, Top, Bra, Breasts, Bottoms, Panties, Pussy, Legs, Foot:
-                - If present, briefly output the color and features in parentheses. (e.g., Frayed Dark Brotherhood Hood, Left breast exposed Old Rags, Pussy visible Torn Black Pantyhose, etc.
-                    - Avoid dirty descriptions (e.g., Smelly Rags OR Filthy Barefoot, etc).
-                    - Enhance sexual descriptions (e.g., White hair, Semen matted in clumps)).
-                - Breasts: size, shape, Color and size of the nipple and areola.
-                - Pussy: degree of opening, shape of pussy hair.
-                - Outfits: Parts (chests, vagina, bras, panties, etc.), which are currently covered and invisible (by clothes or blankets, etc.), are printed as follows "Not visible". However, if the clothes are wet, torn, or have their buttons undone, the inside of the clothes may be visible. Usually, when wearing an outer garment, the bra is not visible.
-                    - Usually, when wearing a skirt or pants, the panties are not visible.
-                    - Usually, when wearing panties or something similar, the vaginal is not visible.
-                    - Usually, when wearing a top, bra, or dress, the breasts are not visible.
+        - Type:
+            - Headwear: Hair, Hair color, Hair style.
+            - Top: Top, Color, Style.
+            - Bra: Bra, Color, Style.
+            - Breasts: Breasts, Size, Color and size of the nipple and areola.
+            - Bottom: Bottom, Color, Style.
+            - Panties: Panties, Color, Style.
+            - Pussy: Pussy, Degree of opening, Shape of pussy hair.
+            - Legs: Legs, Color, Style.
+            - Feet: Feet, Color, Style.
+                
+
     - INLAY: This is a Flag.  
 ]]
 
@@ -1134,6 +1136,8 @@ local function inputTwitter(triggerId, data)
     - TWEET: Content of the Tweet.
         - MUST INLUDE the character's NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Print '<OM>' Exactly.
 ]]
@@ -1144,6 +1148,8 @@ local function inputTwitter(triggerId, data)
     - TWEET: Content of the Tweet.
         - MUST INCLUDE the {{user}}'s NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Describe the situation of the twitter post.
 ]]
@@ -1153,6 +1159,8 @@ local function inputTwitter(triggerId, data)
     - TWEET: Content of the Tweet.
         - MUST INCLUDE the {{char}}'s NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Describe the situation of the twitter post.
 ]]           
@@ -1163,6 +1171,7 @@ local function inputTwitter(triggerId, data)
     - HASH: The hashtags of the tweet.	
         - Each tag MUST BE wrapped in → and ←.
         - If post includes NSFW content, first tag is '섹트'.
+            - No #HASHTAGS ALLOWED AT HERE.
         - Final value example: →섹트←→BitchDog←→PublicToilet←.
     - TIME: The date and time the tweet was posted.
         - Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
@@ -1579,6 +1588,8 @@ local function inputInsta(triggerId, data)
     - POST: Content of the Post.
         - MUST INCLUDE the character's SFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Print '<OM>' Exactly.
 ]]
@@ -1589,6 +1600,8 @@ local function inputInsta(triggerId, data)
     - POST: Content of the Post.
         - MUST INCLUDE the {{user}}'s SFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Describe the situation of the instagram post.
 ]]
@@ -1598,6 +1611,8 @@ local function inputInsta(triggerId, data)
     - POST: Content of the Post.
         - MUST INCLUDE the {{char}}'s SFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Describe the situation of the instagram post.
 ]]           
@@ -1899,6 +1914,8 @@ local function inputSNSHybrid(triggerId, data)
     - TWEET: Content of the Tweet.
         - MUST INLUDE the character's NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Print '<OM>' Exactly.
 ]]
@@ -1909,6 +1926,8 @@ local function inputSNSHybrid(triggerId, data)
     - TWEET: Content of the Tweet.
         - MUST INCLUDE the {{user}}'s NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Describe the situation of the twitter post.
 ]]
@@ -1918,6 +1937,8 @@ local function inputSNSHybrid(triggerId, data)
     - TWEET: Content of the Tweet.
         - MUST INCLUDE the {{char}}'s NSFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Describe the situation of the twitter post.
 ]]           
@@ -1928,6 +1949,7 @@ local function inputSNSHybrid(triggerId, data)
     - HASH: The hashtags of the tweet.	
         - Each tag MUST BE wrapped in → and ←.
         - If post includes NSFW content, first tag is '섹트'.
+            - No #HASHTAGS ALLOWED AT HERE.
         - Final value example: →섹트←→BitchDog←→PublicToilet←.
     - TIME: The date and time the tweet was posted.
         - Format: AM/PM hh:mm·YYYY. MM. DD (e.g., PM 12:58·2026. 03. 29)
@@ -2017,6 +2039,8 @@ local function inputSNSHybrid(triggerId, data)
     - POST: Content of the Post.
         - MUST INCLUDE the character's SFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Print '<OM>' Exactly.
 ]]
@@ -2027,6 +2051,8 @@ local function inputSNSHybrid(triggerId, data)
     - POST: Content of the Post.
         - MUST INCLUDE the {{user}}'s SFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Describe the situation of the instagram post.
 ]]
@@ -2036,6 +2062,8 @@ local function inputSNSHybrid(triggerId, data)
     - POST: Content of the Post.
         - MUST INCLUDE the {{char}}'s SFW POST.
         - NO #HASHTAGS ALLOWED AT HERE.
+            - Invalid: Hello! I'm Akari #Akari
+            - Valid: Hello! I'm Akari
     - MEDIA: Media of the post
         - Describe the situation of the instagram post.
 ]]           
@@ -2799,9 +2827,9 @@ local function inputImage(triggerId, data)
 		- (SITUATION):
 			- Normal situation: Do not print anything.
 			- NSFW SITUATION:
-				- Bodypart not exposed: Print '{{NSFW}}'
-				- Breasts or nipples exposed: Print '{{NSFW}}'
-				- Pussy exposed: Print '{{NSFW, Uncensored}}'
+				- Bodypart not exposed: Print do not print anything.
+				- Breasts or nipples exposed: Print '{NSFW,UNCENSORED}'
+				- Pussy exposed: Print '{{{NSFW,UNCENSORED}}}'
 		- (LABEL):
 			- ONLY 1 LETTERacter.
 			- Example:
@@ -2893,6 +2921,36 @@ local function inputImage(triggerId, data)
 ]]
     end
 
+    if OMCARD == "4" then
+        data = data .. [[
+### Image Prompt: Tags
+
+#### Image Prompt: Character Tag
+- Use the character sheet to set the physical attributes of the featured character in this scene.
+    - Character1: {{user}}
+    - Character2: Opponent character
+- Example:
+    - If the {{user}} is a male, and has a black short hairstyle, tall body, wearing a black suit:
+        - ::Character1: male, black short hair, tall, black suit::
+    - If the Opponent character is a female, and has long twin-tail hairstyle, slender body, small breasts:
+        - ::Character2: female, long twin-tail, slender, small breasts::
+
+### Image Prompt: Action Tag
+- (ACTION TAG) is used as source#, target#, and mutual#.
+    - source#: Used when specifying a character performing a particular action.
+    - target#: Used when specifying a character receiving a particular action.
+    - mutual#: Used when two characters are performing the same action.
+    - Example:
+        - If the Character is in a situation where they are being kissed by someone else:
+            - source#kissed,target#kissing,mutual#standing
+        - If the Character is in a situation where they are kissing someone else:
+            - source#kissing,target#kissed,mutual#standing
+        - If the Character is in a situation where they are kissing each other:
+            - source#kissing,target#kissing,mutual#mouth to mouth,standing
+]]
+    end
+
+
     data = data .. [[
 ### Image Prompt: Negative Template
 - Write up to 30 keywords that should be avoided by Image as a negative prompt.
@@ -2949,10 +3007,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT INLAY INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the INLAY INTERFACE
     - Output Format:
         - INLAY[...|INLAY:<OM1>]
-        - [OMINLAYPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [OMINLAYPROMPT1:(SITUATION),(LABEL),::Character1:{{user}}'s appearance::,::Character2:Opponent NPC1's appearance::,::(ACTION TAG)::,(PLACE),(SCENE)]
         - [NEG_OMINLAYPROMPT1:(NEGATIVE PROMPT)]
         - INLAY[...|INLAY:<OM2>]
-        - [OMINLAYPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [OMINLAYPROMPT2:(SITUATION),(LABEL),::Character1:{{user}}'s appearance::,::Character2:Opponent NPC2's appearance::,::(ACTION TAG)::,(PLACE),(SCENE)]
         - [NEG_OMINLAYPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
@@ -3027,7 +3085,7 @@ local function inputImage(triggerId, data)
         - Output Format:
             - INSTA[...|<OM>|...|<OM>|...]
             - [OMINSTAPROMPT:{{{CENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-            - [NEG_OMINSTAPROMPT:{{{NSFW, UNCENSORED}}},(NEGATIVE PROMPT)]
+            - [NEG_OMINSTAPROMPT:{{{NSFW,UNCENSORED}}},(NEGATIVE PROMPT)]
             - If Character does not have own profile image:
                 - [OMINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
                 - [NEG_OMINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
@@ -3093,12 +3151,13 @@ local function inputImage(triggerId, data)
     if OMNSFW == "0" then
         data = data .. [[
 - UNLESS STATED OTHERWISE, DO NOT USE NSFW SITUATION in the IMAGE PROMPT.
-    - THEN ADD {{{NSFW, UNCENSORED}}} in the NEGATIVE PROMPT.
+    - THEN PRINT {{{NSFW,UNCENSORED}}} in the NEGATIVE PROMPT.
 ]]
     elseif OMNSFW == "1" then
         data = data .. [[
 - ALWAYS USE NSFW SITUATION in the IMAGE PROMPT.
-    - ALWAYS ADD {{{CENSORED}}} in the NEGATIVE PROMPT.
+    - ALWAYS PRINT {{{NSFW,UNCENSORED}}} in the IMAGE PROMPT.
+    - ALWAYS PRINT {{{CENSORED}}} in the NEGATIVE PROMPT.
 ]]
     end
 
@@ -3592,25 +3651,13 @@ onOutput = async(function (triggerId)
 		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
 	elseif OMPRESETPROMPT == "2" then
-		artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}"
-		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-	elseif OMPRESETPROMPT == "3" then
-		artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}"
-		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif OMPRESETPROMPT == "4" then
         artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif OMPRESETPROMPT == "5" then
-        artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
-        qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-        negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
-    elseif OMPRESETPROMPT == "6" then
-        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
-        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
-        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
+    elseif OMPRESETPROMPT == "3" then
+        artistPrompt = "artist:rella, artist:ixy, artist:gomzi, artist:tsunako, artist:momoko (momopoco)"
+        qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
+        negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     end
     	
 	print("-----------------------ART PROMPT-----------------------")
@@ -5178,25 +5225,13 @@ onButtonClick = async(function(triggerId, data)
 		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
 		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
 	elseif OMPRESETPROMPT == "2" then
-		artistPrompt = "artist:mery (yangmalgage), artist:ikeuchi tanuma, artist:hiro (dismaless), {{{artist:ciloranko}}}, {{{{artist:kawakami rokkaku}}}}, artist:ohisashiburi, artist:freng, [[artist:bee (deadflow), artist:healthyman)]], {artist:baffu}, [[artist:deadnooodles]], [[artist:jyt]], {{{artist:yd (orange maru)}}}, [[92m, fkey, iuui]], [[[artist:ie (raarami), artist:mankai kaika, artist:toma (toma50)]]], {year 2025, year 2024}"
-		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-	elseif OMPRESETPROMPT == "3" then
-		artistPrompt = "0.7::artist:taesi::, 0.6::artist:shiratama (shiratamaco)::,0.8::artist:ningen mame::, 1.3::artist:tianliang duohe fangdongye::, 1.3::artist:shuz::, 0.8::artist:wlop::, 0.9::artist:kase daiki::, 0.6::artist:chobi (penguin paradise)::,{year 2025, year 2024}"
-		qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif OMPRESETPROMPT == "4" then
         artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif OMPRESETPROMPT == "5" then
-        artistPrompt = "{healthyman}, [[[as109]]], [[[quasarcake]]], [[[mikozin]]], [[kidmo]], chen bin, year 2024"
-        qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-        negativePrompt = "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts"
-    elseif OMPRESETPROMPT == "6" then
-        artistPrompt = "(artist:nakta, artist: m (m073111), artist: mamei mema, artist:ningen_mame, artist:ciloranko, artist:sho_(sho_lwlw), artist:tianliang duohe fangdongye)"
-        qualityPrompt = "volumetric lighting, very awa, very aesthetic, masterpiece, best quality, amazing quality, absurdres"
-        negativePrompt = "worst quality, blurry, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, ambiguous form, (censored, bar censor), mature female, colored skin, censored genitalia, censorship, unfinished, anthro, furry"
+    elseif OMPRESETPROMPT == "3" then
+        artistPrompt = "artist:rella, artist:ixy, artist:gomzi, artist:tsunako, artist:momoko (momopoco)"
+        qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
+        negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     end
 
     local foundSpecificPrompt = getState(triggerId, specificPromptKey) or "null"
