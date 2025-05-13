@@ -47,13 +47,36 @@ local function getKakaoTime(now)
     return formattedTime
 end
 
+local function getPrompt(currentLine, prompt)
+    print("ONLINEMODULE: getPrompt is in PROCESS!")
+
+    local wholePattern = string.format("(%%[%s:.-%%])", prompt)
+
+    print("ONLINEMODULE: Searching for pattern: " .. wholePattern)
+
+    -- 전체 문자열에서 [prompt:...] 패턴을 찾음
+    local wholeMatch = string.match(currentLine, wholePattern)
+    if not wholeMatch then
+        print("ONLINEMODULE: No match found for pattern: " .. wholePattern)
+        return nil
+    end
+
+    -- wholematch에서 : 뒷부분의 값을 찾음, 줄바꿈까지 전부 캐치, ]전까지.
+    local found = false
+    local foundPrompt = string.match(wholeMatch, ":([%s%S]+)%]")
+
+    print("ONLINEMODULE: Found match: " .. foundPrompt)
+
+    return foundPrompt
+end
+
 local function changeInlay(triggerId, index, oldInlay, newInlay)
-    print("changeInlay is in PROCESS!")
-    print("Attempting to replace ALL occurrences of: '" .. oldInlay .. "' with '" .. newInlay .. "' using specific pattern logic.")
+    print("ONLINEMODULE: changeInlay is in PROCESS!")
+    print("ONLINEMODULE: Attempting to replace ALL occurrences of: '" .. oldInlay .. "' with '" .. newInlay .. "' using specific pattern logic.")
 
     local chatFullHistory = getFullChat()
     if not chatFullHistory or not chatFullHistory[index] then
-        print("Error: Chat history or message at index " .. tostring(index) .. " not found.")
+        print("ONLINEMODULE: Error: Chat history or message at index " .. tostring(index) .. " not found.")
         return
     end
 
@@ -73,7 +96,7 @@ local function changeInlay(triggerId, index, oldInlay, newInlay)
         if s_match then
             local blockContent = string.sub(lineToModify, s_match, e_match)
             
-            print("Found block: '" .. blockContent .. "' at current position " .. s_match .. "-" .. e_match .. " in (potentially modified) line.")
+            print("ONLINEMODULE: Found block: '" .. blockContent .. "' at current position " .. s_match .. "-" .. e_match .. " in (potentially modified) line.")
 
             if blockContent == oldInlay then
                 print("ONLINEMODULE: Found block content matches oldInlay. Replacing.")
@@ -88,23 +111,23 @@ local function changeInlay(triggerId, index, oldInlay, newInlay)
 
                 searchStartIndex = string.len(prefix) + string.len(newInlay) + 1
                 
-                print("Line modified. Next search starts at: " .. searchStartIndex)
+                print("ONLINEMODULE: Line modified. Next search starts at: " .. searchStartIndex)
 
             else
-                print("Block content '" .. blockContent .. "' does not match oldInlay '" .. oldInlay .. "'. Skipping.")
+                print("ONLINEMODULE: Block content '" .. blockContent .. "' does not match oldInlay '" .. oldInlay .. "'. Skipping.")
                 searchStartIndex = e_match + 1 
             end
         else
-            print("No more blocks found matching pattern in the rest of the line.")
+            print("ONLINEMODULE: No more blocks found matching pattern in the rest of the line.")
             break
         end
         
         if searchStartIndex > string.len(lineToModify) then
-            print("Search start index is beyond line length. Ending search.")
+            print("ONLINEMODULE: Search start index is beyond line length. Ending search.")
             break
         end
         if not replacementMade and s_match and searchStartIndex <= e_match then
-             print("WARN: Potential stall in loop, advancing search index past current match.")
+             print("ONLINEMODULE: WARN: Potential stall in loop, advancing search index past current match.")
              searchStartIndex = e_match + 1
         end
         replacementMade = false 
@@ -124,7 +147,7 @@ local function changeInlay(triggerId, index, oldInlay, newInlay)
 end
 
 local function convertDialogue(triggerId, data)
-    print("convertDialogue is in PROCESS!")
+    print("ONLINEMODULE: convertDialogue is in PROCESS!")
     local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
     local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
 
@@ -653,7 +676,7 @@ opacity: 0;
         table.insert(html, "<div id=\"outfit-list-content\">" .. outfitsText .. "</div>")
         
         -- 리롤 버튼 추가 - 추출한 INDEX 값 기반으로 identifier 설정
-        local buttonJson = '{"action":"EROSTATUS_REROLL", "identifier":"' .. (("EROSTATUS_" .. inlayIndex) or "") .. '"}'
+        local buttonJson = '{"action":"EROSTATUS_REROLL", "identifier":"' .. (("EROSTATUS_" .. inlayIndex) or "") .. '," "index":"' .. inlayIndex ..'"}'
 
         table.insert(html, "<div class=\"reroll-button-wrapper\">")
         table.insert(html, "<div class=\"global-reroll-controls\">")
@@ -753,6 +776,9 @@ body { background-color: #f0f0f0;padding: 20px;}
 ]] 
 
         
+        -- INLAY 에서 <OM(INDEX)> 를 찾아서 INDEX 번호만 추출
+        local inlayIndex = string.match(inlayContent, "<OM(%d+)>")
+
         local html = {}
         table.insert(html, SimulBotTemplate)
         table.insert(html, "<div class=\"status-card\">")
@@ -783,7 +809,7 @@ body { background-color: #f0f0f0;padding: 20px;}
         table.insert(html, "</div>")
 
         -- 리롤 버튼 추가 - 추출한 name 값 기반으로 identifier 설정
-        local buttonJson = '{"action":"SIMCARD_REROLL", "identifier":"' .. (name or "") .. '"}'
+        local buttonJson = '{"action":"SIMCARD_REROLL", "identifier":"' .. (name or "") .. '", "index":"' .. inlayIndex .. '"}'
         
         table.insert(html, "<div class=\"reroll-button-wrapper\">")
         table.insert(html, "<div class=\"global-reroll-controls\">")
@@ -1067,7 +1093,7 @@ local function changeInlayOnly(triggerId, data)
         table.insert(html, "</div>")
 
         -- 리롤 버튼 추가 - 추출한 inlayIndex 값 기반으로 identifier 설정
-        local buttonJson = '{"action":"INLAY_REROLL", "identifier":"' .. "INLAY_" .. (inlayIndex or "") .. '"}'
+        local buttonJson = '{"action":"INLAY_REROLL", "identifier":"' .. "INLAY_" .. (inlayIndex or "") .. '", "index":"' .. inlayIndex .. '"}'
 
         table.insert(html, "<div class=\"reroll-button-wrapper\">")
         table.insert(html, "<div class=\"global-reroll-controls\">")
@@ -2534,12 +2560,15 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     local last_end = 1
                     rawPostContent = string.gsub(rawPostContent, "<!%-%-.-%-%->", "")
                     local om_pattern = "(<OM%d+>)"
+                    local inlayIndex = nil
 
                     while true do
                         local omStart, omEnd, omTag = string.find(rawPostContent, om_pattern, last_end)
                         if not omStart then
                             break
                         end
+
+                        inlayIndex = string.match(omTag, "<OM(%d+)>")
 
                         local text_part = string.sub(rawPostContent, last_end, omStart - 1)
                         local processed_text = escapeHtml(text_part)
@@ -2630,7 +2659,7 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                         end
                         table.insert(html, "    </ul>")
 
-                        local buttonJsonBody = '{"action":"DC_REROLL", "identifier":"' .. (postId or "") .. '"}'
+                        local buttonJsonBody = '{"action":"DC_REROLL", "identifier":"' .. (postId or "") .. '," "index":"' .. inlayIndex .. '"}'
                         table.insert(html, "<div class=\"reroll-button-wrapper\">")
                         table.insert(html, "<div class=\"global-reroll-controls\">")
                         table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJsonBody .. "'>POST</button>")
@@ -3622,6 +3651,406 @@ function onInput(triggerId)
 end
 
 
+local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
+    print("ONLINEMODULE: changeKeyValue is in PROCESS! Processing line.")
+    print("ONLINEMODULE: Using startPrefix: " .. startPrefix)
+
+    local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT") or "0"
+    local artistPrompt = ""
+    local qualityPrompt = ""
+    local negativePrompt = ""
+    local OMCACHE = getGlobalVar(triggerId, "toggle_OMCACHE") or "0"
+
+    if OMPRESETPROMPT == "0" then
+        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT") or ""
+        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or ""
+        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or ""
+    elseif OMPRESETPROMPT == "1" then
+        artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
+        qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
+        negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
+    elseif OMPRESETPROMPT == "2" then
+        artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
+        qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
+        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+    elseif OMPRESETPROMPT == "3" then
+        artistPrompt = "artist:rella, artist:ixy, artist:gomzi, artist:tsunako, artist:momoko (momopoco)"
+        qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
+        negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
+    end
+
+    print("---------------------------------ONLINEMODULE PROMPT---------------------------------")
+    print("ONLINEMODULE: artistPrompt: " .. artistPrompt)
+    print("ONLINEMODULE: qualityPrompt: " .. qualityPrompt)
+    print("ONLINEMODULE: negativePrompt: " .. negativePrompt)
+    print("---------------------------------ONLINEMODULE PROMPT---------------------------------")
+
+    local mainPrompt = nil
+    local mainNegPrompt = nil
+    local subPrompt = nil
+    local subNegPrompt = nil
+    local main2Prompt = nil
+    local main2NegPrompt = nil
+    local sub2Prompt = nil
+    local sub2NegPrompt = nil
+
+    -- prefix에 따라서 mainPrompt, mainNegPrompt, subPrompt, subNegPrompt를 설정
+    if startPrefix == "EROSTATUS" then
+        mainPrompt = "OMSTATUSPROMPT"
+        mainNegPrompt = "NEG_OMSTATUSPROMPT"
+    elseif startPrefix == "SIMULSTATUS" then
+        mainPrompt = "OMSIMULCARDPROMPT"
+        mainNegPrompt = "NEG_OMSIMULCARDPROMPT"
+    elseif startPrefix == "HYBRIDSTATUS" then
+        mainPrompt = "OMSTATUSPROMPT"
+        mainNegPrompt = "NEG_OMSTATUSPROMPT"
+        main2Prompt = "OMSIMULCARDPROMPT"
+        main2NegPrompt = "NEG_OMSIMULCARDPROMPT"
+    elseif startPrefix == "INLAY" then
+        mainPrompt = "OMINLAYPROMPT"
+        mainNegPrompt = "NEG_OMINLAYPROMPT"
+    elseif startPrefix == "TWITTER" then
+        mainPrompt = "OMTWITTERPROMPT"
+        mainNegPrompt = "NEG_OMTWITTERPROMPT"
+        subPrompt = "OMTWITTERPROFILEPROMPT"
+        subNegPrompt = "NEG_OMTWITTERPROFILEPROMPT"
+    elseif startPrefix == "INSTA" then
+        mainPrompt = "OMINSTAPROMPT"
+        mainNegPrompt = "NEG_OMINSTAPROMPT"
+        subPrompt = "OMINSTAPROFILEPROMPT"
+        subNegPrompt = "NEG_OMINSTAPROFILEPROMPT"
+    elseif startPrefix == "HYBRIDSNS" then
+        mainPrompt = "OMTWITTERPROMPT"
+        mainNegPrompt = "NEG_OMTWITTERPROMPT"
+        subPrompt = "OMTWITTERPROFILEPROMPT"
+        subNegPrompt = "NEG_OMTWITTERPROFILEPROMPT"
+        main2Prompt = "OMINSTAPROMPT"
+        main2NegPrompt = "NEG_OMINSTAPROMPT"
+        sub2Prompt = "OMINSTAPROFILEPROMPT"
+        sub2NegPrompt = "NEG_OMINSTAPROFILEPROMPT"
+    elseif startPrefix == "DC" then
+        mainPrompt = "OMDCPROMPT"
+        mainNegPrompt = "NEG_OMDCPROMPT"
+    elseif startPrefix == "KAKAO" then
+        mainPrompt = "OMKAKAOPROMPT"
+        mainNegPrompt = "NEG_OMKAKAOPROMPT"
+    end
+
+    -- EROSTATUS/SIMULSTATUS/INLAY/DC는 <OM(index)> 치환
+    -- TWITTER/INSTA는 <OM>을 치환하며, 기본적으로 뒤의 이미지만 치환.
+    -- KAKAO는 항상 <OM>을 하나만 치환
+
+    -- <OM(index)>인 경우 index가 없을 때까지 순회하며 하나하나 교체해야함.
+    -- 이 때, PROMPT 뒤에는 index가 붙음
+    -- <OM>인 경우는 PROMPT 뒤에 index가 붙지 않음.
+
+    local generatedImagesInfo = {} -- 생성된 이미지 정보를 저장할 테이블
+    local lineModified = false     -- 라인이 수정되었는지 여부를 추적하는 플래그
+
+    -- 헬퍼 함수: <OM(인덱스)> 플레이스홀더 처리
+    -- 이 함수는 changeKeyValue 스코프의 triggerId, currentLine (원본 라인), artistPrompt, qualityPrompt, negativePrompt, generatedImagesInfo, OMCACHE를 사용합니다.
+    local function processIndexedPlaceholdersInBlock(blockContent, basePromptKey, baseNegPromptKey, blockSpecificData)
+        local modifiedBlockContent = blockContent
+        local anyOmReplaced = false
+        local omSearchPos = 1
+        local characterImageCache = blockSpecificData.characterImageCache or {}
+
+        while true do
+            local s_om, e_om, omIndexStr = string.find(modifiedBlockContent, "<OM(%d+)>", omSearchPos)
+            if not s_om then break end
+
+            local omIndex = tonumber(omIndexStr)
+            local originalOMTag = "<OM" .. omIndex .. ">"
+            local newOMContent = originalOMTag -- 기본값: 변경 없음
+            
+            local cacheId = nil
+            -- EROSTATUS 또는 SIMULSTATUS 계열인 경우 이름 기반 캐시 ID 설정
+            if blockSpecificData.typeName == "EROSTATUS" or blockSpecificData.typeName == "SIMULSTATUS" then
+                local _, _, nameVal = string.find(blockContent, "NAME:([^|]*)") -- 원본 블록(수정 전 blockContent)에서 이름 추출
+                if nameVal then cacheId = nameVal:match("^%s*(.-)%s*$") end
+            end
+
+            local existingInlay = nil
+            if OMCACHE == "1" and cacheId then -- OMCACHE가 1이고 캐시 ID(이름)가 있을 때만 캐시 로직 실행
+                existingInlay = characterImageCache[cacheId] -- 우선 로컬 캐시(현재 블록 처리 중 캐시) 확인
+                if not existingInlay then
+                    local stateInlay = getState(triggerId, cacheId) -- 전역 상태 캐시 확인
+                    if stateInlay and stateInlay ~= "null" then
+                        existingInlay = stateInlay
+                        characterImageCache[cacheId] = existingInlay -- 로컬 캐시에 저장하여 다음 <OMx> 처리 시 활용
+                    end
+                end
+            end
+
+            if existingInlay then -- 캐시된 이미지가 있다면 사용
+                print("ONLINEMODULE: 캐시된 이미지 사용 (" .. cacheId .. "): " .. existingInlay)
+                newOMContent = originalOMTag .. existingInlay
+                anyOmReplaced = true
+            else -- 캐시된 이미지가 없거나 OMCACHE가 0이면 이미지 생성
+                local actualPromptKey = basePromptKey .. omIndex
+                local actualNegPromptKey = baseNegPromptKey .. omIndex
+                
+                local promptText = getPrompt(currentLine, actualPromptKey) -- currentLine은 changeKeyValue의 초기 currentLine
+                local negPromptText = getPrompt(currentLine, actualNegPromptKey)
+
+                if promptText then
+                    local finalGenPrompt = artistPrompt .. promptText .. qualityPrompt
+                    local currentNegative = negativePrompt
+                
+                    if negPromptText then
+                        currentNegative = negPromptText .. ", " .. currentNegative
+                    end
+                    
+                    local inlay = generateImage(triggerId, finalGenPrompt, currentNegative):await()
+
+                    if inlay and type(inlay) == "string" and #inlay > 10 and not string.find(inlay, "fail") and not string.find(inlay, "error") then
+                        newOMContent = originalOMTag .. inlay
+                        anyOmReplaced = true
+
+                        local finalIdentifier
+                        if cacheId then -- EROSTATUS, SIMULSTATUS (이름 기반 식별자)
+                            finalIdentifier = cacheId
+                        elseif blockSpecificData.typeName == "DC" then
+                            local pidPattern = "PID:([^|]+)"
+                            local _, _, pidMatch = string.find(string.sub(blockContent, 1, s_om -1 ), pidPattern)
+                            if pidMatch then
+                                finalIdentifier = "DC_" .. pidMatch:match("^%s*(.-)%s*$")
+                            else
+                                finalIdentifier = blockSpecificData.typeName .. "_" .. omIndexStr -- 예: DC_1
+                            end
+                        else
+                             -- 다른 타입의 <OMx> 태그가 있다면, 타입과 인덱스로 고유 식별자 생성
+                            finalIdentifier = blockSpecificData.typeName .. "_" .. omIndexStr
+                        end
+                        
+                        table.insert(generatedImagesInfo, {type = blockSpecificData.typeName, identifier = finalIdentifier, inlay = inlay})
+                        setState(triggerId, finalIdentifier, inlay) -- inlay 정보만 저장
+                        
+                        -- OMCACHE가 1이고 이름 기반 캐시 ID(cacheId)가 있다면, characterImageCache에도 저장
+                        if OMCACHE == "1" and cacheId then
+                            characterImageCache[cacheId] = inlay
+                        end
+                        
+                        -- SIMULCARD의 경우 추가적인 목록 관리 (이 부분은 유지될 수 있음, 캐시와 별개)
+                        if (blockSpecificData.typeName == "SIMULSTATUS") and cacheId and blockSpecificData.listKeyForCache then
+                            local currentList = getState(triggerId, blockSpecificData.listKeyForCache) or "null"
+                            if currentList == "null" then currentList = "" end
+                            if not string.find("," .. currentList .. ",", "," .. cacheId .. ",", 1, true) then
+                                setState(triggerId, blockSpecificData.listKeyForCache, currentList == "" and cacheId or (currentList .. "," .. cacheId))
+                            end
+                        end
+                    else
+                        ERR(triggerId, blockSpecificData.typeName, 2) -- 이미지 생성 실패
+                    end
+                else
+                    ERR(triggerId, blockSpecificData.typeName, 0) -- 프롬프트 없음
+                end
+            end
+            modifiedBlockContent = string.sub(modifiedBlockContent, 1, s_om - 1) .. newOMContent .. string.sub(modifiedBlockContent, e_om + 1)
+            omSearchPos = s_om -1 + #newOMContent + 1
+        end
+        return modifiedBlockContent, anyOmReplaced, characterImageCache
+    end
+
+    -- 헬퍼 함수: SNS 블록 처리 (TWITTER, INSTA, KAKAO 등)
+    -- 이 함수는 changeKeyValue 스코프의 triggerId, currentLine (원본 라인), artistPrompt, qualityPrompt, negativePrompt, generatedImagesInfo를 사용합니다.
+    local function processSNSBlock(blockContentWithBrackets, p_mainPromptKey, p_mainNegPromptKey, p_subPromptKey, p_subNegPromptKey, snsType)
+        local modifiedBlock = blockContentWithBrackets
+        local blockModifiedFlag = false
+        local profileInlay, mainMediaInlay
+        
+        local idValue -- Twitter ID 또는 Insta ID
+        if (snsType == "TWITTER" or snsType == "HYBRID_TWITTER") then idValue = string.match(modifiedBlock, "TID:([^|]*)")
+        elseif (snsType == "INSTA" or snsType == "HYBRID_INSTA") then idValue = string.match(modifiedBlock, "IID:([^|]*)")
+        end
+        if idValue then idValue = idValue:match("^%s*(.-)%s*$") end
+
+        -- 프로필 이미지 처리 (subPromptKey 사용)
+        if p_subPromptKey and idValue then
+            local existingProfile = getState(triggerId, idValue) or "null"
+            if existingProfile == "null" then -- OMCACHE와 무관하게 프로필은 ID로 한 번만 생성/로드
+                local profPromptText = getPrompt(currentLine, p_subPromptKey)
+                local profNegPromptText = getPrompt(currentLine, p_subNegPromptKey)
+                if profPromptText then
+                    local finalProfP = artistPrompt .. profPromptText .. qualityPrompt
+                    local currentNegP = negativePrompt
+                    if profNegPromptText then currentNegP = profNegPromptText .. ", " .. currentNegP
+                    end
+                    
+                    profileInlay = generateImage(triggerId, finalProfP, currentNegP):await()
+                    if profileInlay and type(profileInlay) == "string" and #profileInlay > 10 and not string.find(profileInlay, "fail") then
+                        setState(triggerId, idValue, profileInlay) -- 프로필 inlay 저장
+                        table.insert(generatedImagesInfo, {type="PROFILE", identifier=idValue, inlay=profileInlay})
+                        blockModifiedFlag = true
+                    else ERR(triggerId, snsType .. "PROFILE", 2) profileInlay = nil end
+                else ERR(triggerId, snsType .. "PROFILE", 0) end
+            else profileInlay = existingProfile end
+            
+            if profileInlay and profileInlay ~= "null" then
+                local placeholder = (snsType == "TWITTER" or snsType == "HYBRID_TWITTER") and "TPROFILE:<OM>" or "IPROFILE:<OM>"
+                modifiedBlock = string.gsub(modifiedBlock, placeholder, string.match(placeholder, "^[^:]*:") .. "<OM>" .. profileInlay, 1)
+            end
+        end
+
+        -- 메인 미디어 처리 (mainPromptKey 사용)
+        local mainPromptText = getPrompt(currentLine, p_mainPromptKey)
+        if mainPromptText then
+            local mainNegPromptText = getPrompt(currentLine, p_mainNegPromptKey)
+            local finalMainP = artistPrompt .. mainPromptText .. qualityPrompt
+            local currentNegM = negativePrompt -- local storedNegM = "" -- 저장 안함
+            if mainNegPromptText then currentNegM = mainNegPromptText .. ", " .. currentNegM -- storedNegM = mainNegPromptText -- 저장 안함
+            end
+            
+            mainMediaInlay = generateImage(triggerId, finalMainP, currentNegM):await()
+            if mainMediaInlay and type(mainMediaInlay) == "string" and #mainMediaInlay > 10 and not string.find(mainMediaInlay, "fail") then
+                local mediaPlaceholder, mediaReplacementKey, stateKeyForMediaInlay
+                if snsType == "TWITTER" or snsType == "HYBRID_TWITTER" then
+                    mediaPlaceholder = "|MEDIA:<OM>|"
+                    mediaReplacementKey = "_TWEET" -- generatedImagesInfo용 타입 접미사
+                    stateKeyForMediaInlay = (idValue or (snsType .. "_MAIN")) .. mediaReplacementKey -- setState용 키
+                elseif snsType == "INSTA" or snsType == "HYBRID_INSTA" then
+                    mediaPlaceholder = "|MEDIA:<OM>|"
+                    mediaReplacementKey = "_POST"
+                    stateKeyForMediaInlay = (idValue or (snsType .. "_MAIN")) .. mediaReplacementKey
+                elseif snsType == "KAKAO" then
+                    mediaPlaceholder = "<OM>"
+                    mediaReplacementKey = "_KAKAO"
+                    stateKeyForMediaInlay = "KAKAO_" .. (string.match(modifiedBlock, "KAKAO%[^|]*%|([^%]]*)%]") or "MAIN") .. mediaReplacementKey
+                end
+                
+                if mediaPlaceholder then
+                     modifiedBlock = string.gsub(modifiedBlock, mediaPlaceholder, string.gsub(mediaPlaceholder, "<OM>", "<OM>" .. mainMediaInlay), 1)
+                end
+                blockModifiedFlag = true
+                local mainIdForInfo = idValue or (snsType .. "_MAIN")
+                if snsType == "KAKAO" then mainIdForInfo = "KAKAO_" .. (string.match(modifiedBlock, "KAKAO%[^|]*%|([^%]]*)%]") or "MAIN") end
+
+
+                table.insert(generatedImagesInfo, {type=snsType .. mediaReplacementKey, identifier=mainIdForInfo, inlay=mainMediaInlay})
+                setState(triggerId, stateKeyForMediaInlay, mainMediaInlay) -- 메인 미디어 inlay 저장
+            else ERR(triggerId, snsType .. "MEDIA", 2) end
+        else ERR(triggerId, snsType .. "MEDIA", 0) end
+        return modifiedBlock, blockModifiedFlag
+    end
+
+    local originalLine = currentLine -- getPrompt에서 사용할 원본 라인
+    
+    -- EROSTATUS, SIMULSTATUS, INLAY, DC 처리
+    if startPrefix == "EROSTATUS" or startPrefix == "SIMULSTATUS" or startPrefix == "INLAY" or startPrefix == "DC" then
+        local blockPattern = startPrefix .. "%[.-%]"
+        local currentSearchPos = 1
+        local newLineParts = {}
+        local lastPos = 1
+        local tempLineModified = false
+        local charCache = {} -- 함수 호출마다 초기화되는 로컬 캐시
+
+        while true do
+            local s_block, e_block = string.find(currentLine, blockPattern, currentSearchPos)
+            if not s_block then break end
+
+            table.insert(newLineParts, string.sub(currentLine, lastPos, s_block - 1))
+            local capturedBlockContentWithBrackets = string.sub(currentLine, s_block, e_block)
+            local blockContentOnly = string.sub(capturedBlockContentWithBrackets, #startPrefix + 2, -2)
+
+            local blockSpecificData = { typeName = startPrefix, characterImageCache = charCache }
+            if startPrefix == "SIMULSTATUS" then
+                -- blockSpecificData.isCacheable = true -- OMCACHE로 대체
+                blockSpecificData.listKeyForCache = "STORED_SIMCARD_IDS" -- 이 목록은 캐시와 별도로 유지 가능
+            end
+
+            local modifiedContent, omModified, updatedCache = processIndexedPlaceholdersInBlock(blockContentOnly, mainPrompt, mainNegPrompt, blockSpecificData)
+            charCache = updatedCache -- 다음 <OMx> 처리를 위해 동일 블록 내 캐시 업데이트
+            
+            table.insert(newLineParts, startPrefix .. "[" .. modifiedContent .. "]")
+            if omModified then tempLineModified = true end
+            
+            lastPos = e_block + 1
+            currentSearchPos = e_block + 1
+        end
+        table.insert(newLineParts, string.sub(currentLine, lastPos))
+        if tempLineModified then
+            currentLine = table.concat(newLineParts)
+            lineModified = true
+        end
+
+    elseif startPrefix == "HYBRIDSTATUS" then
+        local charCacheEro = {} -- EROSTATUS 블록들 내부용 로컬 캐시
+        local charCacheSimul = {} -- SIMULSTATUS 블록들 내부용 로컬 캐시
+        
+        -- EROSTATUS 블록 처리
+        local tempLine = currentLine
+        local newLinePartsEro = {}
+        local lastPosEro = 1
+        local tempLineModifiedEro = false
+        while true do
+            local s_block, e_block = string.find(tempLine, "EROSTATUS%[.-%]", lastPosEro)
+            if not s_block then table.insert(newLinePartsEro, string.sub(tempLine, lastPosEro)) break end
+            table.insert(newLinePartsEro, string.sub(tempLine, lastPosEro, s_block - 1))
+            local blockContentOnly = string.sub(tempLine, s_block + #("EROSTATUS") + 1, e_block - 1)
+            local modifiedContent, omModified, updatedCache = processIndexedPlaceholdersInBlock(blockContentOnly, mainPrompt, mainNegPrompt, {typeName = "EROSTATUS", characterImageCache = charCacheEro})
+            charCacheEro = updatedCache
+            table.insert(newLinePartsEro, "EROSTATUS[" .. modifiedContent .. "]")
+            if omModified then tempLineModifiedEro = true lineModified = true end
+            lastPosEro = e_block + 1
+        end
+        if tempLineModifiedEro then tempLine = table.concat(newLinePartsEro) end
+
+        -- SIMULSTATUS 블록 처리
+        local newLinePartsSimul = {}
+        local lastPosSimul = 1
+        local tempLineModifiedSimul = false
+        while true do
+            local s_block, e_block = string.find(tempLine, "SIMULSTATUS%[.-%]", lastPosSimul)
+            if not s_block then table.insert(newLinePartsSimul, string.sub(tempLine, lastPosSimul)) break end
+            table.insert(newLinePartsSimul, string.sub(tempLine, lastPosSimul, s_block - 1))
+            local blockContentOnly = string.sub(tempLine, s_block + #("SIMULSTATUS") + 1, e_block - 1)
+            local modifiedContent, omModified, updatedCache = processIndexedPlaceholdersInBlock(blockContentOnly, main2Prompt, main2NegPrompt, {typeName = "SIMULSTATUS", listKeyForCache = "STORED_SIMCARD_IDS", characterImageCache = charCacheSimul})
+            charCacheSimul = updatedCache
+            table.insert(newLinePartsSimul, "SIMULSTATUS[" .. modifiedContent .. "]")
+            if omModified then tempLineModifiedSimul = true lineModified = true end
+            lastPosSimul = e_block + 1
+        end
+        if tempLineModifiedSimul or tempLineModifiedEro then currentLine = table.concat(newLinePartsSimul) end
+    
+    -- TWITTER, INSTA, KAKAO, HYBRIDSNS 처리
+    elseif startPrefix == "TWITTER" or startPrefix == "INSTA" or startPrefix == "KAKAO" or startPrefix == "HYBRIDSNS" then
+        if startPrefix == "HYBRIDSNS" then
+            local s_tw, e_tw, captured_tw = string.find(currentLine, "(TWITTER%[.-%])")
+            if s_tw then
+                local mod_tw_block, tw_mod_flag = processSNSBlock(captured_tw, mainPrompt, mainNegPrompt, subPrompt, subNegPrompt, "HYBRID_TWITTER")
+                if tw_mod_flag then
+                    currentLine = string.sub(currentLine, 1, s_tw - 1) .. mod_tw_block .. string.sub(currentLine, e_tw + 1)
+                    lineModified = true
+                end
+            end
+            local s_in, e_in, captured_in = string.find(currentLine, "(INSTA%[.-%])")
+            if s_in then
+                local mod_in_block, in_mod_flag = processSNSBlock(captured_in, main2Prompt, main2NegPrompt, sub2Prompt, sub2NegPrompt, "HYBRID_INSTA")
+                if in_mod_flag then
+                    currentLine = string.sub(currentLine, 1, s_in - 1) .. mod_in_block .. string.sub(currentLine, e_in + 1)
+                    lineModified = true
+                end
+            end
+        else -- 단일 SNS
+            local s_block, e_block, captured_block = string.find(currentLine, "(" .. startPrefix .. "%[.-%])")
+            if s_block then
+                local mod_block, block_mod_flag = processSNSBlock(captured_block, mainPrompt, mainNegPrompt, subPrompt, subNegPrompt, startPrefix)
+                if block_mod_flag then
+                    currentLine = string.sub(currentLine, 1, s_block - 1) .. mod_block .. string.sub(currentLine, e_block + 1)
+                    lineModified = true
+                end
+            end
+        end
+    end
+
+    if lineModified then
+        print("ONLINEMODULE: 최종 라인이 수정되었습니다.")
+        -- print("ONLINEMODULE: 생성된 이미지 정보:", inspect(generatedImagesInfo)) -- 디버깅용
+    end
+    return currentLine
+    
+end)
+
 onOutput = async(function (triggerId)
     print("onOutput: Triggered with ID:", triggerId)
     local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL") or "0"
@@ -3642,31 +4071,6 @@ onOutput = async(function (triggerId)
     local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
     local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
 	
-	if OMPRESETPROMPT == "0" then
-        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT") or "0"
-        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or "0"
-        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or "0"
-    elseif OMPRESETPROMPT == "1" then
-		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
-		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
-	elseif OMPRESETPROMPT == "2" then
-        artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
-        qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
-    elseif OMPRESETPROMPT == "3" then
-        artistPrompt = "artist:rella, artist:ixy, artist:gomzi, artist:tsunako, artist:momoko (momopoco)"
-        qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
-        negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
-    end
-    	
-	print("-----------------------ART PROMPT-----------------------")
-	print(artistPrompt)
-	print(qualityPrompt)
-	print(negativePrompt)
-	print("-----------------------ART PROMPT-----------------------")
-	
-
     print("ONLINEMODULE: onOutput: OMCARD value:", OMCARD)
     print("ONLINEMODULE: onOutput: OMSNS value:", OMSNS)
 	print("ONLINEMODULE: onOutput: OMCOMMUNITY value:", OMCOMMUNITY)
@@ -3727,1403 +4131,47 @@ onOutput = async(function (triggerId)
             print("ONLINEMODULE: onOutput: Processing last message (index " .. lastIndex .. ") for OM Generation/Replacement")
 
             if OMCARD == "1" and not skipOMCARD then
-                -- 에로스테만 사용할 때
                 print("ONLINEMODULE: onOutput: OMCARD == 1")
-                local searchPos = 1
-                local statusBlocksFound = 0
-                local statusReplacements = {}
-
-                while true do
-                    local s_status, e_status_prefix = string.find(currentLine, "EROSTATUS%[", searchPos)
-                    if not s_status then
-                        print("ONLINEMODULE: onOutput: No more EROSTATUS[ blocks found starting from position " .. searchPos)
-                        break
-                    end
-                    statusBlocksFound = statusBlocksFound + 1
-                    print("ONLINEMODULE: onOutput: Found EROSTATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_status)
-
-                    local bracketLevel = 1
-                    local e_status_suffix = e_status_prefix + 1
-                    local foundClosingBracket = false
-                    local searchEnd = #currentLine
-                    while e_status_suffix <= searchEnd do
-                        local char = currentLine:sub(e_status_suffix, e_status_suffix)
-                        if char == '[' then
-                            bracketLevel = bracketLevel + 1
-                        elseif char == ']' then
-                            bracketLevel = bracketLevel - 1
-                        end
-                        if bracketLevel == 0 then
-                            foundClosingBracket = true
-                            break
-                        end
-                        e_status_suffix = e_status_suffix + 1
-                    end
-
-                    if foundClosingBracket then
-                        print("ONLINEMODULE: onOutput: EROSTATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_status_suffix)
-                        local statusBlockContent = string.sub(currentLine, s_status, e_status_suffix)
-                        local statusPattern = "EROSTATUS%[NAME:([^|]*)|"
-                        local _, _, currentBlockName = string.find(statusBlockContent, statusPattern)
-                        local trimmedBlockName = nil
-                        if currentBlockName then
-                            trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
-                        end
-
-                        local blockContent = string.sub(currentLine, e_status_prefix + 1, e_status_suffix - 1)
-                        local omSearchPosInContent = 1
-                        local omTagsFoundInBlock = 0
-                        while true do
-                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(blockContent, "<OM(%d+)>", omSearchPosInContent)
-                            if not s_om_in_content then break end
-                            omTagsFoundInBlock = omTagsFoundInBlock + 1
-                            local omIndex = tonumber(omIndexStr)
-                            if omIndex then
-                                local statusPromptFindPattern = "%[OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local statusNegPromptFindPattern = "%[NEG_OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local _, _, foundStatusPrompt = string.find(currentLine, statusPromptFindPattern)
-                                local _, _, foundStatusNegPrompt = string.find(currentLine, statusNegPromptFindPattern)
-                                local currentNegativePromptStatus = negativePrompt
-                                local storedNegPrompt = ""
-                                if foundStatusNegPrompt then
-                                    currentNegativePromptStatus = foundStatusNegPrompt .. ", " .. currentNegativePromptStatus
-                                    storedNegPrompt = foundStatusNegPrompt
-                                end
-                                if foundStatusPrompt then
-                                    local finalPromptStatus = artistPrompt .. foundStatusPrompt .. qualityPrompt
-                                    local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
-                                    if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and not string.find(inlayStatus, "fail", 1, true) and not string.find(inlayStatus, "error", 1, true) and not string.find(inlayStatus, "실패", 1, true) then
-                                        local erostatusIdentifier = "EROSTATUS_" .. omIndex
-                                        local content_offset = e_status_prefix
-                                        local om_abs_start = content_offset + s_om_in_content
-                                        local om_abs_end = content_offset + e_om_in_content
-                                        table.insert(statusReplacements, {
-                                            start = om_abs_start,
-                                            finish = om_abs_end,
-                                            inlay = "<OM" .. omIndex .. ">" .. inlayStatus
-                                        })
-                                        local infoEro = {
-                                            type = "EROSTATUS",
-                                            identifier = erostatusIdentifier,
-                                            inlay = inlayStatus,
-                                            prompt = foundStatusPrompt,
-                                            negPrompt = storedNegPrompt
-                                        }
-                                        table.insert(generatedImagesInfo, infoEro)
-                                        setState(triggerId, erostatusIdentifier .. "_PROMPT", infoEro.prompt)
-                                        setState(triggerId, erostatusIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
-                                        setState(triggerId, erostatusIdentifier, infoEro.inlay)
-                                        print("ONLINEMODULE: onOutput: Stored info for generated EROSTATUS image. Identifier: " .. erostatusIdentifier)
-                                    end
-                                else
-                                    ERR(triggerId, "EROSTATUS", 0)
-                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. omIndex .. " in currentLine.")
-                                end
-                            end
-                            omSearchPosInContent = e_om_in_content + 1
-                        end
-                        searchPos = e_status_suffix + 1
-                    else
-                        ERR(triggerId, "EROSTATUS", 1)
-                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for EROSTATUS block #" .. statusBlocksFound .. " even after nested check! Skipping to next search pos.")
-                        searchPos = e_status_prefix + 1
-                    end
-                end
-
-                if #statusReplacements > 0 then
-                    print("ONLINEMODULE: onOutput: Applying ".. #statusReplacements .." erostatus replacements.")
-                    table.sort(statusReplacements, function(a, b) return a.start > b.start end)
-                    for i_rep, rep in ipairs(statusReplacements) do
-                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
-                        end
-                    end
-                    lineModifiedInThisPass = true
-                else
-                    print("ONLINEMODULE: onOutput: No erostatus replacements to apply.")
-                end
-            
-
+                currentLine = changeKeyValue(triggerId, currentLine, "EROSTATUS"):await()
             elseif OMCARD == "2" and not skipOMCARD then
-                -- 시뮬봇 상태창만 사용할 때
-                print("ONLINEMODULE: onOutput: OMCARD == 2 entered.")
-                local searchPos = 1
-                local simulReplacements = {}
-                local statusBlocksFound = 0
-
-                local listKey = "STORED_SIMCARD_IDS"
-
-                while true do
-                    local s_simul, e_simul_prefix = string.find(currentLine, "SIMULSTATUS%[", searchPos)
-                    if not s_simul then
-                        print("ONLINEMODULE: onOutput: No more SIMULSTATUS[ blocks found starting from position " .. searchPos)
-                        break
-                    end
-                    statusBlocksFound = statusBlocksFound + 1
-                    print("ONLINEMODULE: onOutput: Found SIMULSTATUS[ block #" .. statusBlocksFound .. " starting at index " .. s_simul)
-
-                    local bracketLevel = 1
-                    local e_simul_suffix = e_simul_prefix + 1
-                    local foundClosingBracket = false
-                    local searchEnd = #currentLine 
-                    while e_simul_suffix <= searchEnd do
-                        local char = currentLine:sub(e_simul_suffix, e_simul_suffix)
-                        if char == '[' then
-                            bracketLevel = bracketLevel + 1
-                        elseif char == ']' then
-                            bracketLevel = bracketLevel - 1
-                        end
-                        if bracketLevel == 0 then
-                            foundClosingBracket = true
-                            break
-                        end
-                        e_simul_suffix = e_simul_suffix + 1
-                    end
-
-                    if foundClosingBracket then
-                        print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_simul_suffix)
-
-                        local statusBlockContent = string.sub(currentLine, s_simul, e_simul_suffix)
-                        local statusBlockPattern = "SIMULSTATUS%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
-                        local _, _, currentBlockName = string.find(statusBlockContent, statusBlockPattern)
-
-                        if currentBlockName then
-                            print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " NAME found: [" .. currentBlockName .. "]")
-                        else
-                            print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " NAME pattern did not match.")
-                        end
-
-                        local existingInlay = nil
-                        local trimmedBlockName = nil
-                        if currentBlockName then
-                            trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
-                            if trimmedBlockName ~= "" then
-                                print("ONLINEMODULE: onOutput: Trimmed NAME: [" .. trimmedBlockName .. "]")
-                                existingInlay = getState(triggerId, trimmedBlockName) or "null"
-                                if existingInlay == "null" then existingInlay = nil end
-                                print("ONLINEMODULE: onOutput: Existing inlay found from chatVar: [" .. tostring(existingInlay) .. "]")
-                            else
-                                trimmedBlockName = nil
-                            end
-                        end
-
-                        local simulContent = string.sub(currentLine, e_simul_prefix + 1, e_simul_suffix - 1)
-                        local omSearchPosInContent = 1
-                        local omTagsFoundInBlock = 0
-
-                        if existingInlay and trimmedBlockName then
-                            print("ONLINEMODULE: onOutput: Processing with existing inlay for block #" .. statusBlocksFound)
-                        while true do
-                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(simulContent, "<OM(%d+)>", omSearchPosInContent)
-                            if not s_om_in_content then break end
-                            omTagsFoundInBlock = omTagsFoundInBlock + 1
-                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..omTagsFoundInBlock.." (using existing inlay)")
-                            local omIndex = tonumber(omIndexStr)
-                            if omIndex then
-                                local content_offset = e_simul_prefix
-                                local om_abs_start = content_offset + s_om_in_content
-                                local om_abs_end = content_offset + e_om_in_content
-                                table.insert(simulReplacements, { start = om_abs_start, finish = om_abs_end, inlay = existingInlay })
-                                print("ONLINEMODULE: onOutput: Adding existing inlay replacement for OM" .. omIndex .. " at absolute pos " .. om_abs_start .. "-" .. om_abs_end)
-                            end
-                            omSearchPosInContent = e_om_in_content + 1
-                        end
-                        else
-                            print("ONLINEMODULE: onOutput: Processing by generating new image for block #" .. statusBlocksFound)
-                        while true do
-                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(simulContent, "<OM(%d+)>", omSearchPosInContent)
-                            if not s_om_in_content then
-                                print("ONLINEMODULE: onOutput: No more <OM> tags found in block #".. statusBlocksFound .." content search.")
-                                break
-                            end
-                            omTagsFoundInBlock = omTagsFoundInBlock + 1
-                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..omTagsFoundInBlock.." (generating new)")
-                            local omIndex = tonumber(omIndexStr)
-                            if omIndex then
-                                local simulPromptPattern = "%[OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local negSimulPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local _, _, foundSimulPrompt = string.find(currentLine, simulPromptPattern)
-                                local _, _, foundNegSimulPrompt = string.find(currentLine, negSimulPromptPattern)
-
-                                if foundSimulPrompt then
-                                    print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundSimulPrompt, 1, 50) .. "...]")
-                                    local currentNegativePromptSimul = negativePrompt
-                                    local storedNegPrompt = ""
-                                    if foundNegSimulPrompt then currentNegativePromptSimul = foundNegSimulPrompt .. ", " .. currentNegativePromptSimul; storedNegPrompt = foundNegSimulPrompt end
-                                    local finalPromptSimul = artistPrompt .. foundSimulPrompt .. qualityPrompt
-                                    local inlaySimul = generateImage(triggerId, finalPromptSimul, currentNegativePromptSimul):await()
-                                    print("ONLINEMODULE: onOutput: generateImage result for OM"..omIndex..": ["..tostring(inlaySimul).."]")
-                                    local isSuccess = (inlaySimul ~= nil) and (type(inlaySimul) == "string") and (string.len(inlaySimul) > 10) and not string.find(inlaySimul, "fail", 1, true) and not string.find(inlaySimul, "error", 1, true) and not string.find(inlaySimul, "실패", 1, true)
-                                    if isSuccess then
-                                        print("ONLINEMODULE: onOutput: Image generation SUCCESS for OM"..omIndex)
-                                        local content_offset = e_simul_prefix 
-                                        local om_abs_start = content_offset + s_om_in_content
-                                        local om_abs_end = content_offset + e_om_in_content -1
-                                        table.insert(simulReplacements, {
-                                            start = om_abs_start,
-                                            finish = om_abs_end,
-                                            inlay = "<OM" .. omIndex .. ">" .. inlaySimul
-                                        })
-                                        print("ONLINEMODULE: onOutput: Adding new inlay replacement for OM" .. omIndex .. " at absolute pos " .. om_abs_start .. "-" .. om_abs_end)
-
-                                        if trimmedBlockName then
-                                            setState(triggerId, trimmedBlockName, inlaySimul)
-                                            setState(triggerId, trimmedBlockName .. "_SIMULPROMPT", foundSimulPrompt)
-                                            setState(triggerId, trimmedBlockName .. "_NEGSIMULPROMPT", storedNegPrompt)
-
-                                            local currentList = getState(triggerId, listKey) or "null"
-                                            if currentList == "null" then currentList = "" end
-                                                print("ONLINEMODULE: onOutput: Current list for key '" .. listKey .. "': [" .. currentList .. "]")
-                                            local newList = currentList
-                                            if not string.find("," .. currentList .. ",", "," .. trimmedBlockName .. ",", 1, true) then
-                                                if currentList == "" then
-                                                    newList = trimmedBlockName
-                                                else
-                                                    newList = currentList .. "," .. trimmedBlockName
-                                                end
-                                                setState(triggerId, listKey, newList)
-                                                print("ONLINEMODULE: onOutput: Added SimCard ID '" .. trimmedBlockName .. "' to stored list (" .. listKey .. "). New list: [" .. newList .. "]")
-                                            else
-                                                print("ONLINEMODULE: onOutput: SimCard ID '" .. trimmedBlockName .. "' already exists in stored list (" .. listKey .. ").")
-                                            end
-                                            
-                                            local infoSimul = {
-                                                type = "SIMULATIONCARD", identifier = trimmedBlockName, inlay = inlaySimul,
-                                                prompt = foundSimulPrompt, negPrompt = storedNegPrompt
-                                            }
-                                            table.insert(generatedImagesInfo, infoSimul)
-                                            print("ONLINEMODULE: onOutput: Stored info for generated SIMULATIONCARD image: [" .. trimmedBlockName .. "]")
-
-                                            existingInlay = inlaySimul
-                                            print("ONLINEMODULE: onOutput: Updated existingInlay for subsequent OM tags in block #" .. statusBlocksFound)
-                                        end
-                                    else
-                                        ERR(triggerId, "SIMULCARD", 2)
-                                        print("ONLINEMODULE: onOutput: Image generation FAILED or invalid result for OM"..omIndex)
-                                    end
-                                else
-                                    ERR(triggerId, "SIMULCARD", 0)
-                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. omIndex .. " in currentLine.")
-                                end
-                            end
-                            omSearchPosInContent = e_om_in_content + 1
-                        end
-                    end
-                    if omTagsFoundInBlock == 0 then
-                        ERR(triggerId, "SIMULCARD", 3)
-                        print("ONLINEMODULE: onOutput: No <OM> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
-                    end
-                    searchPos = e_simul_suffix + 1
-                    else
-                        ERR(triggerId, "SIMULCARD", 1)
-                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for SIMULSTATUS block #" .. statusBlocksFound .. " even after nested check! Something is wrong. Skipping to next search pos.")
-                        searchPos = e_simul_prefix + 1
-                    end
-                end
-
-                if statusBlocksFound == 0 then
-                    ERR(triggerId, "SIMULCARD", 4)
-                    print("ONLINEMODULE: onOutput: No SIMULSTATUS[...] blocks found in the entire message.")
-                end
-
-                if #simulReplacements > 0 then
-                    print("ONLINEMODULE: onOutput: Applying ".. #simulReplacements .." simulcard replacements.")
-                    table.sort(simulReplacements, function(a, b) return a.start > b.start end)
-                    for i_rep, rep in ipairs(simulReplacements) do
-                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
-                        end
-                    end
-                    lineModifiedInThisPass = true
-                else
-                    print("ONLINEMODULE: onOutput: No simulcard replacements to apply.")
-                end
-            
+                print("ONLINEMODULE: onOutput: OMCARD == 2")
+                currentLine = changeKeyValue(triggerId, currentLine, "SIMULSTATUS"):await()
             elseif OMCARD == "3" and not skipOMCARD then
-                -- 상태창 하이브리드 모드 사용할 때
-                print("ONLINEMODULE: onOutput: OMCARD == 3 (Hybrid mode)")
-                local searchPos = 1
-                local replacements = {}
-                local statusBlocksFound = 0
-                local listKey = "STORED_SIMCARD_IDS"
-                local characterImageCache = {} -- 캐릭터별 이미지 캐시 (시뮬레이션용)
-
-                while true do
-                    local s_ero, e_ero = string.find(currentLine, "EROSTATUS%[", searchPos)
-                    local s_sim, e_sim = string.find(currentLine, "SIMULSTATUS%[", searchPos)
-                    
-                    local s_status, e_status_prefix, isEroStatus
-                    if s_ero and (not s_sim or s_ero < s_sim) then
-                        s_status = s_ero
-                        e_status_prefix = e_ero 
-                        isEroStatus = true
-                    elseif s_sim then
-                        s_status = s_sim
-                        e_status_prefix = e_sim
-                        isEroStatus = false
-                    else
-                        break 
-                    end
-
-                    statusBlocksFound = statusBlocksFound + 1
-                    print("ONLINEMODULE: onOutput: Found " .. (isEroStatus and "EROSTATUS" or "SIMULSTATUS") .. " block #" .. statusBlocksFound)
-
-                    local bracketLevel = 1
-                    local e_status_suffix = e_status_prefix + 1
-                    local foundClosingBracket = false
-                    while e_status_suffix <= #currentLine do
-                        local char = currentLine:sub(e_status_suffix, e_status_suffix)
-                        if char == '[' then
-                            bracketLevel = bracketLevel + 1
-                        elseif char == ']' then
-                            bracketLevel = bracketLevel - 1
-                        end
-                        if bracketLevel == 0 then
-                            foundClosingBracket = true
-                            break
-                        end
-                        e_status_suffix = e_status_suffix + 1
-                    end
-
-                    if foundClosingBracket then
-                        local blockContent = string.sub(currentLine, e_status_prefix + 1, e_status_suffix - 1)
-                        local currentBlockName = nil
-                        
-                        if isEroStatus then
-                            local _, _, name = string.find(blockContent, "NAME:([^|]*)|")
-                            currentBlockName = name
-                        else
-                            local pattern = "NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)"
-                            local _, _, name = string.find(blockContent, pattern)
-                            currentBlockName = name
-                        end
-
-                        local trimmedBlockName = nil
-                        if currentBlockName then
-                            trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
-                        end
-
-                        -- 시뮬레이션 카드일 때만 캐시 확인/사용
-                        local cachedInlay = nil
-                        if not isEroStatus and trimmedBlockName then
-                            cachedInlay = characterImageCache[trimmedBlockName]
-                            if not cachedInlay then
-                                local existingInlay = getState(triggerId, trimmedBlockName) or "null"
-                                if existingInlay ~= "null" then
-                                    characterImageCache[trimmedBlockName] = existingInlay
-                                    cachedInlay = existingInlay
-                                end
-                            end
-                        end
-
-                        local omSearchPosInContent = 1
-                        local omTagsFoundInBlock = 0
-
-                        while true do
-                            local s_om_in_content, e_om_in_content, omIndex = string.find(blockContent, "<OM(%d+)>", omSearchPosInContent)
-                            if not s_om_in_content then break end
-                            omTagsFoundInBlock = omTagsFoundInBlock + 1
-                            omIndex = tonumber(omIndex)
-
-                            if omIndex then
-                                local content_offset = e_status_prefix
-                                local om_abs_start = content_offset + s_om_in_content
-                                local om_abs_end = content_offset + e_om_in_content
-
-                                -- 시뮬레이션이고 캐시된 이미지가 있으면 재사용
-                                if not isEroStatus and cachedInlay then
-                                    print("ONLINEMODULE: onOutput: Reusing cached image for character: " .. trimmedBlockName)
-                                    table.insert(replacements, {
-                                        start = om_abs_start,
-                                        finish = om_abs_end,
-                                        inlay = "<OM" .. omIndex .. ">" .. cachedInlay
-                                    })
-                                else
-                                    -- 새 이미지 생성
-                                    local promptPattern, negPromptPattern, promptType, identifier
-                                    if isEroStatus then
-                                        promptPattern = "%[OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                        negPromptPattern = "%[NEG_OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                        promptType = "EROSTATUS"
-                                        identifier = "EROSTATUS_" .. omIndex
-                                    else
-                                        promptPattern = "%[OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                        negPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                        promptType = "SIMULCARD"
-                                        identifier = trimmedBlockName
-                                    end
-
-                                    local _, _, foundPrompt = string.find(currentLine, promptPattern)
-                                    local _, _, foundNegPrompt = string.find(currentLine, negPromptPattern)
-
-                                    if foundPrompt then
-                                        local currentNegativePrompt = negativePrompt
-                                        local storedNegPrompt = ""
-                                        if foundNegPrompt then
-                                            currentNegativePrompt = foundNegPrompt .. ", " .. currentNegativePrompt
-                                            storedNegPrompt = foundNegPrompt
-                                        end
-
-                                        local finalPrompt = artistPrompt .. foundPrompt .. qualityPrompt
-                                        local inlay = generateImage(triggerId, finalPrompt, currentNegativePrompt):await()
-                                        
-                                        if inlay and type(inlay) == "string" and string.len(inlay) > 10 
-                                           and not string.find(inlay, "fail", 1, true) 
-                                           and not string.find(inlay, "error", 1, true)
-                                           and not string.find(inlay, "실패", 1, true) then
-                                            
-                                            -- 시뮬레이션 카드일 때만 캐시에 저장
-                                            if not isEroStatus then
-                                                characterImageCache[trimmedBlockName] = inlay
-                                            end
-
-                                            table.insert(replacements, {
-                                                start = om_abs_start,
-                                                finish = om_abs_end,
-                                                inlay = "<OM" .. omIndex .. ">" .. inlay
-                                            })
-
-                                            local info = {
-                                                type = promptType,
-                                                identifier = identifier,
-                                                inlay = inlay,
-                                                prompt = foundPrompt,
-                                                negPrompt = storedNegPrompt
-                                            }
-                                            table.insert(generatedImagesInfo, info)
-
-                                            if isEroStatus then
-                                                setState(triggerId, identifier .. "_PROMPT", info.prompt)
-                                                setState(triggerId, identifier .. "_NEGPROMPT", info.negPrompt)
-                                                setState(triggerId, identifier, info.inlay)
-                                            else
-                                                setState(triggerId, identifier, inlay)
-                                                setState(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
-                                                setState(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
-
-                                                local currentList = getState(triggerId, listKey) or "null"
-                                                if currentList == "null" then currentList = "" end
-                                                
-                                                if not string.find("," .. currentList .. ",", "," .. identifier .. ",", 1, true) then
-                                                    local newList = currentList == "" and identifier or (currentList .. "," .. identifier)
-                                                    setState(triggerId, listKey, newList)
-                                                end
-                                            end
-                                        else
-                                            ERR(triggerId, promptType, 2)
-                                        end
-                                    else
-                                        ERR(triggerId, promptType, 0)
-                                    end
-                                end
-                            end
-                            omSearchPosInContent = e_om_in_content + 1
-                        end
-
-                        if omTagsFoundInBlock == 0 then
-                            ERR(triggerId, isEroStatus and "EROSTATUS" or "SIMULCARD", 3)
-                        end
-                        searchPos = e_status_suffix + 1
-                    else
-                        ERR(triggerId, isEroStatus and "EROSTATUS" or "SIMULCARD", 1)
-                        searchPos = e_status_prefix + 1
-                    end
-                end
-
-                if statusBlocksFound == 0 then
-                    print("ONLINEMODULE: onOutput: No status blocks found in hybrid mode")
-                else
-                    if #replacements > 0 then
-                        print("ONLINEMODULE: onOutput: Applying " .. #replacements .. " hybrid mode replacements")
-                        table.sort(replacements, function(a, b) return a.start > b.start end)
-                        for _, rep in ipairs(replacements) do
-                            if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                                currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
-                            end
-                        end
-                        lineModifiedInThisPass = true
-                    end
-                end
+                print("ONLINEMODULE: onOutput: OMCARD == 3")
+                currentLine = changeKeyValue(triggerId, currentLine, "HYBRIDSTATUS"):await()
             elseif OMCARD == "4" and not skipOMCARD then
-                -- 인레이만 출력할 때
-                print("ONLINEMODULE: onOutput: OMCARD == 4 (Inlay only mode)")
-                local searchPos = 1
-                local inlayReplacements = {}
-                local inlayBlocksFound = 0
-                
-                -- INLAY[<OM(INDEX)>] 블록 검색
-                while true do
-                    local s_inlay, e_inlay = string.find(currentLine, "INLAY%[([^%]]*)%]", searchPos)
-                    if not s_inlay then
-                        print("ONLINEMODULE: onOutput: No more INLAY[...] blocks found starting from position " .. searchPos)
-                        break
-                    end
-                    inlayBlocksFound = inlayBlocksFound + 1
-                    print("ONLINEMODULE: onOutput: Found INLAY block #" .. inlayBlocksFound .. " starting at index " .. s_inlay)
-
-                    local inlayContent = string.sub(currentLine, s_inlay, e_inlay)
-                    local _, _, omIndexStr = string.find(inlayContent, "<OM(%d+)>")
-                    local omIndex = tonumber(omIndexStr)
-
-                    if omIndex then
-                        print("ONLINEMODULE: onOutput: Found OM index: " .. omIndex)
-                        local promptPattern = "%[OMINLAYPROMPT" .. omIndex .. ":([^%]]*)%]"
-                        local negPromptPattern = "%[NEG_OMINLAYPROMPT" .. omIndex .. ":([^%]]*)%]"
-                        local _, _, foundInlayPrompt = string.find(currentLine, promptPattern)
-                        local _, _, foundInlayNegPrompt = string.find(currentLine, negPromptPattern)
-
-                        if foundInlayPrompt then
-                            print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundInlayPrompt, 1, 50) .. "...]")
-                            local currentNegativePromptInlay = negativePrompt
-                            local storedNegInlayPrompt = ""
-                            if foundInlayNegPrompt then 
-                                currentNegativePromptInlay = foundInlayNegPrompt .. ", " .. currentNegativePromptInlay
-                                storedNegInlayPrompt = foundInlayNegPrompt 
-                            end
-
-                            local finalPromptInlay = artistPrompt .. foundInlayPrompt .. qualityPrompt
-                            local inlayImage = generateImage(triggerId, finalPromptInlay, currentNegativePromptInlay):await()
-                            
-                            if inlayImage and type(inlayImage) == "string" and string.len(inlayImage) > 10 and 
-                               not string.find(inlayImage, "fail", 1, true) and 
-                               not string.find(inlayImage, "error", 1, true) and 
-                               not string.find(inlayImage, "실패", 1, true) then
-                                
-                                -- 기존 INLAY[<OM>] 블록을 새로운 inlay로 교체
-                                local replacement = "INLAY[<OM" .. omIndex .. ">" .. inlayImage .. "]"
-                                
-                                table.insert(inlayReplacements, {
-                                    start = s_inlay,
-                                    finish = e_inlay, 
-                                    replacement = replacement
-                                })
-
-                                -- 이미지 정보 저장
-                                local infoInlay = {
-                                    type = "INLAY",
-                                    identifier = "INLAY_" .. omIndex,
-                                    inlay = inlayImage,
-                                    prompt = foundInlayPrompt,
-                                    negPrompt = storedNegInlayPrompt
-                                }
-                                table.insert(generatedImagesInfo, infoInlay)
-                                
-                                -- ChatVar에 정보 저장
-                                setState(triggerId, "INLAY_" .. omIndex .. "_PROMPT", foundInlayPrompt)
-                                setState(triggerId, "INLAY_" .. omIndex .. "_NEGPROMPT", storedNegInlayPrompt)
-                                setState(triggerId, "INLAY_" .. omIndex, inlayImage)
-                                
-                                print("ONLINEMODULE: onOutput: Successfully processed INLAY block #" .. inlayBlocksFound)
-                                lineModifiedInThisPass = true
-                            else
-                                ERR(triggerId, "INLAY", 2)
-                                print("ONLINEMODULE: onOutput: Image generation failed for INLAY block #" .. inlayBlocksFound)
-                            end
-                        else
-                            ERR(triggerId, "INLAY", 0)
-                            print("ONLINEMODULE: onOutput: No prompt found for INLAY block #" .. inlayBlocksFound)
-                        end
-                    else
-                        ERR(triggerId, "INLAY", 3)
-                        print("ONLINEMODULE: onOutput: No OM index found in INLAY block #" .. inlayBlocksFound)
-                    end
-                    
-                    searchPos = e_inlay + 1
-                end
-
-                -- 모든 교체작업 수행
-                if #inlayReplacements > 0 then
-                    table.sort(inlayReplacements, function(a, b) return a.start > b.start end)
-                    for _, rep in ipairs(inlayReplacements) do
-                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.replacement .. string.sub(currentLine, rep.finish + 1)
-                        end
-                    end
-                end
+                print("ONLINEMODULE: onOutput: OMCARD == 4")
+                currentLine = changeKeyValue(triggerId, currentLine, "INLAY"):await()
             end
 
             if OMSNS == "1" and not skipOMSNS then
-                -- 트위터 블록 처리
                 print("ONLINEMODULE: onOutput: OMSNS == 1")
-                print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
-                
-                local twitterPromptFindPattern = "%[OMTWITTERPROMPT:([^%]]*)%]"
-                local twitterNegPromptFindPattern = "%[NEG_OMTWITTERPROMPT:([^%]]*)%]"
-                local twitterPattern = "(TWITTER)%[NAME:([^|]*)|TNAME:([^|]*)|TID:([^|]*)|TPROFILE:([^|]*)|TWEET:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|VIEW:([^|]*)|REPLY:([^|]*)|RETWEET:([^|]*)|LIKES:([^|]*)|COMMENT:(.-)%]"
-                
-                print("ONLINEMODULE: onOutput: Looking for Twitter pattern...")
-                local s_twitter, e_twitter, twCap1, twName, twTname, twTid, twTprofile, twTweet, twMedia, twHash, twTime, twView, twReply, twRetweet, twLikes, twCommentBlock = string.find(currentLine, twitterPattern)
-                
-                if s_twitter then
-                    print("ONLINEMODULE: onOutput: Found Twitter block at positions", s_twitter, e_twitter)
-                    print("ONLINEMODULE: onOutput: Twitter ID:", twTid)
-                else
-                    print("ONLINEMODULE: onOutput: No Twitter block found")
-                end
-
-                local twitterId = twTid
-                local profileInlayToUse = nil
-
-                if twitterId then
-                    print("ONLINEMODULE: onOutput: Processing Twitter ID:", twitterId)
-                    local existingProfileInlay = getState(triggerId, twitterId) or "null"
-                    print("ONLINEMODULE: onOutput: Existing profile inlay:", existingProfileInlay)
-
-                    if existingProfileInlay == "null" or not existingProfileInlay then
-                        print("ONLINEMODULE: onOutput: Need to generate new profile image")
-                        local profilePromptFindPattern = "%[OMTWITTERPROFILEPROMPT:([^%]]*)%]"
-                        local profileNegPromptFindPattern = "%[NEG_OMTWITTERPROFILEPROMPT:([^%]]*)%]"
-                        
-                        local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
-                        local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
-                        
-                        print("ONLINEMODULE: onOutput: Found profile prompt:", foundProfilePrompt ~= nil)
-                        print("ONLINEMODULE: onOutput: Found profile neg prompt:", foundProfileNegPrompt ~= nil)
-
-                        if foundProfilePrompt then
-                            local finalPromptTwitterProfile = (artistPrompt or "") .. (foundProfilePrompt or "") .. (qualityPrompt or "")
-                            local currentNegativePromptProfile = (negativePrompt or "")
-                            local storedNegProfilePrompt = ""
-                            
-                            if foundProfileNegPrompt then 
-                                currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
-                                storedNegProfilePrompt = foundProfileNegPrompt 
-                            end
-
-                            print("ONLINEMODULE: onOutput: Generating profile image...")
-                            local inlayProfile = generateImage(triggerId, finalPromptTwitterProfile, currentNegativePromptProfile):await()
-                            
-                            local isSuccessProfile = inlayProfile and type(inlayProfile) == "string" and 
-                                                   string.len(inlayProfile) > 10 and 
-                                                   not string.find(inlayProfile, "fail", 1, true) and 
-                                                   not string.find(inlayProfile, "error", 1, true) and 
-                                                   not string.find(inlayProfile, "실패", 1, true)
-
-                            if isSuccessProfile then
-                                print("ONLINEMODULE: onOutput: Profile image generation successful")
-                                profileInlayToUse = inlayProfile
-                                setState(triggerId, twitterId, profileInlayToUse)
-                                setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                                setState(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
-                                setState(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
-
-                                local infoProfile = {
-                                    type = "PROFILE",
-                                    identifier = twitterId, 
-                                    inlay = profileInlayToUse, 
-                                    prompt = foundProfilePrompt,
-                                    negPrompt = storedNegProfilePrompt
-                                }
-                                table.insert(generatedImagesInfo, infoProfile)
-                                print("ONLINEMODULE: onOutput: Stored generated profile info")
-                            else
-                                print("ONLINEMODULE: onOutput: Profile image generation failed")
-                                ERR(triggerId, "TWITTERPROFILE", 2)
-                            end
-                        end
-                    else
-                        print("ONLINEMODULE: onOutput: Using existing profile inlay")
-                        profileInlayToUse = existingProfileInlay
-                        setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                    end
-                end
-
-                print("ONLINEMODULE: onOutput: Looking for tweet prompt...")
-                local _, _, foundTwitterPrompt = string.find(currentLine, twitterPromptFindPattern)
-                print("ONLINEMODULE: onOutput: Tweet prompt found:", foundTwitterPrompt ~= nil)
-
-                if foundTwitterPrompt and s_twitter then
-                    print("ONLINEMODULE: onOutput: Processing tweet...")
-                    local _, _, foundTwitterNegPrompt = string.find(currentLine, twitterNegPromptFindPattern)
-                    local currentNegativePromptTwitter = negativePrompt
-                    local storedNegTweetPrompt = ""
-                    
-                    if foundTwitterNegPrompt then 
-                        currentNegativePromptTwitter = foundTwitterNegPrompt .. ", " .. currentNegativePromptTwitter
-                        storedNegTweetPrompt = foundTwitterNegPrompt 
-                    end
-
-                    local finalPromptTwitterTweet = artistPrompt .. foundTwitterPrompt .. qualityPrompt
-                    print("ONLINEMODULE: onOutput: Generating tweet image...")
-                    local inlayTwitter = generateImage(triggerId, finalPromptTwitterTweet, currentNegativePromptTwitter):await()
-                    
-                    if inlayTwitter and type(inlayTwitter) == "string" and 
-                       string.len(inlayTwitter) > 10 and 
-                       not string.find(inlayTwitter, "fail", 1, true) and 
-                       not string.find(inlayTwitter, "error", 1, true) and 
-                       not string.find(inlayTwitter, "실패", 1, true) then
-                        
-                        print("ONLINEMODULE: onOutput: Tweet image generation successful")
-                        local replacementTwitter = "TWITTER[NAME:" .. (twName or "") .. 
-                            "|TNAME:" .. (twTname or "") .. 
-                            "|TID:" .. (twTid or "") .. 
-                            "|TPROFILE:" .. (profileInlayToUse or twTprofile or "") .. 
-                            "|TWEET:" .. (twTweet or "") .. 
-                            "|MEDIA:" .. "<OM>" .. inlayTwitter ..
-                            "|HASH:" .. (twHash or "") .. 
-                            "|TIME:" .. (twTime or "") .. 
-                            "|VIEW:" .. (twView or "") .. 
-                            "|REPLY:" .. (twReply or "") .. 
-                            "|RETWEET:" .. (twRetweet or "") .. 
-                            "|LIKES:" .. (twLikes or "") .. 
-                            "|COMMENT:" .. (twCommentBlock or "") .. "]"
-
-                        print("ONLINEMODULE: onOutput: Replacing content in line...")
-                        currentLine = string.sub(currentLine, 1, s_twitter-1) .. replacementTwitter .. string.sub(currentLine, e_twitter + 1)
-                        lineModifiedInThisPass = true
-
-                        local infoTweet = {
-                            type = "TWEET", 
-                            identifier = twitterId, 
-                            inlay = inlayTwitter,
-                            prompt = foundTwitterPrompt,
-                            negPrompt = storedNegTweetPrompt
-                        }
-
-                        table.insert(generatedImagesInfo, infoTweet)
-                        setState(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
-                        setState(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
-                        setState(triggerId, twitterId .. "_TWEET", infoTweet.inlay)
-                        print("ONLINEMODULE: onOutput: Stored generated tweet info")
-                    elseif profileInlayToUse then
-                        print("ONLINEMODULE: onOutput: Using profile-only replacement")
-                        local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. 
-                            "|TNAME:" .. (twTname or "") .. 
-                            "|TID:" .. (twTid or "") .. 
-                            "|TPROFILE:" .. "<OM>" .. profileInlayToUse ..
-                            "|TWEET:" .. (twTweet or "") .. 
-                            "|MEDIA:" .. (twMedia or "") .. 
-                            "|HASH:" .. (twHash or "") .. 
-                            "|TIME:" .. (twTime or "") .. 
-                            "|VIEW:" .. (twView or "") .. 
-                            "|REPLY:" .. (twReply or "") .. 
-                            "|RETWEET:" .. (twRetweet or "") .. 
-                            "|LIKES:" .. (twLikes or "") .. 
-                            "|COMMENT:" .. (twCommentBlock or "") .. "]"
-                        currentLine = string.sub(currentLine, 1, s_twitter-1) .. originalBlockReplacement .. string.sub(currentLine, e_twitter + 1)
-                        lineModifiedInThisPass = true
-                    end
-                elseif profileInlayToUse and s_twitter then
-                    print("ONLINEMODULE: onOutput: Using profile-only replacement (no tweet prompt)")
-                    local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. 
-                        "|TNAME:" .. (twTname or "") .. 
-                        "|TID:" .. (twTid or "") .. 
-                        "|TPROFILE:" .. "<OM>" .. profileInlayToUse ..
-                        "|TWEET:" .. (twTweet or "") .. 
-                        "|MEDIA:" .. (twMedia or "") .. 
-                        "|HASH:" .. (twHash or "") .. 
-                        "|TIME:" .. (twTime or "") .. 
-                        "|VIEW:" .. (twView or "") .. 
-                        "|REPLY:" .. (twReply or "") .. 
-                        "|RETWEET:" .. (twRetweet or "") .. 
-                        "|LIKES:" .. (twLikes or "") .. 
-                        "|COMMENT:" .. (twCommentBlock or "") .. "]"
-                    currentLine = string.sub(currentLine, 1, s_twitter-1) .. originalBlockReplacement .. string.sub(currentLine, e_twitter + 1)
-                    lineModifiedInThisPass = true
-                end
-            end
-
-            if OMSNS == "2" and not skipOMSNS then
-                -- 인스타그램 블록 처리
+                currentLine = changeKeyValue(triggerId, currentLine, "TWITTER"):await()
+            elseif OMSNS == "2" and not skipOMSNS then
                 print("ONLINEMODULE: onOutput: OMSNS == 2")
-                print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
-                
-                local instaPromptFindPattern = "%[OMINSTAPROMPT:([^%]]*)%]"
-                local instaNegPromptFindPattern = "%[NEG_OMINSTAPROMPT:([^%]]*)%]"
-                local instaPattern = "(INSTA)%[NAME:([^|]*)|IID:([^|]*)|IPROFILE:([^|]*)|POST:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|LIKES:([^|]*)|REPLY:([^|]*)|SHARE:([^%]]*)%]"
-                
-                print("ONLINEMODULE: onOutput: Looking for Instagram pattern...")
-                local s_insta, e_insta, instaCap1, instaName, instaIid, instaIprofile, instaPost, instaMedia, instaHash, instaTime, instaLikes, instaReply, instaShare = string.find(currentLine, instaPattern)
-                
-                if s_insta then
-                    print("ONLINEMODULE: onOutput: Found Instagram block at positions", s_insta, e_insta)
-                    print("ONLINEMODULE: onOutput: Instagram ID:", instaIid)
-                else
-                    print("ONLINEMODULE: onOutput: No Instagram block found")
-                end
-
-                local instaId = instaIid
-                local profileInlayToUse = nil
-
-                if instaId then
-                    print("ONLINEMODULE: onOutput: Processing Instagram ID:", instaId)
-                    local existingProfileInlay = getState(triggerId, instaId) or "null"
-                    print("ONLINEMODULE: onOutput: Existing profile inlay:", existingProfileInlay)
-
-                    if existingProfileInlay == "null" or not existingProfileInlay then
-                        print("ONLINEMODULE: onOutput: Need to generate new profile image")
-                        local profilePromptFindPattern = "%[OMINSTAPROFILEPROMPT:([^%]]*)%]"
-                        local profileNegPromptFindPattern = "%[NEG_OMINSTAPROFILEPROMPT:([^%]]*)%]"
-                        
-                        local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
-                        local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
-                        
-                        print("ONLINEMODULE: onOutput: Found profile prompt:", foundProfilePrompt ~= nil)
-                        print("ONLINEMODULE: onOutput: Found profile neg prompt:", foundProfileNegPrompt ~= nil)
-
-                        if foundProfilePrompt then
-                            local finalPromptInstaProfile = (artistPrompt or "") .. (foundProfilePrompt or "") .. (qualityPrompt or "")
-                            local currentNegativePromptProfile = (negativePrompt or "")
-                            local storedNegProfilePrompt = ""
-                            
-                            if foundProfileNegPrompt then 
-                                currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
-                                storedNegProfilePrompt = foundProfileNegPrompt 
-                            end
-
-                            print("ONLINEMODULE: onOutput: Generating profile image...")
-                            local inlayProfile = generateImage(triggerId, finalPromptInstaProfile, currentNegativePromptProfile):await()
-                            
-                            local isSuccessProfile = inlayProfile and type(inlayProfile) == "string" and 
-                                                   string.len(inlayProfile) > 10 and 
-                                                   not string.find(inlayProfile, "fail", 1, true) and 
-                                                   not string.find(inlayProfile, "error", 1, true) and 
-                                                   not string.find(inlayProfile, "실패", 1, true)
-
-                            if isSuccessProfile then
-                                print("ONLINEMODULE: onOutput: Profile image generation successful")
-                                profileInlayToUse = inlayProfile
-                                setState(triggerId, instaId, profileInlayToUse)
-                                setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                                setState(triggerId, instaId .. "_INSTAPROFILEPROMPT", foundProfilePrompt)
-                                setState(triggerId, instaId .. "_NEGINSTAPROFILEPROMPT", storedNegProfilePrompt)
-
-                                local infoProfile = {
-                                    type = "PROFILE",
-                                    identifier = instaId, 
-                                    inlay = profileInlayToUse, 
-                                    prompt = foundProfilePrompt,
-                                    negPrompt = storedNegProfilePrompt
-                                }
-                                table.insert(generatedImagesInfo, infoProfile)
-                                print("ONLINEMODULE: onOutput: Stored generated profile info")
-                            else
-                                print("ONLINEMODULE: onOutput: Profile image generation failed")
-                                ERR(triggerId, "INSTAPROFILE", 2)
-                            end
-                        end
-                    else
-                        print("ONLINEMODULE: onOutput: Using existing profile inlay")
-                        profileInlayToUse = existingProfileInlay
-                        setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                    end
-                end
-
-                print("ONLINEMODULE: onOutput: Looking for post prompt...")
-                local _, _, foundInstaPrompt = string.find(currentLine, instaPromptFindPattern)
-                print("ONLINEMODULE: onOutput: Post prompt found:", foundInstaPrompt ~= nil)
-
-                if foundInstaPrompt and s_insta then
-                    print("ONLINEMODULE: onOutput: Processing post...")
-                    local _, _, foundInstaNegPrompt = string.find(currentLine, instaNegPromptFindPattern)
-                    local currentNegativePromptInsta = negativePrompt
-                    local storedNegPostPrompt = ""
-                    
-                    if foundInstaNegPrompt then 
-                        currentNegativePromptInsta = foundInstaNegPrompt .. ", " .. currentNegativePromptInsta
-                        storedNegPostPrompt = foundInstaNegPrompt 
-                    end
-
-                    local finalPromptInstaPost = artistPrompt .. foundInstaPrompt .. qualityPrompt
-                    print("ONLINEMODULE: onOutput: Generating post image...")
-                    local inlayInsta = generateImage(triggerId, finalPromptInstaPost, currentNegativePromptInsta):await()
-                    
-                    if inlayInsta and type(inlayInsta) == "string" and 
-                       string.len(inlayInsta) > 10 and 
-                       not string.find(inlayInsta, "fail", 1, true) and 
-                       not string.find(inlayInsta, "error", 1, true) and 
-                       not string.find(inlayInsta, "실패", 1, true) then
-                        
-                        print("ONLINEMODULE: onOutput: Post image generation successful")
-                        local replacementInsta = "INSTA[NAME:" .. (instaName or "") .. 
-                            "|IID:" .. (instaIid or "") .. 
-                            "|IPROFILE:" .. (profileInlayToUse or instaIprofile or "") .. 
-                            "|POST:" .. (instaPost or "") .. 
-                            "|MEDIA:" .. "<OM>" .. inlayInsta ..
-                            "|HASH:" .. (instaHash or "") .. 
-                            "|TIME:" .. (instaTime or "") .. 
-                            "|LIKES:" .. (instaLikes or "") .. 
-                            "|REPLY:" .. (instaReply or "") .. 
-                            "|SHARE:" .. (instaShare or "") .. "]"
-
-                        print("ONLINEMODULE: onOutput: Replacing content in line...")
-                        currentLine = string.sub(currentLine, 1, s_insta-1) .. replacementInsta .. string.sub(currentLine, e_insta + 1)
-                        lineModifiedInThisPass = true
-
-                        local infoPost = {
-                            type = "POST", 
-                            identifier = instaId, 
-                            inlay = inlayInsta,
-                            prompt = foundInstaPrompt,
-                            negPrompt = storedNegPostPrompt
-                        }
-
-                        table.insert(generatedImagesInfo, infoPost)
-                        setState(triggerId, instaId .. "_INSTAPROMPT", infoPost.prompt)
-                        setState(triggerId, instaId .. "_INSTANEGPROMPT", infoPost.negPrompt)
-                        setState(triggerId, instaId, infoPost.inlay)
-                        print("ONLINEMODULE: onOutput: Stored generated post info")
-                    elseif profileInlayToUse then
-                        print("ONLINEMODULE: onOutput: Using profile-only replacement")
-                        local originalBlockReplacement = "INSTA[NAME:" .. (instaName or "") .. 
-                            "|IID:" .. (instaIid or "") .. 
-                            "|IPROFILE:" .. "<OM>" .. profileInlayToUse ..
-                            "|POST:" .. (instaPost or "") .. 
-                            "|MEDIA:" .. (instaMedia or "") .. 
-                            "|HASH:" .. (instaHash or "") .. 
-                            "|TIME:" .. (instaTime or "") .. 
-                            "|LIKES:" .. (instaLikes or "") .. 
-                            "|REPLY:" .. (instaReply or "") .. 
-                            "|SHARE:" .. (instaShare or "") .. "]"
-                        currentLine = string.sub(currentLine, 1, s_insta-1) .. originalBlockReplacement .. string.sub(currentLine, e_insta + 1)
-                        lineModifiedInThisPass = true
-                    end
-                elseif profileInlayToUse and s_insta then
-                    print("ONLINEMODULE: onOutput: Using profile-only replacement (no post prompt)")
-                    local originalBlockReplacement = "INSTA[NAME:" .. (instaName or "") .. 
-                        "|IID:" .. (instaIid or "") .. 
-                        "|IPROFILE:" .. "<OM>" .. profileInlayToUse ..
-                        "|POST:" .. (instaPost or "") .. 
-                        "|MEDIA:" .. (instaMedia or "") .. 
-                        "|HASH:" .. (instaHash or "") .. 
-                        "|TIME:" .. (instaTime or "") .. 
-                        "|LIKES:" .. (instaLikes or "") .. 
-                        "|REPLY:" .. (instaReply or "") .. 
-                        "|SHARE:" .. (instaShare or "") .. "]"
-                    currentLine = string.sub(currentLine, 1, s_insta-1) .. originalBlockReplacement .. string.sub(currentLine, e_insta + 1)
-                    lineModifiedInThisPass = true
-                end
-            end
-
-            if OMSNS == "3" and not skipOMSNS then
-                -- 하이브리드 모드 블록 처리
-                print("ONLINEMODULE: onOutput: OMSNS == 3 (Hybrid mode)")
-                print("ONLINEMODULE: onOutput: Current line length:", #currentLine)
-
-                -- 트위터 블록부터
-                local twitterPromptFindPattern = "%[OMTWITTERPROMPT:([^%]]*)%]"
-                local twitterNegPromptFindPattern = "%[NEG_OMTWITTERPROMPT:([^%]]*)%]"
-                local twitterPattern = "(TWITTER)%[NAME:([^|]*)|TNAME:([^|]*)|TID:([^|]*)|TPROFILE:([^|]*)|TWEET:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|VIEW:([^|]*)|REPLY:([^|]*)|RETWEET:([^|]*)|LIKES:([^|]*)|COMMENT:(.-)%]"
-
-                local _, _, foundTwitterPrompt = string.find(currentLine, twitterPromptFindPattern)
-                local s_twitter, e_twitter, twCap1, twName, twTname, twTid, twTprofile, twTweet, twMedia, twHash, twTime, twView, twReply, twRetweet, twLikes, twCommentBlock = string.find(currentLine, twitterPattern)
-                
-                if s_twitter then  -- s_twitter가 발견되면 프로필 처리 시작
-                    local twitterId = twTid
-                    local profileInlayToUse = nil
-
-                    if twitterId then
-                        local existingProfileInlay = getState(triggerId, twitterId) or "null" 
-                        if existingProfileInlay == "null" or not existingProfileInlay then
-                            local profilePromptFindPattern = "%[OMTWITTERPROFILEPROMPT:([^%]]*)%]"
-                            local profileNegPromptFindPattern = "%[NEG_OMTWITTERPROFILEPROMPT:([^%]]*)%]"
-                            local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
-                            local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
-
-                            if foundProfilePrompt then
-                                local finalPromptTwitterProfile = artistPrompt .. foundProfilePrompt .. qualityPrompt
-                                local currentNegativePromptProfile = negativePrompt
-                                local storedNegProfilePrompt = ""
-                                
-                                if foundProfileNegPrompt then 
-                                    currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
-                                    storedNegProfilePrompt = foundProfileNegPrompt
-                                end
-
-                                local inlayProfile = generateImage(triggerId, finalPromptTwitterProfile, currentNegativePromptProfile):await()
-                                
-                                if inlayProfile and type(inlayProfile) == "string" and string.len(inlayProfile) > 10 
-                                   and not string.find(inlayProfile, "fail", 1, true) 
-                                   and not string.find(inlayProfile, "error", 1, true)
-                                   and not string.find(inlayProfile, "실패", 1, true) then
-                                    
-                                    profileInlayToUse = inlayProfile
-                                    setState(triggerId, twitterId, profileInlayToUse)
-                                    setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                                    setState(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
-                                    setState(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
-
-                                    local infoProfile = {
-                                        type = "PROFILE",
-                                        identifier = twitterId,
-                                        inlay = profileInlayToUse,
-                                        prompt = foundProfilePrompt,
-                                        negPrompt = storedNegProfilePrompt
-                                    }
-                                    table.insert(generatedImagesInfo, infoProfile)
-                                else
-                                    ERR(triggerId, "TWITTERPROFILE", 2)
-                                end
-                            end
-                        else
-                            profileInlayToUse = existingProfileInlay
-                            setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                        end
-                    end
-
-                    -- 트윗 처리는 foundTwitterPrompt가 있을 때만
-                    if foundTwitterPrompt then
-                        local _, _, foundTwitterNegPrompt = string.find(currentLine, twitterNegPromptFindPattern)
-                        local currentNegativePromptTwitter = negativePrompt
-                        local storedNegTweetPrompt = ""
-                        
-                        if foundTwitterNegPrompt then 
-                            currentNegativePromptTwitter = foundTwitterNegPrompt .. ", " .. currentNegativePromptTwitter
-                            storedNegTweetPrompt = foundTwitterNegPrompt
-                        end
-
-                        local finalPromptTwitterTweet = artistPrompt .. foundTwitterPrompt .. qualityPrompt
-                        local inlayTwitter = generateImage(triggerId, finalPromptTwitterTweet, currentNegativePromptTwitter):await()
-                        
-                        if inlayTwitter and type(inlayTwitter) == "string" and string.len(inlayTwitter) > 10 
-                           and not string.find(inlayTwitter, "fail", 1, true) 
-                           and not string.find(inlayTwitter, "error", 1, true)
-                           and not string.find(inlayTwitter, "실패", 1, true) then
-                            
-                            local replacementTwitter = string.format(
-                                "TWITTER[NAME:%s|TNAME:%s|TID:%s|TPROFILE:%s|TWEET:%s|MEDIA:%s|HASH:%s|TIME:%s|VIEW:%s|REPLY:%s|RETWEET:%s|LIKES:%s|COMMENT:%s]",
-                                twName or "", twTname or "", twTid or "",
-                                profileInlayToUse and "<OM>" .. profileInlayToUse or (twTprofile or ""),
-                                twTweet or "", "<OM>" .. inlayTwitter,
-                                twHash or "", twTime or "", twView or "",
-                                twReply or "", twRetweet or "", twLikes or "",
-                                twCommentBlock or ""
-                            )
-                            currentLine = string.sub(currentLine, 1, s_twitter-1) .. replacementTwitter .. string.sub(currentLine, e_twitter + 1)
-                            lineModifiedInThisPass = true
-
-                            local infoTweet = {
-                                type = "TWEET", 
-                                identifier = twitterId, 
-                                inlay = inlayTwitter,
-                                prompt = foundTwitterPrompt,
-                                negPrompt = storedNegTweetPrompt
-                            }
-                            table.insert(generatedImagesInfo, infoTweet)
-                            setState(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
-                            setState(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
-                            setState(triggerId, twitterId .. "_TWEET", infoTweet.inlay)
-                        end
-                    elseif profileInlayToUse then
-                        -- 프로필만 있을 때의 교체
-                        local replacementTwitter = string.format(
-                            "TWITTER[NAME:%s|TNAME:%s|TID:%s|TPROFILE:%s|TWEET:%s|MEDIA:%s|HASH:%s|TIME:%s|VIEW:%s|REPLY:%s|RETWEET:%s|LIKES:%s|COMMENT:%s]",
-                            twName or "", twTname or "", twTid or "",
-                            "<OM>" .. profileInlayToUse,
-                            twTweet or "", twMedia or "",
-                            twHash or "", twTime or "", twView or "",
-                            twReply or "", twRetweet or "", twLikes or "",
-                            twCommentBlock or ""
-                        )
-                        currentLine = string.sub(currentLine, 1, s_twitter-1) .. replacementTwitter .. string.sub(currentLine, e_twitter + 1)
-                        lineModifiedInThisPass = true
-                    end
-                end
-
-                -- 그 다음은 인스타
-                local instaPromptFindPattern = "%[OMINSTAPROMPT:([^%]]*)%]"
-                local instaNegPromptFindPattern = "%[NEG_OMINSTAPROMPT:([^%]]*)%]"
-                local instaPattern = "(INSTA)%[NAME:([^|]*)|IID:([^|]*)|IPROFILE:([^|]*)|POST:([^|]*)|MEDIA:([^|]*)|HASH:([^|]*)|TIME:([^|]*)|LIKES:([^|]*)|REPLY:([^|]*)|SHARE:([^%]]*)%]"
-
-                local _, _, foundInstaPrompt = string.find(currentLine, instaPromptFindPattern)
-                local s_insta, e_insta, instaCap1, instaName, instaIid, instaIprofile, instaPost, instaMedia, instaHash, instaTime, instaLikes, instaReply, instaShare = string.find(currentLine, instaPattern)
-
-                if foundInstaPrompt and s_insta then
-                    -- 인스타도 똑같이
-                    local instaId = instaIid
-                    local profileInlayToUse = nil
-                    local _, _, foundInstaNegPrompt = string.find(currentLine, instaNegPromptFindPattern)
-
-                    -- 인스타 프로필 생성 및 재사용 로직
-                    if instaId then
-                        local existingProfileInlay = getState(triggerId, instaId) or "null"
-                        if existingProfileInlay == "null" or not existingProfileInlay then
-                            local profilePromptFindPattern = "%[OMINSTAPROFILEPROMPT:([^%]]*)%]"
-                            local profileNegPromptFindPattern = "%[NEG_OMINSTAPROFILEPROMPT:([^%]]*)%]"
-                            local _, _, foundProfilePrompt = string.find(currentLine, profilePromptFindPattern)
-                            local _, _, foundProfileNegPrompt = string.find(currentLine, profileNegPromptFindPattern)
-
-                            if foundProfilePrompt then
-                                local finalPromptInstaProfile = artistPrompt .. foundProfilePrompt .. qualityPrompt
-                                local currentNegativePromptProfile = negativePrompt
-                                local storedNegProfilePrompt = ""
-                                if foundProfileNegPrompt then 
-                                    currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
-                                    storedNegProfilePrompt = foundProfileNegPrompt
-                                end
-
-                                local inlayProfile = generateImage(triggerId, finalPromptInstaProfile, currentNegativePromptProfile):await()
-                                
-                                if inlayProfile and type(inlayProfile) == "string" and string.len(inlayProfile) > 10
-                                   and not string.find(inlayProfile, "fail", 1, true)
-                                   and not string.find(inlayProfile, "error", 1, true) 
-                                   and not string.find(inlayProfile, "실패", 1, true) then
-                                    
-                                    profileInlayToUse = inlayProfile
-                                    setState(triggerId, instaId, profileInlayToUse)
-                                    setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                                    setState(triggerId, instaId .. "_INSTAPROFILEPROMPT", foundProfilePrompt)
-                                    setState(triggerId, instaId .. "_NEGINSTAPROFILEPROMPT", storedNegProfilePrompt)
-
-                                    local infoProfile = {
-                                        type = "PROFILE",
-                                        identifier = instaId,
-                                        inlay = profileInlayToUse,
-                                        prompt = foundProfilePrompt,
-                                        negPrompt = storedNegProfilePrompt
-                                    }
-                                    table.insert(generatedImagesInfo, infoProfile)
-                                else
-                                    ERR(triggerId, "INSTAPROFILE", 2)
-                                end
-                            end
-                        else
-                            profileInlayToUse = existingProfileInlay
-                            setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                        end
-                    end
-
-                    -- 이미지 후처리
-                    local currentNegativePromptInsta = negativePrompt
-                    local storedNegPostPrompt = ""
-                    if foundInstaNegPrompt then 
-                        currentNegativePromptInsta = foundInstaNegPrompt .. ", " .. currentNegativePromptInsta
-                        storedNegPostPrompt = foundInstaNegPrompt
-                    end
-
-                    local finalPromptInstaPost = artistPrompt .. foundInstaPrompt .. qualityPrompt
-                    local inlayInsta = generateImage(triggerId, finalPromptInstaPost, currentNegativePromptInsta):await()
-                    
-                    if inlayInsta and type(inlayInsta) == "string" and string.len(inlayInsta) > 10
-                       and not string.find(inlayInsta, "fail", 1, true)
-                       and not string.find(inlayInsta, "error", 1, true)
-                       and not string.find(inlayInsta, "실패", 1, true) then
-                        
-                        local replacementInsta = string.format(
-                            "INSTA[NAME:%s|IID:%s|IPROFILE:%s|POST:%s|MEDIA:%s|HASH:%s|TIME:%s|LIKES:%s|REPLY:%s|SHARE:%s]",
-                            instaName or "", instaIid or "",
-                            profileInlayToUse and "<OM>" .. profileInlayToUse or (instaIprofile or ""),
-                            instaPost or "", "<OM>" .. inlayInsta,
-                            instaHash or "", instaTime or "",
-                            instaLikes or "", instaReply or "", instaShare or ""
-                        )
-                        currentLine = string.sub(currentLine, 1, s_insta-1) .. replacementInsta .. string.sub(currentLine, e_insta + 1)
-                        lineModifiedInThisPass = true
-
-                        local infoPost = {
-                            type = "POST",
-                            identifier = instaId,
-                            inlay = inlayInsta,
-                            prompt = foundInstaPrompt,
-                            negPrompt = storedNegPostPrompt
-                        }
-                        table.insert(generatedImagesInfo, infoPost)
-
-                        setState(triggerId, instaId .. "_INSTAPROMPT", infoPost.prompt)
-                        setState(triggerId, instaId .. "_INSTANEGPROMPT", infoPost.negPrompt) 
-                        setState(triggerId, instaId, infoPost.inlay)
-                    elseif profileInlayToUse then
-                        local replacementInsta = string.format(
-                            "INSTA[NAME:%s|IID:%s|IPROFILE:%s|POST:%s|MEDIA:%s|HASH:%s|TIME:%s|LIKES:%s|REPLY:%s|SHARE:%s]",
-                            instaName or "", instaIid or "",
-                            "<OM>" .. profileInlayToUse,
-                            instaPost or "", instaMedia or "",
-                            instaHash or "", instaTime or "",
-                            instaLikes or "", instaReply or "", instaShare or ""
-                        )
-                        currentLine = string.sub(currentLine, 1, s_insta-1) .. replacementInsta .. string.sub(currentLine, e_insta + 1)
-                        lineModifiedInThisPass = true
-                    end
-                end
+                currentLine = changeKeyValue(triggerId, currentLine, "INSTA"):await()
+            elseif OMSNS == "3" and not skipOMSNS then
+                print("ONLINEMODULE: onOutput: OMSNS == 3")
+                currentLine = changeKeyValue(triggerId, currentLine, "HYBRIDSNS"):await()
             end
 
             if OMCOMMUNITY == "1" and not skipOMCOMMUNITY then
                 print("ONLINEMODULE: onOutput: OMCOMMUNITY == 1")
-                local searchPos = 1
-                local dcReplacements = {}
-
-                local function findLastPatternBefore(str, pattern, beforePos)
-                    local last_s, last_e, last_cap1 = nil, nil, nil
-                    local searchPosFn = 1
-                    while true do
-                        local s_fn, e_fn, cap1_fn = string.find(str, pattern, searchPosFn)
-                        if not s_fn or s_fn >= beforePos then
-                            break
-                        end
-                        last_s, last_e, last_cap1 = s_fn, e_fn, cap1_fn
-                        searchPosFn = e_fn + 1
-                    end
-                    return last_s, last_e, last_cap1
-                end
-
-                while true do
-                    local s_dc, e_dc_prefix = string.find(currentLine, "DC%[", searchPos)
-                    if not s_dc then break end
-                    local bracketLevel = 1
-                    local e_dc_suffix = e_dc_prefix + 1
-                    local foundClosingBracket = false
-                    while e_dc_suffix <= #currentLine do
-                        local char = currentLine:sub(e_dc_suffix, e_dc_suffix)
-                        if char == '[' then
-                            bracketLevel = bracketLevel + 1
-                        elseif char == ']' then
-                            bracketLevel = bracketLevel - 1
-                        end
-                        if bracketLevel == 0 then foundClosingBracket = true; break end
-                        e_dc_suffix = e_dc_suffix + 1
-                    end
-                    if foundClosingBracket then
-                        local dcContent = string.sub(currentLine, e_dc_prefix + 1, e_dc_suffix - 1)
-                        local omSearchPosInContent = 1
-                        while true do
-                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(dcContent, "<OM(%d+)>", omSearchPosInContent)
-                            if not s_om_in_content then break end
-                            local omIndex = tonumber(omIndexStr)
-
-                            local content_start_abs = e_dc_prefix + 1
-                            local om_abs_start = content_start_abs + s_om_in_content - 1
-                            local om_abs_end = content_start_abs + e_om_in_content - 1
-
-                            local postId = nil
-                            local postIdPattern = "PID:([^|]*)"
-                            local s_post, e_post, capturedPostId = findLastPatternBefore(dcContent, postIdPattern, s_om_in_content)
-                            if not capturedPostId then
-                                local s_post2, e_post2, capturedPostId2 = findLastPatternBefore(dcContent, "PN:([^|]*)", s_om_in_content)
-                                capturedPostId = capturedPostId2
-                            end
-                            if capturedPostId and type(capturedPostId) == "string" then
-                                postId = capturedPostId:match("^%s*(.-)%s*$")
-                                if postId == "" then postId = nil end
-                            end
-
-                            if omIndex and postId then
-                                local dcPromptPattern = "%[OMDCPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local negDcPromptPattern = "%[NEG_OMDCPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local _, _, foundDcPrompt = string.find(currentLine, dcPromptPattern)
-                                local _, _, foundNegDcPrompt = string.find(currentLine, negDcPromptPattern)
-                                local currentNegativePromptDc = negativePrompt
-                                local storedDcNegPrompt = ""
-                                if foundNegDcPrompt then currentNegativePromptDc = foundNegDcPrompt .. ", " .. currentNegativePromptDc; storedDcNegPrompt = foundNegDcPrompt end
-                                if foundDcPrompt then
-                                    local finalPromptDc = artistPrompt .. foundDcPrompt .. qualityPrompt
-                                    local successCall, inlayDc = pcall(function() return generateImage(triggerId, finalPromptDc, currentNegativePromptDc):await() end)
-                                    local isSuccessDc = successCall and (inlayDc ~= nil) and (type(inlayDc) == "string") and (string.len(inlayDc) > 10) and not string.find(inlayDc, "fail", 1, true) and not string.find(inlayDc, "error", 1, true) and not string.find(inlayDc, "실패", 1, true)
-                                    if isSuccessDc then
-                                        local dcIdentifier = postId
-
-                                        table.insert(dcReplacements, {
-                                            start = om_abs_start,
-                                            finish = om_abs_end,
-                                            inlay = "<OM" .. omIndex .. ">" .. inlayDc
-                                        })
-
-                                        local infoDC = {
-                                            type = "DC",
-                                            identifier = dcIdentifier,
-                                            inlay = inlayDc, 
-                                            prompt = foundDcPrompt,
-                                            negPrompt = storedDcNegPrompt
-                                        }
-                                        local alreadyGeneratedForThisPostId = false
-                                        local existingIndex = -1
-                                        for k, v in ipairs(generatedImagesInfo) do
-                                            if v.type == "DC" and v.identifier == dcIdentifier then
-                                                alreadyGeneratedForThisPostId = true
-                                                existingIndex = k
-                                                break
-                                            end
-                                        end
-                                        if alreadyGeneratedForThisPostId then
-                                            generatedImagesInfo[existingIndex] = infoDC
-                                        else
-                                            table.insert(generatedImagesInfo, infoDC)
-                                        end
-
-                                        setState(triggerId, "DC_" .. dcIdentifier .. "_PROMPT", infoDC.prompt)
-                                        setState(triggerId, "DC_" .. dcIdentifier .. "_NEGPROMPT", infoDC.negPrompt)
-                                        setState(triggerId, "DC_" .. dcIdentifier, inlayDc) 
-                                    else
-                                        ERR(triggerId, "DCINSIDE", 2)
-                                        print("ONLINEMODULE: onOutput: ERROR - DC image generation failed...")
-                                    end
-                                else
-                                    ERR(triggerId, "DCINSIDE", 0)
-                                    print("ONLINEMODULE: onOutput: WARN - Found <OM...> tag but no corresponding prompt tag...")
-                                end
-                            else
-                                ERR(triggerId, "DCINSIDE", 3)
-                                if not postId then print("ONLINEMODULE: onOutput: WARN - Could not determine Post ID for <OM" .. (omIndex or "??") .. "> tag at position " .. om_abs_start .. ". Skipping.") end
-                            end
-                            omSearchPosInContent = e_om_in_content + 1
-                        end
-                        searchPos = e_dc_suffix + 1
-                    else
-                        searchPos = e_dc_prefix + 1
-                    end
-                end
-                if #dcReplacements > 0 then
-                    table.sort(dcReplacements, function(a, b) return a.start > b.start end)
-                    for i, rep in ipairs(dcReplacements) do
-                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
-                        else
-                            print("ONLINEMODULE: onOutput: WARN - Invalid range for replacement: " .. rep.start .. " to " .. rep.finish)
-                        end
-                    end
-                    lineModifiedInThisPass = true
-                end
+                currentLine = changeKeyValue(triggerId, currentLine, "DC"):await()
             end
-            
+
             if OMMESSENGER == "1" and not skipOMMESSENGER then
-                print("ONLINEMODULE: onOutput: OMMESSENGER == 1 (KAKAO) processing...")
-                local kakaoPromptFindPattern = "%[OMKAKAOPROMPT:([^%]]*)%]"
-                local kakaoNegPromptFindPattern = "%[NEG_OMKAKAOPROMPT:([^%]]*)%]"
-                local kakaoPattern = "(KAKAO)%[(<OM>)%|([^%]]*)%]"
-                local _, _, foundKakaoPrompt = string.find(currentLine, kakaoPromptFindPattern)
-                local s_kakao, e_kakao, cap1, cap2, cap3 = string.find(currentLine, kakaoPattern)
-                print("Found Prefix: " .. cap1 .. " Found OM Value: " .. cap2 .. " Found Suffix: " .. cap3)
-       
-                if foundKakaoPrompt and s_kakao then
-                    print("ONLINEMODULE: onOutput: Found KAKAO block and prompt. Generating image...")
-                    local _, _, foundKakaoNegPrompt = string.find(currentLine, kakaoNegPromptFindPattern)
-                    local currentNegativePromptKakao = negativePrompt or ""
-                    local storedNegPrompt = ""
-                    if foundKakaoNegPrompt then currentNegativePromptKakao = foundKakaoNegPrompt .. ", " .. currentNegativePromptKakao; storedNegPrompt = foundKakaoNegPrompt end
-                    local finalPromptKakao = (artistPrompt or "") .. foundKakaoPrompt .. (qualityPrompt or "")
-        
-                    local successCall, inlayKakao = pcall(function() return generateImage(triggerId, finalPromptKakao, currentNegativePromptKakao):await() end)
-                    local isSuccessKakao = successCall and inlayKakao and type(inlayKakao) == "string" and string.len(inlayKakao) > 10 and not string.find(inlayKakao, "fail", 1, true) and not string.find(inlayKakao, "error", 1, true) and not string.find(inlayKakao, "실패", 1, true)
-        
-                    if isSuccessKakao then
-                        print("ONLINEMODULE: onOutput: KAKAO image generated successfully.")
-                        local kakaoIdentifier = "KAKAO_" .. cap3
-                        local replacementKakao = "KAKAO[" .. inlayKakao .. "|" .. cap3 .. "]"
-                        currentLine = string.sub(currentLine, 1, s_kakao-1) .. replacementKakao .. string.sub(currentLine, e_kakao + 1)
-                        lineModifiedInThisPass = true
-        
-                        local infoEro = { type = "KAKAO", identifier = kakaoIdentifier, inlay = inlayKakao, prompt = foundKakaoPrompt, negPrompt = storedNegPrompt }
-                        table.insert(generatedImagesInfo, infoEro)
-                        setState(triggerId, kakaoIdentifier .. "_PROMPT", infoEro.prompt)
-                        setState(triggerId, kakaoIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
-                        setState(triggerId, kakaoIdentifier, infoEro.inlay)
-                        print("ONLINEMODULE: onOutput: Stored info for generated KAKAO image. Identifier: " .. kakaoIdentifier)
-                    else
-                        ERR(triggerId, "KAKAOTALK", 2)
-                        print("ONLINEMODULE: onOutput: KAKAO image generation FAILED. Error/Result: " .. tostring(inlayKakao))
-                    end
-                end
-            end
-            
+                print("ONLINEMODULE: onOutput: OMMESSENGER == 1")
+                currentLine = changeKeyValue(triggerId, currentLine, "KAKAO"):await()
+            end            
         else
-                print("ONLINEMODULE: onOutput: Last message data is not in the expected format.")
+            print("ONLINEMODULE: onOutput: Last message data is not in the expected format.")
         end
     end
 
-    print("ONLINEMODULE: onOutput: Always applying setChat to last message after prompt cleanup.")
     setChat(triggerId, lastIndex - 1, currentLine)
     print("ONLINEMODULE: onOutput: setChat call complete.")
 end)
-
 
 onButtonClick = async(function(triggerId, data)
     print("triggerId is " .. triggerId)
@@ -5133,13 +4181,15 @@ onButtonClick = async(function(triggerId, data)
     local action = nil
     local identifierFromData = nil
     local identifier = nil
+    local index = nil
 
     if type(data) ~= "string" then
         print("ONLINEMODULE: ERROR - Expected string data from risu-btn, but received type: " .. type(data))
         return
     end
 
-    action, identifierFromData = data:match('^{%s*"action"%s*:%s*"([^"]+)"%s*,%s*"identifier"%s*:%s*"([^"]+)"%s*%}$')
+    -- Updated pattern to also extract the index field
+    action, identifierFromData, index = data:match('^{%s*"action"%s*:%s*"([^"]+)"%s*,%s*"identifier"%s*:%s*"([^"]+)"%s*,%s*"index"%s*:%s*"([^"]*)"')
 
     if not action or not identifierFromData then
         print("ONLINEMODULE: ERROR - Could not parse action and identifier from JSON-like string:", data)
@@ -5147,7 +4197,7 @@ onButtonClick = async(function(triggerId, data)
     end
 
     identifier = identifierFromData:match("^%s*(.-)%s*$")
-    print("ONLINEMODULE: Parsed action: [" .. action .. "] Original identifier: [" .. identifierFromData .. "] Trimmed identifier: [" .. identifier .. "]")
+    print("ONLINEMODULE: Parsed action: [" .. action .. "] Original identifier: [" .. identifierFromData .. "] Trimmed identifier: [" .. identifier .. "] Index: [" .. (index or "nil") .. "]")
 
     if identifier == nil or identifier == "" then
          print("ONLINEMODULE: ERROR - Identifier part is invalid after trimming: [" .. tostring(identifierFromData) .. "]")
@@ -5162,69 +4212,83 @@ onButtonClick = async(function(triggerId, data)
     print(action .. " currently triggered!")
     print("ONLINEMODULE: onButtonClick: Processing action " .. action .. " for identifier: [" .. identifier .. "]")
 
+    local mainPrompt = nil
+    local mainNegPrompt = nil
+    local promptFlags = nil
+
     if action == "EROSTATUS_REROLL" then
         rerollType = "EROSTATUS"
+        mainPrompt = "OMSTATUSPROMPT"
+        mainNegPrompt = "NEG_OMSTATUSPROMPT"
+        promptFlags = 1
         chatVarKeyForInlay = identifier
-        specificPromptKey = identifier .. "_PROMPT"
-        specificNegPromptKey = identifier .. "_NEGPROMPT"
     elseif action == "SIMCARD_REROLL" then
         rerollType = "SIMULATIONCARD"
+        mainPrompt = "OMSIMULCARDPROMPT"
+        mainNegPrompt = "NEG_OMSIMULCARDPROMPT"
+        promptFlags = 1
         chatVarKeyForInlay = identifier
-        specificPromptKey = identifier .. "_SIMULPROMPT"
-        specificNegPromptKey = identifier .. "_NEGSIMULPROMPT"
     elseif action == "INLAY_REROLL" then
-        -- INLAY ONLY 옵션(4)
         rerollType = "INLAY"
+        mainPrompt = "OMINLAYPROMPT"
+        mainNegPrompt = "NEG_OMINLAYPROMPT"
+        promptFlags = 1
         chatVarKeyForInlay = identifier
-        specificPromptKey = identifier .. "_PROMPT"
-        specificNegPromptKey = identifier .. "_NEGPROMPT"
-    elseif action == "TWITTER_PROFILE_REROLL" then
-        rerollType = "TWITTER_PROFILE"
-        chatVarKeyForInlay = identifier
-        specificPromptKey = identifier .. "_PROFILEPROMPT"
-        specificNegPromptKey = identifier .. "_NEGPROFILEPROMPT"
     elseif action == "TWEET_REROLL" then
         rerollType = "TWEET"
+        mainPrompt = "OMTWITTERPROMPT"
+        mainNegPrompt = "NEG_OMTWITTERPROMPT"
+        promptFlags = 0
         chatVarKeyForInlay = identifier .. "_TWEET"
-        specificPromptKey = identifier .. "_TWEETPROMPT"
-        specificNegPromptKey = identifier .. "_TWEETNEGPROMPT"
-    elseif action == "INSTA_PROFILE_REROLL" then
-        rerollType = "INSTAGRAM_PROFILE"
+    elseif action == "TWITTER_PROFILE_REROLL" then
+        rerollType = "TWITTER_PROFILE"
+        mainPrompt = "OMTWITTERPROFILEPROMPT"
+        mainNegPrompt = "NEG_OMTWITTERPROFILEPROMPT"
+        promptFlags = 0
         chatVarKeyForInlay = identifier
-        specificPromptKey = identifier .. "_INSTAPROFILEPROMPT"
-        specificNegPromptKey = identifier .. "_NEGINSTAPROFILEPROMPT"
     elseif action == "INSTA_REROLL" then
         rerollType = "INSTAGRAM"
+        mainPrompt = "OMINSTAPROMPT"
+        mainNegPrompt = "NEG_OMINSTAPROMPT"
+        promptFlags = 0
         chatVarKeyForInlay = identifier
-        specificPromptKey = identifier .. "_INSTAPROMPT" 
-        specificNegPromptKey = identifier .. "_INSTANEGPROMPT"
+    elseif action == "INSTA_PROFILE_REROLL" then
+        rerollType = "INSTAGRAM_PROFILE"
+        mainPrompt = "OMINSTAPROFILEPROMPT"
+        mainNegPrompt = "NEG_OMINSTAPROFILEPROMPT"
+        promptFlags = 0
+        chatVarKeyForInlay = identifier
     elseif action == "DC_REROLL" then
         rerollType = "DC"
+        mainPrompt = "OMDCPROMPT"
+        mainNegPrompt = "NEG_OMDCPROMPT"
+        promptFlags = 1
         chatVarKeyForInlay = "DC_" .. identifier
-        specificPromptKey = "DC_" .. identifier .. "_PROMPT"
-        specificNegPromptKey = "DC_" .. identifier .. "_NEGPROMPT"
     elseif action == "KAKAO_REROLL" then
         rerollType = "KAKAO"
+        mainPrompt = "OMKAKAOPROMPT"
+        mainNegPrompt = "NEG_OMKAKAOPROMPT"
+        promptFlags = 0
         chatVarKeyForInlay = identifier
-        specificPromptKey = identifier .. "_PROMPT"
-        specificNegPromptKey = identifier .. "_NEGPROMPT"
     else
         print("ONLINEMODULE: Unknown button action received: " .. tostring(action))
         return
     end
 
     local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT") or "0"
+    local artistPrompt = ""
+    local qualityPrompt = ""
+    local negativePrompt = ""
 
-    local artistPrompt, qualityPrompt, negativePrompt = nil, nil, nil
-	if OMPRESETPROMPT == "0" then
-        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT") or "0"
-        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or "0"
-        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or "0"
+    if OMPRESETPROMPT == "0" then
+        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT") or ""
+        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or ""
+        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or ""
     elseif OMPRESETPROMPT == "1" then
-		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
-		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
-	elseif OMPRESETPROMPT == "2" then
+        artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
+        qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
+        negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
+    elseif OMPRESETPROMPT == "2" then
         artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
@@ -5234,45 +4298,49 @@ onButtonClick = async(function(triggerId, data)
         negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     end
 
-    local foundSpecificPrompt = getState(triggerId, specificPromptKey) or "null"
-    if foundSpecificPrompt == "null" then foundSpecificPrompt = "" end
-    local foundSpecificNegPrompt = getState(triggerId, specificNegPromptKey) or "null"
-    if foundSpecificNegPrompt == "null" then foundSpecificNegPrompt = "" end
+    print("---------------------------------ONLINEMODULE PROMPT---------------------------------")
+    print("ONLINEMODULE: artistPrompt: " .. artistPrompt)
+    print("ONLINEMODULE: qualityPrompt: " .. qualityPrompt)
+    print("ONLINEMODULE: negativePrompt: " .. negativePrompt)
+    print("---------------------------------ONLINEMODULE PROMPT---------------------------------")
 
-    local finalPrompt = (artistPrompt or "") .. (foundSpecificPrompt or "") .. (qualityPrompt or "")
-    local currentNegativePrompt = (negativePrompt or "")
-    if foundSpecificNegPrompt and foundSpecificNegPrompt ~= "" and foundSpecificNegPrompt ~= "null" then
-         currentNegativePrompt = foundSpecificNegPrompt .. ", " .. currentNegativePrompt
+    local chatHistoryTable = getFullChat(triggerId)
+    local historyLength = #chatHistoryTable
+    local targetIndex = nil
+
+    for i = historyLength, 1, -1 do
+        if chatHistoryTable[i].role == 'char' then
+            targetIndex = i
+            break
+        end
     end
 
-    print("ONLINEMODULE: Generating new image for " .. rerollType .. " Identifier: " .. identifier)
-    local successCall, newInlay = pcall(function() return generateImage(triggerId, finalPrompt, currentNegativePrompt):await() end)
+    local currentLine = chatHistoryTable[targetIndex].data
+
+    local getPromptNow = nil
+    local getNegPromptNow = nil
+
+    if promptFlags == 1 then
+        getPromptNow = getPrompt(currentLine, mainPrompt .. index)
+        getNegPromptNow = getPrompt(currentLine, mainNegPrompt .. index)
+    elseif promptFlags == 0 then
+        getPromptNow = getPrompt(currentLine, mainPrompt)
+        getNegPromptNow = getPrompt(currentLine, mainNegPrompt)
+    end
+
+    local finalPrompt = artistPrompt .. ", " ..  getPromptNow .. ", " .. qualityPrompt
+    local finalNegPrompt = getNegPromptNow .. ", " .. negativePrompt
+
+    local newInlay = generateImage(triggerId, finalPrompt, finalNegPrompt):await()
     local oldInlay = getState(triggerId, chatVarKeyForInlay) or "null"
 
-    local isSuccess = successCall and newInlay and type(newInlay) == "string" and string.len(newInlay) > 10 and not string.find(newInlay, "fail", 1, true) and not string.find(newInlay, "error", 1, true) and not string.find(newInlay, "실패", 1, true)
-
-    if isSuccess then
+    if newInlay ~= nil then
         alertNormal(triggerId, "이미지 리롤 완료")
         print("ONLINEMODULE: New " .. rerollType .. " image generated successfully for Identifier: " .. identifier)
 
         setState(triggerId, chatVarKeyForInlay, newInlay)
         print("ONLINEMODULE: Updated chat variable for Identifier: " .. identifier .. " with new inlay.")
 
-        local chatHistoryTable = getFullChat(triggerId)
-        local historyLength = #chatHistoryTable
-        local targetIndex = nil
-
-        for i = historyLength, 1, -1 do
-            if chatHistoryTable[i].role == 'char' then
-                targetIndex = i
-                break
-            end
-        end
-    
-        local historyModified = false
-        
-        local messageData = chatHistoryTable[targetIndex]
-        local currentLine = messageData.data
         print("ONLINEMODULE: Checking history index " .. targetIndex .. " for update. Starts with: [" .. string.sub(currentLine, 1, 50) .. "]")
         
         local replacementOccurred = false
