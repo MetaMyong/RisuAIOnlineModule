@@ -70,7 +70,7 @@ local function getPrompt(currentLine, prompt)
     return foundPrompt
 end
 
-local function getOldInlay(triggerId, index, omIndex)
+local function getOldInlay(startPrefix, profileFlags, index, omIndex)
     -- 해당 index의 대화 내용에서 omIndex에 해당하는 블록의 {{inlay::random uuid}}값을 찾아 {{부터 }}까지 추출해 반환하는 함수
     print("ONLINEMODULE: getOldInlay is in PROCESS!")
     
@@ -87,16 +87,58 @@ local function getOldInlay(triggerId, index, omIndex)
     local anyReplacementMade = false 
     local searchStartIndex = 1
     local foundInlay = nil
+    local lastEnd = 1
+    local tempLine = ""
 
-    local pattern = "({{[^}]+}})"
+    local fullPattern = string.format("(%s%%[.-%%])", startPrefix)
     
-    -- 형식은 <OM1>{{inlay::random uuid}}| 또는 <OM2>{{inlay::random uuid}}] 등으로 이루어져있음
-    -- <OM(omIndex)>로 시작하는 블록을 찾고, 그 블록의 {{inlay::random uuid}}를 찾아서 반환함
+    while true do
+        local s, e, capturedBlock = string.find(originalLine, fullPattern, searchStartIndex)
 
-    local pattern = "<OM" .. omIndex .. ">({{inlay::[^}]+}})"
-    local foundInlay = string.match(originalLine, pattern)
+        if not s then
+            tempLine = tempLine .. string.sub(originalLine, lastEnd)
+            break
+        end
 
+        local startPrefixBlock = string.sub(originalLine, s, e)
+        local searchPattern = nil
+        
+        if omIndex == 0 then
+            searchPattern = "<OM>({{inlay::[^}]+}})"
+        elseif omIndex > 0 then
+            searchPattern = "<OM" .. omIndex .. ">({{inlay::[^}]+}})"  
+        end
+            
+        if profileFlags == 1 then
+            searchPattern = "|MEDIA:<OM>{{inlay::[^}]+}}"
+        end
+        
+        foundInlay = string.match(startPrefixBlock, searchPattern)
+        
+        if foundInlay then
+            tempLine = tempLine .. string.sub(originalLine, lastEnd, e)
+            lastEnd = e + 1
+            break
+        else
+            searchStartIndex = e + 1
+        end
+    end
+
+    -- foundInlay에서 {{inlay::random uuid}}를 전부 추출
+    if foundInlay then
+        foundInlay = string.match(foundInlay, "{{inlay::[^}]+}}")
+        if foundInlay then
+            print("ONLINEMODULE: Found inlay: " .. foundInlay)
+        else
+            print("ONLINEMODULE: No inlay found in the block.")
+        end
+    else
+        print("ONLINEMODULE: No inlay found in the block.")        
+    end
+
+    print("ONLINEMODULE: Found inlay: " .. foundInlay)
     return foundInlay
+
 end
 
 local function changeInlay(triggerId, index, oldInlay, newInlay)
@@ -1563,8 +1605,8 @@ body, .tweet-card { font-size: 15px; }
         end
 
         -- 리롤 버튼 추가 - 추출한 twitterid 값 기반으로 identifier 설정
-        local buttonJsonProfile = '{"action":"TWITTER_PROFILE_REROLL", "identifier":"' .. (twitter_id or "") .. '"}'
-        local buttonJsonBody = '{"action":"TWEET_REROLL", "identifier":"' .. (twitter_id or "") .. '"}'
+        local buttonJsonProfile = '{"action":"TWITTER_PROFILE_REROLL", "identifier":"' .. (twitter_id or "") .. '", "index":"' .. 0 ..'"}'
+        local buttonJsonBody = '{"action":"TWEET_REROLL", "identifier":"' .. (twitter_id or "") .. '", "index":"' .. 0 ..'"}'
 
         table.insert(html, "<div class=\"reroll-button-wrapper\">")
         table.insert(html, "<div class=\"global-reroll-controls\">")
@@ -1860,8 +1902,8 @@ html{box-sizing:border-box;height:100%}*,*::before,*::after{box-sizing:inherit;m
         table.insert(html, "<div class='post-time'>" .. (time_text or "Posted Time") .. "</div>")
 
         -- 리롤 버튼 추가 - 추출한 iid 값 기반으로 identifier 설정
-        local buttonJsonProfile = '{"action":"INSTA_PROFILE_REROLL", "identifier":"' .. (iid or "") .. '"}'
-        local buttonJsonBody = '{"action":"INSTA_REROLL", "identifier":"' .. (iid or "") .. '"}'
+        local buttonJsonProfile = '{"action":"INSTA_PROFILE_REROLL", "identifier":"' .. (iid or "") .. '", "index":"' .. 0 ..'"}'
+        local buttonJsonBody = '{"action":"INSTA_REROLL", "identifier":"' .. (iid or "") .. '", "index":"' .. 0 ..'"}'
 
         table.insert(html, "<div class=\"reroll-button-wrapper\">")
         table.insert(html, "<div class=\"global-reroll-controls\">")
@@ -2345,7 +2387,7 @@ local function inputDCInside(triggerId, data)
 #### DCInside Gallery Interface Template
 - AI must follow this template:
     - DC[GN:(Gallery Name)|PID:(Post1 ID)|PN:(Post1 Number)|PT:(Post1 Title)|PC:(Post1 Comment)|PW:(Post1 Writer)|PD:(Post1 Date)|PV:(Post1 Views)|PR:(Post1 Recommend)|BODY:(Post1 Body)|COMMENT:(Comment1 Author)|(Comment1 Content)|(Comment2 Author)|(Comment2 Content)| ... | REPEAT POST and COMMENT ]] .. OMDCPOSTNUMBER ..[[ TIMES MORE ]
-    - GN: The name of the gallery where the post is located.
+    - GN: The name of the gallery where the post is located, must include the word '갤러리'.
     - PID: The unique identifier for the post in the gallery.
     - PN: The unique number of the post in the gallery.
     - PT: The title of the post.
@@ -2688,7 +2730,7 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                         end
                         table.insert(html, "    </ul>")
 
-                        local buttonJsonBody = '{"action":"DC_REROLL", "identifier":"' .. (postId or "") .. '," "index":"' .. inlayIndex .. '"}'
+                        local buttonJsonBody = '{"action":"DC_REROLL", "identifier":"' .. (postId or "") .. '", "index":"' .. inlayIndex .. '"}'
                         table.insert(html, "<div class=\"reroll-button-wrapper\">")
                         table.insert(html, "<div class=\"global-reroll-controls\">")
                         table.insert(html, "<button style=\"text-align: center;\" class=\"reroll-button\" risu-btn='" .. buttonJsonBody .. "'>POST</button>")
@@ -2834,7 +2876,7 @@ body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen
     -- inlay::가 존재할 경우
     local inlayTag = string.match(message, "{{inlay::[^}]+}}")
     if inlayTag and OMMESSENGERNOIMAGE == "0" then
-        local buttonJsonBody = '{"action":"KAKAO_REROLL", "identifier":"KAKAO_' .. timestamp .. '"}'
+        local buttonJsonBody = '{"action":"KAKAO_REROLL", "identifier":"KAKAO_' .. timestamp .. '", "index":"' .. 0 .. '"}'
         table.insert(html, '<div class="reroll-button-wrapper" style="margin-top: 10px; z-index: 2;">')
         table.insert(html, '<div class="global-reroll-controls">')
         table.insert(html, '<button style="text-align: center;" class="reroll-button" risu-btn=\'' .. buttonJsonBody .. '\'>KAKAO</button>')
@@ -3088,13 +3130,14 @@ local function inputImage(triggerId, data)
             end
             
             data = data .. [[
-    - Output Format:
-        - TWITTER[...|<OM>|...|<OM>|...]
-        - [OMTWITTERPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-        - [NEG_OMTWITTERPROMPT:(NEGATIVE PROMPT)]
-        - If Character does not have own profile image:
-            - [OMTWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
-            - [NEG_OMTWITTERPROFILEPROMPT:(NEGATIVE PROMPT)]
+    - TWITTER PROMPT MUST INCLUDE NSFW SITUATION
+        - Output Format:
+            - TWITTER[...|<OM>|...|<OM>|...]
+            - [OMTWITTERPROMPT:{{{NSFW,UNCENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),pussy,nipples,(DRESSES),(PLACE),(SCENE)]
+            - [NEG_OMTWITTERPROMPT:{{{CENSORED}}},(NEGATIVE PROMPT)]
+            - If Character does not have own profile image:
+                - [OMTWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+                - [NEG_OMTWITTERPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]
         
         elseif OMSNS == "2" then
@@ -3108,14 +3151,14 @@ local function inputImage(triggerId, data)
 ]]
             end
             data = data .. [[
-    - ALWAYS PRINT OUT INSTAGRAM INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the INSTAGRAM INTERFACE
-    - Output Format:
-        - INSTA[...|<OM>|...|<OM>|...]
-        - [OMINSTAPROMPT:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-        - [NEG_OMINSTAPROMPT:(NEGATIVE PROMPT)]
-        - If Character does not have own profile image:
-            - [OMINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
-            - [NEG_OMINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
+    - INSTAGRAM PROMPT MUST INCLUDE SFW SITUATION
+        - Output Format:
+            - INSTA[...|<OM>|...|<OM>|...]
+            - [OMINSTAPROMPT:{{{CENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+            - [NEG_OMINSTAPROMPT:{{{NSFW,UNCENSORED}}},pussy,nipples,(NEGATIVE PROMPT)]
+            - If Character does not have own profile image:
+                - [OMINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
+                - [NEG_OMINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
 ]]
         elseif OMSNS == "3" then
             if OMSNSREAL == "1" then
@@ -3134,7 +3177,7 @@ local function inputImage(triggerId, data)
     - TWITTER PROMPT MUST INCLUDE NSFW SITUATION
         - Output Format:
             - TWITTER[...|<OM>|...|<OM>|...]
-            - [OMTWITTERPROMPT:{{{NSFW,UNCENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
+            - [OMTWITTERPROMPT:{{{NSFW,UNCENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),pussy,nipples,(DRESSES),(PLACE),(SCENE)]
             - [NEG_OMTWITTERPROMPT:{{{CENSORED}}},(NEGATIVE PROMPT)]
             - If Character does not have own profile image:
                 - [OMTWITTERPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
@@ -3142,8 +3185,8 @@ local function inputImage(triggerId, data)
     - INSTAGRAM PROMPT MUST INCLUDE SFW SITUATION
         - Output Format:
             - INSTA[...|<OM>|...|<OM>|...]
-            - [OMINSTAPROMPT:{{{CENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY), (DRESSES),(PLACE),(SCENE)]
-            - [NEG_OMINSTAPROMPT:{{{NSFW,UNCENSORED}}},(NEGATIVE PROMPT)]
+            - [OMINSTAPROMPT:{{{CENSORED}}},(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+            - [NEG_OMINSTAPROMPT:{{{NSFW,UNCENSORED}}},pussy,nipples,(NEGATIVE PROMPT)]
             - If Character does not have own profile image:
                 - [OMINSTAPROFILEPROMPT:(LABEL),(AGE),(APPEARANCE),portrait,face,close-up,white background,simple background]
                 - [NEG_OMINSTAPROFILEPROMPT:(NEGATIVE PROMPT)]
@@ -4228,62 +4271,82 @@ onButtonClick = async(function(triggerId, data)
     print(action .. " currently triggered!")
     print("ONLINEMODULE: onButtonClick: Processing action " .. action .. " for identifier: [" .. identifier .. "]")
 
+    local startPrefix = nil
     local mainPrompt = nil
     local mainNegPrompt = nil
     local promptFlags = nil
+    local profileFlags = nil
 
     if action == "EROSTATUS_REROLL" then
+        startPrefix = "EROSTATUS"
         rerollType = "EROSTATUS"
         mainPrompt = "OMSTATUSPROMPT"
         mainNegPrompt = "NEG_OMSTATUSPROMPT"
+        profileFlags = 0
         promptFlags = 1
         chatVarKeyForInlay = identifier
     elseif action == "SIMCARD_REROLL" then
+        startPrefix = "SIMULSTATUS"
         rerollType = "SIMULATIONCARD"
         mainPrompt = "OMSIMULCARDPROMPT"
         mainNegPrompt = "NEG_OMSIMULCARDPROMPT"
+        profileFlags = 0
         promptFlags = 1
         chatVarKeyForInlay = identifier
     elseif action == "INLAY_REROLL" then
+        startPrefix = "INLAY"
         rerollType = "INLAY"
         mainPrompt = "OMINLAYPROMPT"
         mainNegPrompt = "NEG_OMINLAYPROMPT"
+        profileFlags = 0
         promptFlags = 1
         chatVarKeyForInlay = identifier
     elseif action == "TWEET_REROLL" then
+        startPrefix = "TWITTER"
         rerollType = "TWEET"
         mainPrompt = "OMTWITTERPROMPT"
         mainNegPrompt = "NEG_OMTWITTERPROMPT"
+        profileFlags = 1
         promptFlags = 0
         chatVarKeyForInlay = identifier .. "_TWEET"
     elseif action == "TWITTER_PROFILE_REROLL" then
+        startPrefix = "TWITTER"
         rerollType = "TWITTER_PROFILE"
         mainPrompt = "OMTWITTERPROFILEPROMPT"
         mainNegPrompt = "NEG_OMTWITTERPROFILEPROMPT"
+        profileFlags = 0
         promptFlags = 0
         chatVarKeyForInlay = identifier
     elseif action == "INSTA_REROLL" then
+        startPrefix = "INSTA"
         rerollType = "INSTAGRAM"
         mainPrompt = "OMINSTAPROMPT"
         mainNegPrompt = "NEG_OMINSTAPROMPT"
+        profileFlags = 1
         promptFlags = 0
         chatVarKeyForInlay = identifier
     elseif action == "INSTA_PROFILE_REROLL" then
+        startPrefix = "INSTA"
         rerollType = "INSTAGRAM_PROFILE"
         mainPrompt = "OMINSTAPROFILEPROMPT"
         mainNegPrompt = "NEG_OMINSTAPROFILEPROMPT"
+        profileFlags = 0
         promptFlags = 0
         chatVarKeyForInlay = identifier
     elseif action == "DC_REROLL" then
+        startPrefix = "DC"
         rerollType = "DC"
         mainPrompt = "OMDCPROMPT"
         mainNegPrompt = "NEG_OMDCPROMPT"
+        profileFlags = 0
         promptFlags = 1
         chatVarKeyForInlay = "DC_" .. identifier
     elseif action == "KAKAO_REROLL" then
+        startPrefix = "KAKAO"
         rerollType = "KAKAO"
         mainPrompt = "OMKAKAOPROMPT"
         mainNegPrompt = "NEG_OMKAKAOPROMPT"
+        profileFlags = 0
         promptFlags = 0
         chatVarKeyForInlay = identifier
     else
@@ -4337,8 +4400,8 @@ onButtonClick = async(function(triggerId, data)
     local getNegPromptNow = nil
 
     if promptFlags == 1 then
-        getPromptNow = getPrompt(currentLine, mainPrompt .. index)
-        getNegPromptNow = getPrompt(currentLine, mainNegPrompt .. index)
+        getPromptNow = getPrompt(currentLine, mainPrompt .. tonumber(index))
+        getNegPromptNow = getPrompt(currentLine, mainNegPrompt .. tonumber(index))
     elseif promptFlags == 0 then
         getPromptNow = getPrompt(currentLine, mainPrompt)
         getNegPromptNow = getPrompt(currentLine, mainNegPrompt)
@@ -4347,7 +4410,7 @@ onButtonClick = async(function(triggerId, data)
     local finalPrompt = artistPrompt .. ", " ..  getPromptNow .. ", " .. qualityPrompt
     local finalNegPrompt = getNegPromptNow .. ", " .. negativePrompt
 
-    local oldInlay = getOldInlay(triggerId, targetIndex, index)
+    local oldInlay = getOldInlay(startPrefix, profileFlags, targetIndex, tonumber(index))
     local newInlay = generateImage(triggerId, finalPrompt, finalNegPrompt):await()
 
     if newInlay ~= nil then
