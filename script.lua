@@ -4090,13 +4090,22 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
                     lineModified = true
                 end
             end
-        else -- 단일 SNS
-            local s_block, e_block, captured_block = string.find(currentLine, "(" .. startPrefix .. "%[.-%])")
-            if s_block then
+        elseif startPrefix == "KAKAO" then
+            -- KAKAO 메시지는 특별한 처리가 필요함
+            local pattern = "(KAKAO%[[^|]*<OM>[^%]]*%])"
+            
+            local searchPos = 1
+            while true do
+                local s_block, e_block, captured_block = string.find(currentLine, pattern, searchPos)
+                if not s_block then break end
+                
                 local mod_block, block_mod_flag = processSNSBlock(captured_block, mainPrompt, mainNegPrompt, subPrompt, subNegPrompt, startPrefix)
                 if block_mod_flag then
                     currentLine = string.sub(currentLine, 1, s_block - 1) .. mod_block .. string.sub(currentLine, e_block + 1)
                     lineModified = true
+                    searchPos = s_block + string.len(mod_block)
+                else
+                    searchPos = e_block + 1
                 end
             end
         end
