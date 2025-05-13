@@ -70,6 +70,35 @@ local function getPrompt(currentLine, prompt)
     return foundPrompt
 end
 
+local function getOldInlay(triggerId, index, omIndex)
+    -- 해당 index의 대화 내용에서 omIndex에 해당하는 블록의 {{inlay::random uuid}}값을 찾아 {{부터 }}까지 추출해 반환하는 함수
+    print("ONLINEMODULE: getOldInlay is in PROCESS!")
+    
+    local chatFullHistory = getFullChat()
+    if not chatFullHistory or not chatFullHistory[index] then
+        print("ONLINEMODULE: Error: Chat history or message at index " .. tostring(index) .. " not found.")
+        return
+    end
+    
+    local currentChatMessage = chatFullHistory[index]
+    local originalLine = currentChatMessage.data 
+
+    local replacementMade = false
+    local anyReplacementMade = false 
+    local searchStartIndex = 1
+    local foundInlay = nil
+
+    local pattern = "({{[^}]+}})"
+    
+    -- 형식은 <OM1>{{inlay::random uuid}}| 또는 <OM2>{{inlay::random uuid}}] 등으로 이루어져있음
+    -- <OM(omIndex)>로 시작하는 블록을 찾고, 그 블록의 {{inlay::random uuid}}를 찾아서 반환함
+
+    local pattern = "<OM" .. omIndex .. ">({{inlay::[^}]+}})"
+    local foundInlay = string.match(originalLine, pattern)
+
+    return foundInlay
+end
+
 local function changeInlay(triggerId, index, oldInlay, newInlay)
     print("ONLINEMODULE: changeInlay is in PROCESS!")
     print("ONLINEMODULE: Attempting to replace ALL occurrences of: '" .. oldInlay .. "' with '" .. newInlay .. "' using specific pattern logic.")
@@ -676,7 +705,7 @@ opacity: 0;
         table.insert(html, "<div id=\"outfit-list-content\">" .. outfitsText .. "</div>")
         
         -- 리롤 버튼 추가 - 추출한 INDEX 값 기반으로 identifier 설정
-        local buttonJson = '{"action":"EROSTATUS_REROLL", "identifier":"' .. (("EROSTATUS_" .. inlayIndex) or "") .. '," "index":"' .. inlayIndex ..'"}'
+        local buttonJson = '{"action":"EROSTATUS_REROLL", "identifier":"' .. npcName .. '", "index":"' .. inlayIndex ..'"}'
 
         table.insert(html, "<div class=\"reroll-button-wrapper\">")
         table.insert(html, "<div class=\"global-reroll-controls\">")
@@ -3831,14 +3860,6 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
                             characterImageCache[cacheId] = inlay
                         end
                         
-                        -- SIMULCARD의 경우 추가적인 목록 관리 (이 부분은 유지될 수 있음, 캐시와 별개)
-                        if (blockSpecificData.typeName == "SIMULSTATUS") and cacheId and blockSpecificData.listKeyForCache then
-                            local currentList = getState(triggerId, blockSpecificData.listKeyForCache) or "null"
-                            if currentList == "null" then currentList = "" end
-                            if not string.find("," .. currentList .. ",", "," .. cacheId .. ",", 1, true) then
-                                setState(triggerId, blockSpecificData.listKeyForCache, currentList == "" and cacheId or (currentList .. "," .. cacheId))
-                            end
-                        end
                     else
                         ERR(triggerId, blockSpecificData.typeName, 2) -- 이미지 생성 실패
                     end
@@ -3951,12 +3972,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
             table.insert(newLineParts, string.sub(currentLine, lastPos, s_block - 1))
             local capturedBlockContentWithBrackets = string.sub(currentLine, s_block, e_block)
             local blockContentOnly = string.sub(capturedBlockContentWithBrackets, #startPrefix + 2, -2)
-
             local blockSpecificData = { typeName = startPrefix, characterImageCache = charCache }
-            if startPrefix == "SIMULSTATUS" then
-                -- blockSpecificData.isCacheable = true -- OMCACHE로 대체
-                blockSpecificData.listKeyForCache = "STORED_SIMCARD_IDS" -- 이 목록은 캐시와 별도로 유지 가능
-            end
 
             local modifiedContent, omModified, updatedCache = processIndexedPlaceholdersInBlock(blockContentOnly, mainPrompt, mainNegPrompt, blockSpecificData)
             charCache = updatedCache -- 다음 <OMx> 처리를 위해 동일 블록 내 캐시 업데이트
@@ -4004,7 +4020,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
             if not s_block then table.insert(newLinePartsSimul, string.sub(tempLine, lastPosSimul)) break end
             table.insert(newLinePartsSimul, string.sub(tempLine, lastPosSimul, s_block - 1))
             local blockContentOnly = string.sub(tempLine, s_block + #("SIMULSTATUS") + 1, e_block - 1)
-            local modifiedContent, omModified, updatedCache = processIndexedPlaceholdersInBlock(blockContentOnly, main2Prompt, main2NegPrompt, {typeName = "SIMULSTATUS", listKeyForCache = "STORED_SIMCARD_IDS", characterImageCache = charCacheSimul})
+            local modifiedContent, omModified, updatedCache = processIndexedPlaceholdersInBlock(blockContentOnly, main2Prompt, main2NegPrompt, {typeName = "SIMULSTATUS", characterImageCache = charCacheSimul})
             charCacheSimul = updatedCache
             table.insert(newLinePartsSimul, "SIMULSTATUS[" .. modifiedContent .. "]")
             if omModified then tempLineModifiedSimul = true lineModified = true end
@@ -4331,8 +4347,8 @@ onButtonClick = async(function(triggerId, data)
     local finalPrompt = artistPrompt .. ", " ..  getPromptNow .. ", " .. qualityPrompt
     local finalNegPrompt = getNegPromptNow .. ", " .. negativePrompt
 
+    local oldInlay = getOldInlay(triggerId, targetIndex, index)
     local newInlay = generateImage(triggerId, finalPrompt, finalNegPrompt):await()
-    local oldInlay = getState(triggerId, chatVarKeyForInlay) or "null"
 
     if newInlay ~= nil then
         alertNormal(triggerId, "이미지 리롤 완료")
