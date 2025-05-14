@@ -821,8 +821,8 @@ local function inputSimulCard(triggerId, data)
 ### Simulation Status Interface: CRITICAL
 - Replace the "dialogue" of all living things, not just humans, with Status blocks.
     - Example:
-        - Invalid: "KRRRRRR!"
-        - Valid: SIMULSTATUS[NAME:BLACK DRAGON|DIALOGUE:KRRRRRR!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Abandoned mountain|INLAY:<OM1>]
+        - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
+        - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]
 ]]
     end
 
@@ -1117,8 +1117,8 @@ local function inputStatusHybrid(triggerId, data)
 ### Simulation Status Interface: CRITICAL
 - Replace the "dialogue" of all living things, not just humans, with Status blocks.
     - Example:
-        - Invalid: "KRRRRRR!"
-        - Valid: SIMULSTATUS[NAME:BLACK DRAGON|DIALOGUE:KRRRRRR!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Abandoned mountain|INLAY:<OM1>]        
+        - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
+        - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]       
 ]]
 
     return data
@@ -3764,7 +3764,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
         qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
         negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     elseif OMPRESETPROMPT == "4" then
-        artistPrompt = "1.5::artist:namako daibakuhatsu ::, 1.2::pixel art ::"
+        artistPrompt = "1.1::artist:tianliang duohe fangdongye ::, 0.95::artist:namako daibakuhatsu ::, 0.5::channel(caststation) ::, 0.75::jtveemo ::, 1.1::pixel art ::"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     end
@@ -4403,7 +4403,7 @@ onButtonClick = async(function(triggerId, data)
         qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
         negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     elseif OMPRESETPROMPT == "4" then
-        artistPrompt = "[[[[[artist:hella p]]]]], [[[[[artist:taesi]]]]], [[[[artist:blue gk]]]], [[artist:zankuro]], [[[[[artist:null(nyanpyoun)]]]]], [artist:wagashi(dagashiya)], [artist:jtveemo], [[artist:naga U]], [artist:namako daibakuhatsu], {{{pixel art}}}"
+        artistPrompt = "1.1::artist:tianliang duohe fangdongye ::, 0.95::artist:namako daibakuhatsu ::, 0.5::channel(caststation) ::, 0.75::jtveemo ::, 1.1::pixel art ::"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     end
