@@ -3906,36 +3906,31 @@ onOutput = async(function (triggerId)
                                 local _, _, foundStatusPrompt = string.find(currentLine, statusPromptFindPattern)
                                 local _, _, foundStatusNegPrompt = string.find(currentLine, statusNegPromptFindPattern)
                                 local currentNegativePromptStatus = negativePrompt
-                                local storedNegPrompt = ""
                                 if foundStatusNegPrompt then
                                     currentNegativePromptStatus = foundStatusNegPrompt .. ", " .. currentNegativePromptStatus
-                                    storedNegPrompt = foundStatusNegPrompt
                                 end
                                 if foundStatusPrompt then
                                     local finalPromptStatus = artistPrompt .. ", " .. foundStatusPrompt .. ", " .. qualityPrompt
                                     local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
                                     if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and not string.find(inlayStatus, "fail", 1, true) and not string.find(inlayStatus, "error", 1, true) and not string.find(inlayStatus, "실패", 1, true) then
-                                        local erostatusIdentifier = "EROSTATUS_" .. omIndex
                                         local content_offset = e_status_prefix
                                         local om_abs_start = content_offset + s_om_in_content
                                         local om_abs_end = content_offset + e_om_in_content
+                                        
                                         table.insert(statusReplacements, {
                                             start = om_abs_start,
                                             finish = om_abs_end,
                                             inlay = "<OM" .. omIndex .. ">" .. inlayStatus
                                         })
-                                        local infoEro = {
-                                            type = "EROSTATUS",
-                                            identifier = erostatusIdentifier,
-                                            inlay = inlayStatus,
-                                            prompt = foundStatusPrompt,
-                                            negPrompt = storedNegPrompt
-                                        }
-                                        table.insert(generatedImagesInfo, infoEro)
-                                        setState(triggerId, erostatusIdentifier .. "_PROMPT", infoEro.prompt)
-                                        setState(triggerId, erostatusIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
-                                        setState(triggerId, erostatusIdentifier, infoEro.inlay)
-                                        print("ONLINEMODULE: onOutput: Stored info for generated EROSTATUS image. Identifier: " .. erostatusIdentifier)
+                                        
+                                        -- trimmedBlockName이 존재하면 상태를 저장
+                                        if trimmedBlockName then
+                                            setState(triggerId, trimmedBlockName, inlayStatus)
+                                            print("ONLINEMODULE: onOutput: Stored inlay for NAME: " .. trimmedBlockName)
+                                        end
+                                    else
+                                        ERR(triggerId, "EROSTATUS", 2)
+                                        print("ONLINEMODULE: onOutput: Image generation failed for OM" .. omIndex)
                                     end
                                 else
                                     ERR(triggerId, "EROSTATUS", 0)
@@ -3964,7 +3959,6 @@ onOutput = async(function (triggerId)
                 else
                     print("ONLINEMODULE: onOutput: No erostatus replacements to apply.")
                 end
-            
 
             elseif OMCARD == "2" and not skipOMCARD then
                 -- 시뮬봇 상태창만 사용할 때
@@ -4070,8 +4064,9 @@ onOutput = async(function (triggerId)
                                 if foundSimulPrompt then
                                     print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundSimulPrompt, 1, 50) .. "...]")
                                     local currentNegativePromptSimul = negativePrompt
-                                    local storedNegPrompt = ""
-                                    if foundNegSimulPrompt then currentNegativePromptSimul = foundNegSimulPrompt .. ", " .. currentNegativePromptSimul; storedNegPrompt = foundNegSimulPrompt end
+                                    if foundNegSimulPrompt then 
+                                        currentNegativePromptSimul = foundNegSimulPrompt .. ", " .. currentNegativePromptSimul
+                                    end
                                     local finalPromptSimul = artistPrompt .. ", " .. foundSimulPrompt .. ", " .. qualityPrompt
                                     local inlaySimul = generateImage(triggerId, finalPromptSimul, currentNegativePromptSimul):await()
                                     print("ONLINEMODULE: onOutput: generateImage result for OM"..omIndex..": ["..tostring(inlaySimul).."]")
@@ -4089,9 +4084,8 @@ onOutput = async(function (triggerId)
                                         print("ONLINEMODULE: onOutput: Adding new inlay replacement for OM" .. omIndex .. " at absolute pos " .. om_abs_start .. "-" .. om_abs_end)
 
                                         if trimmedBlockName then
+                                            -- 캐릭터 이름으로 인레이 이미지 저장
                                             setState(triggerId, trimmedBlockName, inlaySimul)
-                                            setState(triggerId, trimmedBlockName .. "_SIMULPROMPT", foundSimulPrompt)
-                                            setState(triggerId, trimmedBlockName .. "_NEGSIMULPROMPT", storedNegPrompt)
 
                                             local currentList = getState(triggerId, listKey) or "null"
                                             if currentList == "null" then currentList = "" end
@@ -4108,13 +4102,6 @@ onOutput = async(function (triggerId)
                                             else
                                                 print("ONLINEMODULE: onOutput: SimCard ID '" .. trimmedBlockName .. "' already exists in stored list (" .. listKey .. ").")
                                             end
-                                            
-                                            local infoSimul = {
-                                                type = "SIMULATIONCARD", identifier = trimmedBlockName, inlay = inlaySimul,
-                                                prompt = foundSimulPrompt, negPrompt = storedNegPrompt
-                                            }
-                                            table.insert(generatedImagesInfo, infoSimul)
-                                            print("ONLINEMODULE: onOutput: Stored info for generated SIMULATIONCARD image: [" .. trimmedBlockName .. "]")
 
                                             existingInlay = inlaySimul
                                             print("ONLINEMODULE: onOutput: Updated existingInlay for subsequent OM tags in block #" .. statusBlocksFound)
@@ -4167,7 +4154,6 @@ onOutput = async(function (triggerId)
                 local searchPos = 1
                 local replacements = {}
                 local statusBlocksFound = 0
-                local listKey = "STORED_SIMCARD_IDS"
                 local characterImageCache = {} -- 캐릭터별 이미지 캐시 (시뮬레이션용)
 
                 while true do
@@ -4262,17 +4248,15 @@ onOutput = async(function (triggerId)
                                     })
                                 else
                                     -- 새 이미지 생성
-                                    local promptPattern, negPromptPattern, promptType, identifier
+                                    local promptPattern, negPromptPattern, promptType
                                     if isEroStatus then
                                         promptPattern = "%[OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
                                         negPromptPattern = "%[NEG_OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
                                         promptType = "EROSTATUS"
-                                        identifier = "EROSTATUS_" .. omIndex
                                     else
                                         promptPattern = "%[OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
                                         negPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
                                         promptType = "SIMULCARD"
-                                        identifier = trimmedBlockName
                                     end
 
                                     local _, _, foundPrompt = string.find(currentLine, promptPattern)
@@ -4280,10 +4264,8 @@ onOutput = async(function (triggerId)
 
                                     if foundPrompt then
                                         local currentNegativePrompt = negativePrompt
-                                        local storedNegPrompt = ""
                                         if foundNegPrompt then
                                             currentNegativePrompt = foundNegPrompt .. ", " .. currentNegativePrompt
-                                            storedNegPrompt = foundNegPrompt
                                         end
 
                                         local finalPrompt = artistPrompt .. ", " .. foundPrompt .. ", " .. qualityPrompt
@@ -4305,31 +4287,9 @@ onOutput = async(function (triggerId)
                                                 inlay = "<OM" .. omIndex .. ">" .. inlay
                                             })
 
-                                            local info = {
-                                                type = promptType,
-                                                identifier = identifier,
-                                                inlay = inlay,
-                                                prompt = foundPrompt,
-                                                negPrompt = storedNegPrompt
-                                            }
-                                            table.insert(generatedImagesInfo, info)
-
-                                            if isEroStatus then
-                                                setState(triggerId, identifier .. "_PROMPT", info.prompt)
-                                                setState(triggerId, identifier .. "_NEGPROMPT", info.negPrompt)
-                                                setState(triggerId, identifier, info.inlay)
-                                            else
-                                                setState(triggerId, identifier, inlay)
-                                                setState(triggerId, identifier .. "_SIMULPROMPT", foundPrompt)
-                                                setState(triggerId, identifier .. "_NEGSIMULPROMPT", storedNegPrompt)
-
-                                                local currentList = getState(triggerId, listKey) or "null"
-                                                if currentList == "null" then currentList = "" end
-                                                
-                                                if not string.find("," .. currentList .. ",", "," .. identifier .. ",", 1, true) then
-                                                    local newList = currentList == "" and identifier or (currentList .. "," .. identifier)
-                                                    setState(triggerId, listKey, newList)
-                                                end
+                                            -- 캐릭터 이름으로 이미지 저장
+                                            if trimmedBlockName then
+                                                setState(triggerId, trimmedBlockName, inlay)
                                             end
                                         else
                                             ERR(triggerId, promptType, 2)
@@ -4397,10 +4357,9 @@ onOutput = async(function (triggerId)
                         if foundInlayPrompt then
                             print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundInlayPrompt, 1, 50) .. "...]")
                             local currentNegativePromptInlay = negativePrompt
-                            local storedNegInlayPrompt = ""
+                            
                             if foundInlayNegPrompt then 
                                 currentNegativePromptInlay = foundInlayNegPrompt .. ", " .. currentNegativePromptInlay
-                                storedNegInlayPrompt = foundInlayNegPrompt 
                             end
 
                             local finalPromptInlay = artistPrompt .. ", " .. foundInlayPrompt .. ", " .. qualityPrompt
@@ -4420,19 +4379,7 @@ onOutput = async(function (triggerId)
                                     replacement = replacement
                                 })
 
-                                -- 이미지 정보 저장
-                                local infoInlay = {
-                                    type = "INLAY",
-                                    identifier = "INLAY_" .. omIndex,
-                                    inlay = inlayImage,
-                                    prompt = foundInlayPrompt,
-                                    negPrompt = storedNegInlayPrompt
-                                }
-                                table.insert(generatedImagesInfo, infoInlay)
-                                
-                                -- ChatVar에 정보 저장
-                                setState(triggerId, "INLAY_" .. omIndex .. "_PROMPT", foundInlayPrompt)
-                                setState(triggerId, "INLAY_" .. omIndex .. "_NEGPROMPT", storedNegInlayPrompt)
+                                -- 인레이 식별자로 이미지만 저장
                                 setState(triggerId, "INLAY_" .. omIndex, inlayImage)
                                 
                                 print("ONLINEMODULE: onOutput: Successfully processed INLAY block #" .. inlayBlocksFound)
@@ -4505,11 +4452,9 @@ onOutput = async(function (triggerId)
                         if foundProfilePrompt then
                             local finalPromptTwitterProfile = (artistPrompt or "") .. ", " .. (foundProfilePrompt or "") .. ", " .. (qualityPrompt or "")
                             local currentNegativePromptProfile = (negativePrompt or "")
-                            local storedNegProfilePrompt = ""
                             
                             if foundProfileNegPrompt then 
                                 currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
-                                storedNegProfilePrompt = foundProfileNegPrompt 
                             end
 
                             print("ONLINEMODULE: onOutput: Generating profile image...")
@@ -4524,20 +4469,9 @@ onOutput = async(function (triggerId)
                             if isSuccessProfile then
                                 print("ONLINEMODULE: onOutput: Profile image generation successful")
                                 profileInlayToUse = inlayProfile
+                                -- 프로필 이미지 저장
                                 setState(triggerId, twitterId, profileInlayToUse)
                                 setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                                setState(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
-                                setState(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
-
-                                local infoProfile = {
-                                    type = "PROFILE",
-                                    identifier = twitterId, 
-                                    inlay = profileInlayToUse, 
-                                    prompt = foundProfilePrompt,
-                                    negPrompt = storedNegProfilePrompt
-                                }
-                                table.insert(generatedImagesInfo, infoProfile)
-                                print("ONLINEMODULE: onOutput: Stored generated profile info")
                             else
                                 print("ONLINEMODULE: onOutput: Profile image generation failed")
                                 ERR(triggerId, "TWITTERPROFILE", 2)
@@ -4558,11 +4492,9 @@ onOutput = async(function (triggerId)
                     print("ONLINEMODULE: onOutput: Processing tweet...")
                     local _, _, foundTwitterNegPrompt = string.find(currentLine, twitterNegPromptFindPattern)
                     local currentNegativePromptTwitter = negativePrompt
-                    local storedNegTweetPrompt = ""
                     
                     if foundTwitterNegPrompt then 
                         currentNegativePromptTwitter = foundTwitterNegPrompt .. ", " .. currentNegativePromptTwitter
-                        storedNegTweetPrompt = foundTwitterNegPrompt 
                     end
 
                     local finalPromptTwitterTweet = artistPrompt .. ", " .. foundTwitterPrompt .. ", " .. qualityPrompt
@@ -4593,20 +4525,6 @@ onOutput = async(function (triggerId)
                         print("ONLINEMODULE: onOutput: Replacing content in line...")
                         currentLine = string.sub(currentLine, 1, s_twitter-1) .. replacementTwitter .. string.sub(currentLine, e_twitter + 1)
                         lineModifiedInThisPass = true
-
-                        local infoTweet = {
-                            type = "TWEET", 
-                            identifier = twitterId, 
-                            inlay = inlayTwitter,
-                            prompt = foundTwitterPrompt,
-                            negPrompt = storedNegTweetPrompt
-                        }
-
-                        table.insert(generatedImagesInfo, infoTweet)
-                        setState(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
-                        setState(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
-                        setState(triggerId, twitterId .. "_TWEET", infoTweet.inlay)
-                        print("ONLINEMODULE: onOutput: Stored generated tweet info")
                     elseif profileInlayToUse then
                         print("ONLINEMODULE: onOutput: Using profile-only replacement")
                         local originalBlockReplacement = "TWITTER[NAME:" .. (twName or "") .. 
@@ -4686,11 +4604,9 @@ onOutput = async(function (triggerId)
                         if foundProfilePrompt then
                             local finalPromptInstaProfile = (artistPrompt or "") .. ", " .. (foundProfilePrompt or "") .. ", " .. (qualityPrompt or "")
                             local currentNegativePromptProfile = (negativePrompt or "")
-                            local storedNegProfilePrompt = ""
                             
                             if foundProfileNegPrompt then 
                                 currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
-                                storedNegProfilePrompt = foundProfileNegPrompt 
                             end
 
                             print("ONLINEMODULE: onOutput: Generating profile image...")
@@ -4705,20 +4621,9 @@ onOutput = async(function (triggerId)
                             if isSuccessProfile then
                                 print("ONLINEMODULE: onOutput: Profile image generation successful")
                                 profileInlayToUse = inlayProfile
+                                -- 인스타그램 ID로 프로필 이미지 저장
                                 setState(triggerId, instaId, profileInlayToUse)
                                 setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                                setState(triggerId, instaId .. "_INSTAPROFILEPROMPT", foundProfilePrompt)
-                                setState(triggerId, instaId .. "_NEGINSTAPROFILEPROMPT", storedNegProfilePrompt)
-
-                                local infoProfile = {
-                                    type = "PROFILE",
-                                    identifier = instaId, 
-                                    inlay = profileInlayToUse, 
-                                    prompt = foundProfilePrompt,
-                                    negPrompt = storedNegProfilePrompt
-                                }
-                                table.insert(generatedImagesInfo, infoProfile)
-                                print("ONLINEMODULE: onOutput: Stored generated profile info")
                             else
                                 print("ONLINEMODULE: onOutput: Profile image generation failed")
                                 ERR(triggerId, "INSTAPROFILE", 2)
@@ -4739,11 +4644,9 @@ onOutput = async(function (triggerId)
                     print("ONLINEMODULE: onOutput: Processing post...")
                     local _, _, foundInstaNegPrompt = string.find(currentLine, instaNegPromptFindPattern)
                     local currentNegativePromptInsta = negativePrompt
-                    local storedNegPostPrompt = ""
                     
                     if foundInstaNegPrompt then 
                         currentNegativePromptInsta = foundInstaNegPrompt .. ", " .. currentNegativePromptInsta
-                        storedNegPostPrompt = foundInstaNegPrompt 
                     end
 
                     local finalPromptInstaPost = artistPrompt .. ", " .. foundInstaPrompt .. ", " .. qualityPrompt
@@ -4771,20 +4674,6 @@ onOutput = async(function (triggerId)
                         print("ONLINEMODULE: onOutput: Replacing content in line...")
                         currentLine = string.sub(currentLine, 1, s_insta-1) .. replacementInsta .. string.sub(currentLine, e_insta + 1)
                         lineModifiedInThisPass = true
-
-                        local infoPost = {
-                            type = "POST", 
-                            identifier = instaId, 
-                            inlay = inlayInsta,
-                            prompt = foundInstaPrompt,
-                            negPrompt = storedNegPostPrompt
-                        }
-
-                        table.insert(generatedImagesInfo, infoPost)
-                        setState(triggerId, instaId .. "_INSTAPROMPT", infoPost.prompt)
-                        setState(triggerId, instaId .. "_INSTANEGPROMPT", infoPost.negPrompt)
-                        setState(triggerId, instaId, infoPost.inlay)
-                        print("ONLINEMODULE: onOutput: Stored generated post info")
                     elseif profileInlayToUse then
                         print("ONLINEMODULE: onOutput: Using profile-only replacement")
                         local originalBlockReplacement = "INSTA[NAME:" .. (instaName or "") .. 
@@ -4845,11 +4734,9 @@ onOutput = async(function (triggerId)
                             if foundProfilePrompt then
                                 local finalPromptTwitterProfile = artistPrompt .. ", " .. foundProfilePrompt .. ", " .. qualityPrompt
                                 local currentNegativePromptProfile = negativePrompt
-                                local storedNegProfilePrompt = ""
                                 
                                 if foundProfileNegPrompt then 
                                     currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
-                                    storedNegProfilePrompt = foundProfileNegPrompt
                                 end
 
                                 local inlayProfile = generateImage(triggerId, finalPromptTwitterProfile, currentNegativePromptProfile):await()
@@ -4860,19 +4747,9 @@ onOutput = async(function (triggerId)
                                    and not string.find(inlayProfile, "실패", 1, true) then
                                     
                                     profileInlayToUse = inlayProfile
+                                    -- 트위터 ID로 프로필 이미지만 저장
                                     setState(triggerId, twitterId, profileInlayToUse)
                                     setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                                    setState(triggerId, twitterId .. "_PROFILEPROMPT", foundProfilePrompt)
-                                    setState(triggerId, twitterId .. "_NEGPROFILEPROMPT", storedNegProfilePrompt)
-
-                                    local infoProfile = {
-                                        type = "PROFILE",
-                                        identifier = twitterId,
-                                        inlay = profileInlayToUse,
-                                        prompt = foundProfilePrompt,
-                                        negPrompt = storedNegProfilePrompt
-                                    }
-                                    table.insert(generatedImagesInfo, infoProfile)
                                 else
                                     ERR(triggerId, "TWITTERPROFILE", 2)
                                 end
@@ -4887,11 +4764,9 @@ onOutput = async(function (triggerId)
                     if foundTwitterPrompt then
                         local _, _, foundTwitterNegPrompt = string.find(currentLine, twitterNegPromptFindPattern)
                         local currentNegativePromptTwitter = negativePrompt
-                        local storedNegTweetPrompt = ""
                         
                         if foundTwitterNegPrompt then 
                             currentNegativePromptTwitter = foundTwitterNegPrompt .. ", " .. currentNegativePromptTwitter
-                            storedNegTweetPrompt = foundTwitterNegPrompt
                         end
 
                         local finalPromptTwitterTweet = artistPrompt .. ", " .. foundTwitterPrompt .. ", " .. qualityPrompt
@@ -4913,18 +4788,6 @@ onOutput = async(function (triggerId)
                             )
                             currentLine = string.sub(currentLine, 1, s_twitter-1) .. replacementTwitter .. string.sub(currentLine, e_twitter + 1)
                             lineModifiedInThisPass = true
-
-                            local infoTweet = {
-                                type = "TWEET", 
-                                identifier = twitterId, 
-                                inlay = inlayTwitter,
-                                prompt = foundTwitterPrompt,
-                                negPrompt = storedNegTweetPrompt
-                            }
-                            table.insert(generatedImagesInfo, infoTweet)
-                            setState(triggerId, twitterId .. "_TWEETPROMPT", infoTweet.prompt)
-                            setState(triggerId, twitterId .. "_TWEETNEGPROMPT", infoTweet.negPrompt)
-                            setState(triggerId, twitterId .. "_TWEET", infoTweet.inlay)
                         end
                     elseif profileInlayToUse then
                         -- 프로필만 있을 때의 교체
@@ -4968,10 +4831,9 @@ onOutput = async(function (triggerId)
                             if foundProfilePrompt then
                                 local finalPromptInstaProfile = artistPrompt .. ", " .. foundProfilePrompt .. ", " .. qualityPrompt
                                 local currentNegativePromptProfile = negativePrompt
-                                local storedNegProfilePrompt = ""
+                                
                                 if foundProfileNegPrompt then 
                                     currentNegativePromptProfile = foundProfileNegPrompt .. ", " .. currentNegativePromptProfile
-                                    storedNegProfilePrompt = foundProfileNegPrompt
                                 end
 
                                 local inlayProfile = generateImage(triggerId, finalPromptInstaProfile, currentNegativePromptProfile):await()
@@ -4982,19 +4844,9 @@ onOutput = async(function (triggerId)
                                    and not string.find(inlayProfile, "실패", 1, true) then
                                     
                                     profileInlayToUse = inlayProfile
+                                    -- 인스타그램 ID로 프로필 이미지만 저장
                                     setState(triggerId, instaId, profileInlayToUse)
                                     setState(triggerId, "OMSNSPROFILETEMP", profileInlayToUse)
-                                    setState(triggerId, instaId .. "_INSTAPROFILEPROMPT", foundProfilePrompt)
-                                    setState(triggerId, instaId .. "_NEGINSTAPROFILEPROMPT", storedNegProfilePrompt)
-
-                                    local infoProfile = {
-                                        type = "PROFILE",
-                                        identifier = instaId,
-                                        inlay = profileInlayToUse,
-                                        prompt = foundProfilePrompt,
-                                        negPrompt = storedNegProfilePrompt
-                                    }
-                                    table.insert(generatedImagesInfo, infoProfile)
                                 else
                                     ERR(triggerId, "INSTAPROFILE", 2)
                                 end
@@ -5005,12 +4857,11 @@ onOutput = async(function (triggerId)
                         end
                     end
 
-                    -- 이미지 후처리
+                    -- 인스타 포스트 이미지 생성
                     local currentNegativePromptInsta = negativePrompt
-                    local storedNegPostPrompt = ""
+                    
                     if foundInstaNegPrompt then 
                         currentNegativePromptInsta = foundInstaNegPrompt .. ", " .. currentNegativePromptInsta
-                        storedNegPostPrompt = foundInstaNegPrompt
                     end
 
                     local finalPromptInstaPost = artistPrompt .. ", " .. foundInstaPrompt .. ", " .. qualityPrompt
@@ -5031,19 +4882,6 @@ onOutput = async(function (triggerId)
                         )
                         currentLine = string.sub(currentLine, 1, s_insta-1) .. replacementInsta .. string.sub(currentLine, e_insta + 1)
                         lineModifiedInThisPass = true
-
-                        local infoPost = {
-                            type = "POST",
-                            identifier = instaId,
-                            inlay = inlayInsta,
-                            prompt = foundInstaPrompt,
-                            negPrompt = storedNegPostPrompt
-                        }
-                        table.insert(generatedImagesInfo, infoPost)
-
-                        setState(triggerId, instaId .. "_INSTAPROMPT", infoPost.prompt)
-                        setState(triggerId, instaId .. "_INSTANEGPROMPT", infoPost.negPrompt) 
-                        setState(triggerId, instaId, infoPost.inlay)
                     elseif profileInlayToUse then
                         local replacementInsta = string.format(
                             "INSTA[NAME:%s|IID:%s|IPROFILE:%s|POST:%s|MEDIA:%s|HASH:%s|TIME:%s|LIKES:%s|REPLY:%s|SHARE:%s]",
@@ -5124,46 +4962,22 @@ onOutput = async(function (triggerId)
                                 local _, _, foundDcPrompt = string.find(currentLine, dcPromptPattern)
                                 local _, _, foundNegDcPrompt = string.find(currentLine, negDcPromptPattern)
                                 local currentNegativePromptDc = negativePrompt
-                                local storedDcNegPrompt = ""
-                                if foundNegDcPrompt then currentNegativePromptDc = foundNegDcPrompt .. ", " .. currentNegativePromptDc; storedDcNegPrompt = foundNegDcPrompt end
+                                
+                                if foundNegDcPrompt then 
+                                    currentNegativePromptDc = foundNegDcPrompt .. ", " .. currentNegativePromptDc
+                                end
+                                
                                 if foundDcPrompt then
                                     local finalPromptDc = artistPrompt .. ", " .. foundDcPrompt .. ", " .. qualityPrompt
                                     local successCall, inlayDc = pcall(function() return generateImage(triggerId, finalPromptDc, currentNegativePromptDc):await() end)
                                     local isSuccessDc = successCall and (inlayDc ~= nil) and (type(inlayDc) == "string") and (string.len(inlayDc) > 10) and not string.find(inlayDc, "fail", 1, true) and not string.find(inlayDc, "error", 1, true) and not string.find(inlayDc, "실패", 1, true)
+                                    
                                     if isSuccessDc then
-                                        local dcIdentifier = postId
-
                                         table.insert(dcReplacements, {
                                             start = om_abs_start,
                                             finish = om_abs_end,
                                             inlay = "<OM" .. omIndex .. ">" .. inlayDc
                                         })
-
-                                        local infoDC = {
-                                            type = "DC",
-                                            identifier = dcIdentifier,
-                                            inlay = inlayDc, 
-                                            prompt = foundDcPrompt,
-                                            negPrompt = storedDcNegPrompt
-                                        }
-                                        local alreadyGeneratedForThisPostId = false
-                                        local existingIndex = -1
-                                        for k, v in ipairs(generatedImagesInfo) do
-                                            if v.type == "DC" and v.identifier == dcIdentifier then
-                                                alreadyGeneratedForThisPostId = true
-                                                existingIndex = k
-                                                break
-                                            end
-                                        end
-                                        if alreadyGeneratedForThisPostId then
-                                            generatedImagesInfo[existingIndex] = infoDC
-                                        else
-                                            table.insert(generatedImagesInfo, infoDC)
-                                        end
-
-                                        setState(triggerId, "DC_" .. dcIdentifier .. "_PROMPT", infoDC.prompt)
-                                        setState(triggerId, "DC_" .. dcIdentifier .. "_NEGPROMPT", infoDC.negPrompt)
-                                        setState(triggerId, "DC_" .. dcIdentifier, inlayDc) 
                                     else
                                         ERR(triggerId, "DCINSIDE", 2)
                                         print("ONLINEMODULE: onOutput: ERROR - DC image generation failed...")
@@ -5183,6 +4997,7 @@ onOutput = async(function (triggerId)
                         searchPos = e_dc_prefix + 1
                     end
                 end
+                
                 if #dcReplacements > 0 then
                     table.sort(dcReplacements, function(a, b) return a.start > b.start end)
                     for i, rep in ipairs(dcReplacements) do
@@ -5209,8 +5024,11 @@ onOutput = async(function (triggerId)
                     print("ONLINEMODULE: onOutput: Found KAKAO block and prompt. Generating image...")
                     local _, _, foundKakaoNegPrompt = string.find(currentLine, kakaoNegPromptFindPattern)
                     local currentNegativePromptKakao = negativePrompt or ""
-                    local storedNegPrompt = ""
-                    if foundKakaoNegPrompt then currentNegativePromptKakao = foundKakaoNegPrompt .. ", " .. currentNegativePromptKakao; storedNegPrompt = foundKakaoNegPrompt end
+                    
+                    if foundKakaoNegPrompt then 
+                        currentNegativePromptKakao = foundKakaoNegPrompt .. ", " .. currentNegativePromptKakao
+                    end
+                    
                     local finalPromptKakao = (artistPrompt or "") .. ", " .. foundKakaoPrompt .. ", " .. (qualityPrompt or "")
         
                     local successCall, inlayKakao = pcall(function() return generateImage(triggerId, finalPromptKakao, currentNegativePromptKakao):await() end)
@@ -5218,17 +5036,9 @@ onOutput = async(function (triggerId)
         
                     if isSuccessKakao then
                         print("ONLINEMODULE: onOutput: KAKAO image generated successfully.")
-                        local kakaoIdentifier = "KAKAO_" .. cap3
                         local replacementKakao = "KAKAO[" .. inlayKakao .. "|" .. cap3 .. "]"
                         currentLine = string.sub(currentLine, 1, s_kakao-1) .. replacementKakao .. string.sub(currentLine, e_kakao + 1)
                         lineModifiedInThisPass = true
-        
-                        local infoEro = { type = "KAKAO", identifier = kakaoIdentifier, inlay = inlayKakao, prompt = foundKakaoPrompt, negPrompt = storedNegPrompt }
-                        table.insert(generatedImagesInfo, infoEro)
-                        setState(triggerId, kakaoIdentifier .. "_PROMPT", infoEro.prompt)
-                        setState(triggerId, kakaoIdentifier .. "_NEGPROMPT", infoEro.negPrompt)
-                        setState(triggerId, kakaoIdentifier, infoEro.inlay)
-                        print("ONLINEMODULE: onOutput: Stored info for generated KAKAO image. Identifier: " .. kakaoIdentifier)
                     else
                         ERR(triggerId, "KAKAOTALK", 2)
                         print("ONLINEMODULE: onOutput: KAKAO image generation FAILED. Error/Result: " .. tostring(inlayKakao))
@@ -5237,7 +5047,7 @@ onOutput = async(function (triggerId)
             end
             
         else
-                print("ONLINEMODULE: onOutput: Last message data is not in the expected format.")
+            print("ONLINEMODULE: onOutput: Last message data is not in the expected format.")
         end
     end
 
