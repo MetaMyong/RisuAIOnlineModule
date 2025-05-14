@@ -3101,10 +3101,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - SIMULSTATUS[...|INLAY:<OM1>]
-        - [OMSIMULCARDPROMPT1:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{full body, white background,simple background}}}]
+        - [OMSIMULCARDPROMPT1:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}]
         - [NEG_OMSIMULCARDPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]
-        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{full body, white background,simple background}}}]
+        - [OMSIMULCARDPROMPT2:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}]
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
@@ -3113,10 +3113,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - EROSTATUS[...|INLAY:<OM1>]  --> FEMALE
-        - [OMSTATUSPROMPT1:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{full body, white background,simple background}}}]
+        - [OMSTATUSPROMPT1:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}]
         - [NEG_OMSTATUSPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]  --> MALE
-        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{full body, white background,simple background}}}]
+        - [OMSIMULCARDPROMPT2:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}]
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]] 
@@ -3760,7 +3760,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
         qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or ""
         negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or ""
     elseif OMPRESETPROMPT == "1" then
-        artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
+        artistPrompt = "1.3::artist:Goldcan9 ::, 1.1::artist:sakurai norio, artist:torino ::, 1.1::artist:mankai kaika, artist:gomzi ::, year 2024"
         qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
     elseif OMPRESETPROMPT == "2" then
@@ -4485,7 +4485,7 @@ onButtonClick = async(function(triggerId, data)
         qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or ""
         negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or ""
     elseif OMPRESETPROMPT == "1" then
-        artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
+        artistPrompt = "1.3::artist:Goldcan9 ::, 1.1::artist:sakurai norio, artist:torino ::, 1.1::artist:mankai kaika, artist:gomzi ::, year 2024"
         qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
     elseif OMPRESETPROMPT == "2" then
