@@ -770,19 +770,25 @@ local function inputSimulCard(triggerId, data)
 - DO NOT PRINT DIALOGUE via "" or 「」, REPLACE ALL DIALOGUE to SIMULSTATUS BLOCK.
     - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - PRINT SIMULSTATUS[...] INSTEAD.
-    - DO NOT COMBINE THEM into ONE SENTENCE, SEPERATE THEM
-- Example:
-    - Invalid:
-        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-    - Valid:
-        - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
-        - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
-        - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
-
+    - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
+    - Example:
+        - Invalid:
+            - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+        - Valid:
+            - Choi Yujin briefly put down her pen and looked up at you. Her gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
+            - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect."|...]
+            - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
+            - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
+- Do not change the name if exists.
+- Replace the "dialogue" of all living things, not just humans, with Status blocks.
+    - Even if the dialogue is short, it must be replaced with the Status block.
+    - Example:
+        - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
+        - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]       
+    
 #### Simulation Status Interface: Template
 - SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
-- NAME: The name of the NPC.
+- NAME: English Name of NPC.
 - DIALOGUE: The dialogue of the NPC.
     - Make sure to include NPC's dialogue here
     - Do not include any other NPC's dialogue or actions.
@@ -1064,18 +1070,24 @@ local function inputStatusHybrid(triggerId, data)
     - DO NOT PRINT "dialogue" or 「dialogue」 OUTSIDE of SIMULSTATUS BLOCK(SIMULSTATUS[NAME:...|DIALOGUE:dialogue|...]).
         - PRINT SIMULSTATUS[...] INSTEAD.
     - DO NOT COMBINE THEM into ONE SENTENCE, SEPARATE THEM
-- Example:
-    - Invalid:
-        - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
-    - Valid:
-        - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
-        - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect.|...]
-        - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed.|...]
-        - His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
+    - Example:
+        - Invalid:
+            - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it. "And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect. Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed." His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
+        - Valid:
+            - Choi Siwoo briefly put down her pen and looked up at you. His gaze was still calm and unwavering, but a subtle curiosity seemed to flicker within it.
+            - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:And if you have a skill you are currently aware of, I would appreciate it if you could tell me its name and brief effect.|...]
+            - SIMULSTATUS[NAME:Choi Siwoo|DIALOGUE:Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed.|...]
+            - His voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, he was cautiously exploring the unknown entity that was you.
+- Do not change the name if exists.
+- Replace the "dialogue" of all living things, not just humans, with Status blocks.
+    - Even if the dialogue is short, it must be replaced with the Status block.
+    - Example:
+        - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
+        - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]       
 
 #### Simulation Status Interface Template
 - SIMULSTATUS[NAME:(CHARACTER's Name)|DIALOGUE:(CHARACTER's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
-- NAME: The name of the CHARACTER.
+- NAME: English Name of NPC.
 - DIALOGUE: The dialogue of the CHARACTER.
 - Make sure to include CHARACTER's dialogue here
 - Do not include any other CHARACTER's dialogue or actions.
@@ -2645,15 +2657,18 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     local last_end = 1
                     rawPostContent = string.gsub(rawPostContent, "<!%-%-.-%-%->", "")
                     local om_pattern = "(<OM%d+>)"
-                    local inlayIndex = nil
+                    local inlayIndex = 0
 
                     while true do
                         local omStart, omEnd, omTag = string.find(rawPostContent, om_pattern, last_end)
                         if not omStart then
                             break
                         end
-
+                        
                         inlayIndex = string.match(omTag, "<OM(%d+)>")
+                        if not inlayIndex then
+                            print("ONLINEMODULE: No valid index found in OM tag:", omTag)
+                        end
 
                         local text_part = string.sub(rawPostContent, last_end, omStart - 1)
                         local processed_text = escapeHtml(text_part)
@@ -4018,7 +4033,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
     local originalLine = currentLine -- getPrompt에서 사용할 원본 라인
     
     -- EROSTATUS, SIMULSTATUS, INLAY, DC 처리
-    if startPrefix == "EROSTATUS" or startPrefix == "SIMULSTATUS" or startPrefix == "INLAY" or startPrefix == "DC" then
+    if startPrefix == "EROSTATUS" or startPrefix == "SIMULSTATUS" or startPrefix == "INLAY" then
         local blockPattern = startPrefix .. "%[.-%]"
         local currentSearchPos = 1
         local newLineParts = {}
@@ -4028,15 +4043,19 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
 
         while true do
             local s_block, e_block = string.find(currentLine, blockPattern, currentSearchPos)
-            if not s_block then break end
+            if not s_block then 
+                table.insert(newLineParts, string.sub(currentLine, lastPos))
+                break 
+            end
 
             table.insert(newLineParts, string.sub(currentLine, lastPos, s_block - 1))
             local capturedBlockContentWithBrackets = string.sub(currentLine, s_block, e_block)
             local blockContentOnly = string.sub(capturedBlockContentWithBrackets, #startPrefix + 2, -2)
+            
+            -- EROSTATUS, SIMULSTATUS, INLAY 등의 일반적인 블록 처리
             local blockSpecificData = { typeName = startPrefix, characterImageCache = charCache }
-
             local modifiedContent, omModified, updatedCache = processIndexedPlaceholdersInBlock(blockContentOnly, mainPrompt, mainNegPrompt, blockSpecificData)
-            charCache = updatedCache -- 다음 <OMx> 처리를 위해 동일 블록 내 캐시 업데이트
+            charCache = updatedCache
             
             table.insert(newLineParts, startPrefix .. "[" .. modifiedContent .. "]")
             if omModified then tempLineModified = true end
@@ -4044,7 +4063,89 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
             lastPos = e_block + 1
             currentSearchPos = e_block + 1
         end
-        table.insert(newLineParts, string.sub(currentLine, lastPos))
+        
+        if tempLineModified then
+            currentLine = table.concat(newLineParts)
+            lineModified = true
+        end
+    elseif startPrefix == "DC" then
+        local blockPattern = startPrefix .. "%[.-%]"
+        local currentSearchPos = 1
+        local newLineParts = {}
+        local lastPos = 1
+        local tempLineModified = false
+
+        while true do
+            local s_block, e_block = string.find(currentLine, blockPattern, currentSearchPos)
+            if not s_block then 
+                table.insert(newLineParts, string.sub(currentLine, lastPos))
+                break 
+            end
+
+            table.insert(newLineParts, string.sub(currentLine, lastPos, s_block - 1))
+            local capturedBlockContentWithBrackets = string.sub(currentLine, s_block, e_block)
+            local blockContentOnly = string.sub(capturedBlockContentWithBrackets, #startPrefix + 2, -2)
+            
+            local dcBlockParts = {}
+            local lastDcPos = 1
+            local dcBlockModified = false
+            
+            -- <OMx> 태그를 찾아 처리
+            while true do
+                local om_start, om_end, om_index = string.find(blockContentOnly, "<OM(%d+)>", lastDcPos)
+                if not om_start then 
+                    table.insert(dcBlockParts, string.sub(blockContentOnly, lastDcPos))
+                    break 
+                end
+                
+                table.insert(dcBlockParts, string.sub(blockContentOnly, lastDcPos, om_start - 1))
+                
+                local omPlaceholder = "<OM" .. om_index .. ">"
+                local specificPromptKey = mainPrompt .. om_index
+                local specificNegPromptKey = mainNegPrompt .. om_index
+                
+                local promptText = getPrompt(originalLine, specificPromptKey)
+                local negPromptText = getPrompt(originalLine, specificNegPromptKey)
+                
+                if promptText then
+                    local finalGenPrompt = artistPrompt .. promptText .. qualityPrompt
+                    local currentNegative = negativePrompt
+                    
+                    if negPromptText then
+                        currentNegative = negPromptText .. ", " .. currentNegative
+                    end
+                    
+                    local inlay = generateImage(triggerId, finalGenPrompt, currentNegative):await()
+                    
+                    if inlay and type(inlay) == "string" and #inlay > 10 and not string.find(inlay, "fail") and not string.find(inlay, "error") then
+                        local stateKey = "DC_" .. om_index
+                        setState(triggerId, stateKey, inlay)
+                        table.insert(generatedImagesInfo, {type = "DC", identifier = stateKey, inlay = inlay})
+                        table.insert(dcBlockParts, omPlaceholder .. inlay)
+                        dcBlockModified = true
+                    else
+                        table.insert(dcBlockParts, omPlaceholder)
+                        ERR(triggerId, "DC", 2)
+                    end
+                else
+                    table.insert(dcBlockParts, omPlaceholder)
+                    ERR(triggerId, "DC", 0)
+                end
+                
+                lastDcPos = om_end + 1
+            end
+            
+            if dcBlockModified then
+                blockContentOnly = table.concat(dcBlockParts)
+                tempLineModified = true
+            end
+            
+            table.insert(newLineParts, startPrefix .. "[" .. blockContentOnly .. "]")
+            
+            lastPos = e_block + 1
+            currentSearchPos = e_block + 1
+        end
+        
         if tempLineModified then
             currentLine = table.concat(newLineParts)
             lineModified = true
