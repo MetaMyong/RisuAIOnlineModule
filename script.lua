@@ -4071,9 +4071,9 @@ onOutput = async(function (triggerId)
                                 if useExistingImage then
                                     -- 기존 이미지 사용
                                     table.insert(statusReplacements, {
-                                        start = om_abs_end,
+                                        start = om_abs_start,
                                         finish = om_abs_end,
-                                        inlay = "{{inlay::" .. existingInlay .. "}}"
+                                        inlay = "<OM" .. omIndex .. ">" .. existingInlay
                                     })
                                     print("ONLINEMODULE: onOutput: Added cached inlay after OM" .. omIndex .. " at absolute pos " .. om_abs_end)
                                 else
@@ -4094,11 +4094,11 @@ onOutput = async(function (triggerId)
                                            not string.find(inlayStatus, "error", 1, true) and 
                                            not string.find(inlayStatus, "실패", 1, true) then
                                             
-                                            -- 생성된 이미지를 테이블에 추가
+                                            -- 생성된 이미지를 테이블에 추가 - 기존 OM 태그를 교체
                                             table.insert(statusReplacements, {
-                                                start = om_abs_end,
+                                                start = om_abs_start,
                                                 finish = om_abs_end,
-                                                inlay = "{{inlay::" .. inlayStatus .. "}}"
+                                                inlay = "<OM" .. omIndex .. ">" .. inlayStatus
                                             })
                                             
                                             -- trimmedBlockName이 존재하면 상태를 저장
@@ -4138,7 +4138,7 @@ onOutput = async(function (triggerId)
                     table.sort(statusReplacements, function(a, b) return a.start > b.start end)
                     for i_rep, rep in ipairs(statusReplacements) do
                         if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
                             lineModifiedInThisPass = true
                         end
                     end
