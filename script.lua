@@ -780,7 +780,7 @@ local function inputSimulCard(triggerId, data)
         - SIMULSTATUS[NAME:Choi Yujin|DIALOGUE:"Of course, accurate skill analysis will be done in the precision measurement room later, but basic information is needed."|...]
         - Her voice was soft, yet carried a hint of firmness. As if a skilled artisan were appraising a raw gemstone, she was cautiously exploring the unknown entity that was you.
 
-#### Simulation Status Interface Template
+#### Simulation Status Interface: Template
 - SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
 - NAME: The name of the NPC.
 - DIALOGUE: The dialogue of the NPC.
@@ -817,6 +817,12 @@ local function inputSimulCard(triggerId, data)
 - Example:
     - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NOIMAGE>]
     - Describe the situation (e.g., Eun-Young was happy....)
+
+### Simulation Status Interface: CRITICAL
+- Replace the "dialogue" of all living things, not just humans, with Status blocks.
+    - Example:
+        - Invalid: "KRRRRRR!"
+        - Valid: SIMULSTATUS[NAME:BLACK DRAGON|DIALOGUE:KRRRRRR!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Abandoned mountain|INLAY:<OM1>]
 ]]
     end
 
@@ -1106,6 +1112,14 @@ local function inputStatusHybrid(triggerId, data)
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]
         end
+
+        data = data .. [[
+### Simulation Status Interface: CRITICAL
+- Replace the "dialogue" of all living things, not just humans, with Status blocks.
+    - Example:
+        - Invalid: "KRRRRRR!"
+        - Valid: SIMULSTATUS[NAME:BLACK DRAGON|DIALOGUE:KRRRRRR!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Abandoned mountain|INLAY:<OM1>]        
+]]
 
     return data
 end
