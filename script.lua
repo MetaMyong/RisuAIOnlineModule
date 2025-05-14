@@ -785,7 +785,8 @@ local function inputSimulCard(triggerId, data)
     - Example:
         - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
         - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]       
-    
+
+
 #### Simulation Status Interface: Template
 - SIMULSTATUS[NAME:(NPC's Name)|DIALOGUE:(NPC's Dialogue)|TIME:(Time)|LOCATION:(LOCATION)|INLAY:(INLAY)]
 - NAME: English Name of NPC.
@@ -823,12 +824,6 @@ local function inputSimulCard(triggerId, data)
 - Example:
     - SIMULSTATUS[NAME:Yang Eun-young|DIALOGUE:If I'm with {{user}}, anyth-anything is good!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Eun-young's room, on the bed|INLAY:<NOIMAGE>]
     - Describe the situation (e.g., Eun-Young was happy....)
-
-### Simulation Status Interface: CRITICAL
-- Replace the "dialogue" of all living things, not just humans, with Status blocks.
-    - Example:
-        - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
-        - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]
 ]]
     end
 
@@ -1124,14 +1119,6 @@ local function inputStatusHybrid(triggerId, data)
     - Describe the situation (e.g., Eun-Young was happy....)
 ]]
         end
-
-        data = data .. [[
-### Simulation Status Interface: CRITICAL
-- Replace the "dialogue" of all living things, not just humans, with Status blocks.
-    - Example:
-        - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
-        - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]       
-]]
 
     return data
 end
