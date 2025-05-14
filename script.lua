@@ -820,6 +820,7 @@ local function inputSimulCard(triggerId, data)
 
 ### Simulation Status Interface: CRITICAL
 - Replace the "dialogue" of all living things, not just humans, with Status blocks.
+- Even if the dialogue is short, it must be replaced with the Status block.
     - Example:
         - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
         - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]
@@ -1116,6 +1117,7 @@ local function inputStatusHybrid(triggerId, data)
         data = data .. [[
 ### Simulation Status Interface: CRITICAL
 - Replace the "dialogue" of all living things, not just humans, with Status blocks.
+- Even if the dialogue is short, it must be replaced with the Status block.
     - Example:
         - Invalid: Bulbasaur chirped happily, letting out a short "Bulba-!" sound.
         - Valid: Bulbasaur chirped happily, letting out a short sound. SIMULSTATUS[NAME:Bulbasaur|DIALOGUE:Bulba-!|TIME:2025/05/01 Thursday 02:12PM|LOCATION:Kanto region, Pallet Town, Professor Oak's Laboratory|INLAY:<OM1>]       
