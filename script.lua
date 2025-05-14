@@ -3888,15 +3888,15 @@ onOutput = async(function (triggerId)
     local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
     local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
 	
-	if OMPRESETPROMPT == "0" then
-        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT") or "0"
-        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or "0"
-        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or "0"
+    if OMPRESETPROMPT == "0" then
+        artistPrompt = getGlobalVar(triggerId, "toggle_OMARTISTPROMPT") or ""
+        qualityPrompt = getGlobalVar(triggerId, "toggle_OMQUALITYPROMPT") or ""
+        negativePrompt = getGlobalVar(triggerId, "toggle_OMNEGPROMPT") or ""
     elseif OMPRESETPROMPT == "1" then
-		artistPrompt = "{{{artist:Goldcan9, artist:shiba}}}, {artist:sakurai norio,year 2023},{artist: torino}, [[[[[[[[artist: eonsang]]]]]]]], artist: gomzi, {year 2025, year 2024}"
-		qualityPrompt = "best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
-		negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, {{{censored}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, {{{{mascot}}}}, {{{{puppet}}}}, {{{{character doll}}}}, {{{{pet}}}}, {{{{cake}}}}, {{{{stuffed toy}}}}, aged down, furry, sagging breasts, {multiple views}, pastie, maebari, animals, crowd, multiple girls, {eyeball}, {empty eyes}, {slit pupils}, {bright pupils}, {{sketch}}, {{flat color}}, censored, bestiality, from below, 3D"
-	elseif OMPRESETPROMPT == "2" then
+        artistPrompt = "1.33::artist:Goldcan9 ::, 1.1::artist:sakurai norio,artist: torino,year 2023 ::, 0.5::artist: eonsang, artist: gomzi, artist:shiba ::"
+        qualityPrompt = "smooth lines, excellent color, depth of field, shiny skin, best quality, amazing quality, very aesthetic, highres, incredibly absurdres"
+        negativePrompt = "{{{worst quality}}}, {{{bad quality}}}, reference, unfinished, unclear fingertips, twist, Squiggly, Grumpy, incomplete, {{Imperfect Fingers}}, Cheesy, {{very displeasing}}, {{mess}}, {{Approximate}}, {{monochrome}}, {{greyscale}}, 3D"
+    elseif OMPRESETPROMPT == "2" then
         artistPrompt = "1.3::artist:tianliang duohe fangdongye ::,1.2::artist:shuz ::, 0.7::artist:wlop ::, 1.0::artist:kase daiki ::,0.8::artist:ningen mame ::,0.8::artist:voruvoru ::,0.8::artist:tomose_shunsaku ::,0.7::artist:sweetonedollar ::,0.7::artist:chobi (penguin paradise) ::,0.8::artist:rimo ::,{year 2024, year 2025}"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
@@ -3904,6 +3904,10 @@ onOutput = async(function (triggerId)
         artistPrompt = "artist:rella, artist:ixy, artist:gomzi, artist:tsunako, artist:momoko (momopoco)"
         qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
         negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
+    elseif OMPRESETPROMPT == "4" then
+        artistPrompt = "0.8::artist:namako daibakuhatsu ::, 0.5::artist:tianliang duohe fangdongye ::, 0.4::channel(caststation) ::, 0.7::jtveemo ::, 1.3::pixel art,  8-bit, pixel size: 4 ::, year 2024"
+        qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
+        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     end
     	
 	print("-----------------------ART PROMPT-----------------------")
