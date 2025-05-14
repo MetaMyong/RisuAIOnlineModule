@@ -3078,8 +3078,8 @@ local function inputImage(triggerId, data)
 
 ### Image Prompt: Usage
 - DO NOT INCLUDE '(''PLACEHOLDER'')' when REPLACING
-    - Invalid: (SITUATION: {{user}} is in a situation where they are being kissed by someone else.)
-    - Valid: {{user}} is in a situation where they are being kissed by someone else.
+    - Invalid: ... ,(SCENE:Yellow reacts with surprise and a slight blush to {{user}}'s offer to travel together.), ...
+    - Valid: ... ,Yellow reacts with surprise and a slight blush to {{user}}'s offer to travel together, ...
 - NEVER refer to the past chat history when outputting the prompt below:
 ]]
 
