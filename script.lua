@@ -3982,6 +3982,9 @@ onOutput = async(function (triggerId)
                 local searchPos = 1
                 local statusBlocksFound = 0
                 local statusReplacements = {}
+                local OMCACHE = getGlobalVar(triggerId, "toggle_OMCACHE") or "0"
+                local characterImageCache = {} -- 메모리 내 캐시 추가
+                print("ONLINEMODULE: onOutput: OMCACHE value:", OMCACHE)
 
                 while true do
                     local s_status, e_status_prefix = string.find(currentLine, "EROSTATUS%[", searchPos)
@@ -4018,6 +4021,9 @@ onOutput = async(function (triggerId)
                         local trimmedBlockName = nil
                         if currentBlockName then
                             trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
+                            print("ONLINEMODULE: onOutput: Block NAME found: [" .. trimmedBlockName .. "]")
+                        else
+                            print("ONLINEMODULE: onOutput: Block NAME pattern did not match.")
                         end
 
                         local blockContent = string.sub(currentLine, e_status_prefix + 1, e_status_suffix - 1)
@@ -4029,43 +4035,95 @@ onOutput = async(function (triggerId)
                             omTagsFoundInBlock = omTagsFoundInBlock + 1
                             local omIndex = tonumber(omIndexStr)
                             if omIndex then
-                                local statusPromptFindPattern = "%[OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local statusNegPromptFindPattern = "%[NEG_OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local _, _, foundStatusPrompt = string.find(currentLine, statusPromptFindPattern)
-                                local _, _, foundStatusNegPrompt = string.find(currentLine, statusNegPromptFindPattern)
-                                local currentNegativePromptStatus = negativePrompt
-                                if foundStatusNegPrompt then
-                                    currentNegativePromptStatus = foundStatusNegPrompt .. ", " .. currentNegativePromptStatus
-                                end
-                                if foundStatusPrompt then
-                                    local finalPromptStatus = artistPrompt .. ", " .. foundStatusPrompt .. ", " .. qualityPrompt
-                                    local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
-                                    if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and not string.find(inlayStatus, "fail", 1, true) and not string.find(inlayStatus, "error", 1, true) and not string.find(inlayStatus, "실패", 1, true) then
-                                        local content_offset = e_status_prefix
-                                        local om_abs_start = content_offset + s_om_in_content
-                                        local om_abs_end = content_offset + e_om_in_content
-                                        
-                                        table.insert(statusReplacements, {
-                                            start = om_abs_start,
-                                            finish = om_abs_end,
-                                            inlay = "<OM" .. omIndex .. ">" .. inlayStatus
-                                        })
-                                        
-                                        -- trimmedBlockName이 존재하면 상태를 저장
-                                        if trimmedBlockName then
-                                            setState(triggerId, trimmedBlockName, inlayStatus)
-                                            print("ONLINEMODULE: onOutput: Stored inlay for NAME: " .. trimmedBlockName)
+                                local content_offset = e_status_prefix
+                                local om_abs_start = content_offset + s_om_in_content
+                                local om_abs_end = content_offset + e_om_in_content
+                                
+                                local useExistingImage = false
+                                local existingInlay = nil
+                                
+                                -- 캐릭터 이름이 있고 OMCACHE가 활성화된 경우 기존 이미지 확인
+                                if trimmedBlockName and trimmedBlockName ~= "" then
+                                    -- 메모리 캐시 먼저 확인
+                                    existingInlay = characterImageCache[trimmedBlockName]
+                                    
+                                    -- 메모리 캐시에 없으면 상태 변수에서 확인
+                                    if not existingInlay then
+                                        existingInlay = getState(triggerId, trimmedBlockName) or "null"
+                                        if existingInlay ~= "null" then
+                                            -- 상태 변수에서 찾은 이미지를 메모리 캐시에 저장
+                                            characterImageCache[trimmedBlockName] = existingInlay
+                                            print("ONLINEMODULE: onOutput: Loaded existing inlay from state for NAME: " .. trimmedBlockName)
+                                        else
+                                            existingInlay = nil
                                         end
                                     else
-                                        ERR(triggerId, "EROSTATUS", 2)
-                                        print("ONLINEMODULE: onOutput: Image generation failed for OM" .. omIndex)
+                                        print("ONLINEMODULE: onOutput: Using memory cached inlay for NAME: " .. trimmedBlockName)
                                     end
+                                    
+                                    -- OMCACHE 설정에 따라 기존 이미지 사용 여부 결정
+                                    if OMCACHE == "1" and existingInlay then
+                                        useExistingImage = true
+                                        print("ONLINEMODULE: onOutput: OMCACHE enabled, using existing image for " .. trimmedBlockName)
+                                    end
+                                end
+                                
+                                if useExistingImage then
+                                    -- 기존 이미지 사용
+                                    table.insert(statusReplacements, {
+                                        start = om_abs_end,
+                                        finish = om_abs_end,
+                                        inlay = "{{inlay::" .. existingInlay .. "}}"
+                                    })
+                                    print("ONLINEMODULE: onOutput: Added cached inlay after OM" .. omIndex .. " at absolute pos " .. om_abs_end)
                                 else
-                                    ERR(triggerId, "EROSTATUS", 0)
-                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. omIndex .. " in currentLine.")
+                                    -- 새 이미지 생성
+                                    local statusPromptFindPattern = "%[OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                    local statusNegPromptFindPattern = "%[NEG_OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                    local _, _, foundStatusPrompt = string.find(currentLine, statusPromptFindPattern)
+                                    local _, _, foundStatusNegPrompt = string.find(currentLine, statusNegPromptFindPattern)
+                                    local currentNegativePromptStatus = negativePrompt
+                                    if foundStatusNegPrompt then
+                                        currentNegativePromptStatus = foundStatusNegPrompt .. ", " .. currentNegativePromptStatus
+                                    end
+                                    if foundStatusPrompt then
+                                        local finalPromptStatus = artistPrompt .. ", " .. foundStatusPrompt .. ", " .. qualityPrompt
+                                        local inlayStatus = generateImage(triggerId, finalPromptStatus, currentNegativePromptStatus):await()
+                                        if inlayStatus and type(inlayStatus) == "string" and string.len(inlayStatus) > 10 and 
+                                           not string.find(inlayStatus, "fail", 1, true) and 
+                                           not string.find(inlayStatus, "error", 1, true) and 
+                                           not string.find(inlayStatus, "실패", 1, true) then
+                                            
+                                            -- 생성된 이미지를 테이블에 추가
+                                            table.insert(statusReplacements, {
+                                                start = om_abs_end,
+                                                finish = om_abs_end,
+                                                inlay = "{{inlay::" .. inlayStatus .. "}}"
+                                            })
+                                            
+                                            -- trimmedBlockName이 존재하면 상태를 저장
+                                            if trimmedBlockName and trimmedBlockName ~= "" then
+                                                -- 생성된 이미지를 상태 변수와 메모리 캐시에 저장
+                                                setState(triggerId, trimmedBlockName, inlayStatus)
+                                                characterImageCache[trimmedBlockName] = inlayStatus
+                                                print("ONLINEMODULE: onOutput: Stored new inlay for NAME: " .. trimmedBlockName)
+                                            end
+                                        else
+                                            ERR(triggerId, "EROSTATUS", 2)
+                                            print("ONLINEMODULE: onOutput: Image generation failed for OM" .. omIndex)
+                                        end
+                                    else
+                                        ERR(triggerId, "EROSTATUS", 0)
+                                        print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. omIndex .. " in currentLine.")
+                                    end
                                 end
                             end
                             omSearchPosInContent = e_om_in_content + 1
+                        end
+                        
+                        if omTagsFoundInBlock == 0 then
+                            ERR(triggerId, "EROSTATUS", 3)
+                            print("ONLINEMODULE: onOutput: No <OM> tags found in block #" .. statusBlocksFound)
                         end
                         searchPos = e_status_suffix + 1
                     else
@@ -4080,10 +4138,10 @@ onOutput = async(function (triggerId)
                     table.sort(statusReplacements, function(a, b) return a.start > b.start end)
                     for i_rep, rep in ipairs(statusReplacements) do
                         if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                            currentLine = string.sub(currentLine, 1, rep.start) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                            lineModifiedInThisPass = true
                         end
                     end
-                    lineModifiedInThisPass = true
                 else
                     print("ONLINEMODULE: onOutput: No erostatus replacements to apply.")
                 end
@@ -4094,8 +4152,9 @@ onOutput = async(function (triggerId)
                 local searchPos = 1
                 local simulReplacements = {}
                 local statusBlocksFound = 0
-
-                local listKey = "STORED_SIMCARD_IDS"
+                local OMCACHE = getGlobalVar(triggerId, "toggle_OMCACHE") or "0"
+                local characterImageCache = {} -- 메모리 내 캐시 추가
+                print("ONLINEMODULE: onOutput: OMCACHE value:", OMCACHE)
 
                 while true do
                     local s_simul, e_simul_prefix = string.find(currentLine, "SIMULSTATUS%[", searchPos)
@@ -4128,154 +4187,146 @@ onOutput = async(function (triggerId)
                         print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " closing bracket found at index " .. e_simul_suffix)
 
                         local statusBlockContent = string.sub(currentLine, s_simul, e_simul_suffix)
-                        local statusBlockPattern = "SIMULSTATUS%[NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)%]"
-                        local _, _, currentBlockName = string.find(statusBlockContent, statusBlockPattern)
+                        local statusPattern = "SIMULSTATUS%[NAME:([^|]*)|"
+                        local _, _, currentBlockName = string.find(statusBlockContent, statusPattern)
 
-                        if currentBlockName then
-                            print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " NAME found: [" .. currentBlockName .. "]")
-                        else
-                            print("ONLINEMODULE: onOutput: SIMULSTATUS block #" .. statusBlocksFound .. " NAME pattern did not match.")
-                        end
-
-                        local existingInlay = nil
                         local trimmedBlockName = nil
                         if currentBlockName then
                             trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
-                            if trimmedBlockName ~= "" then
-                                print("ONLINEMODULE: onOutput: Trimmed NAME: [" .. trimmedBlockName .. "]")
-                                existingInlay = getState(triggerId, trimmedBlockName) or "null"
-                                if existingInlay == "null" then existingInlay = nil end
-                                print("ONLINEMODULE: onOutput: Existing inlay found from chatVar: [" .. tostring(existingInlay) .. "]")
-                            else
-                                trimmedBlockName = nil
-                            end
+                            print("ONLINEMODULE: onOutput: Block NAME found: [" .. trimmedBlockName .. "]")
+                        else
+                            print("ONLINEMODULE: onOutput: Block NAME pattern did not match.")
                         end
 
                         local simulContent = string.sub(currentLine, e_simul_prefix + 1, e_simul_suffix - 1)
                         local omSearchPosInContent = 1
                         local omTagsFoundInBlock = 0
 
-                        if existingInlay and trimmedBlockName then
-                            print("ONLINEMODULE: onOutput: Processing with existing inlay for block #" .. statusBlocksFound)
                         while true do
                             local s_om_in_content, e_om_in_content, omIndexStr = string.find(simulContent, "<OM(%d+)>", omSearchPosInContent)
                             if not s_om_in_content then break end
                             omTagsFoundInBlock = omTagsFoundInBlock + 1
-                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..omTagsFoundInBlock.." (using existing inlay)")
                             local omIndex = tonumber(omIndexStr)
+                            
                             if omIndex then
                                 local content_offset = e_simul_prefix
                                 local om_abs_start = content_offset + s_om_in_content
                                 local om_abs_end = content_offset + e_om_in_content
-                                table.insert(simulReplacements, { start = om_abs_start, finish = om_abs_end, inlay = existingInlay })
-                                print("ONLINEMODULE: onOutput: Adding existing inlay replacement for OM" .. omIndex .. " at absolute pos " .. om_abs_start .. "-" .. om_abs_end)
-                            end
-                            omSearchPosInContent = e_om_in_content + 1
-                        end
-                        else
-                            print("ONLINEMODULE: onOutput: Processing by generating new image for block #" .. statusBlocksFound)
-                        while true do
-                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(simulContent, "<OM(%d+)>", omSearchPosInContent)
-                            if not s_om_in_content then
-                                print("ONLINEMODULE: onOutput: No more <OM> tags found in block #".. statusBlocksFound .." content search.")
-                                break
-                            end
-                            omTagsFoundInBlock = omTagsFoundInBlock + 1
-                            print("ONLINEMODULE: onOutput: Found <OM> tag #"..omTagsFoundInBlock.." (generating new)")
-                            local omIndex = tonumber(omIndexStr)
-                            if omIndex then
-                                local simulPromptPattern = "%[OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local negSimulPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
-                                local _, _, foundSimulPrompt = string.find(currentLine, simulPromptPattern)
-                                local _, _, foundNegSimulPrompt = string.find(currentLine, negSimulPromptPattern)
-
-                                if foundSimulPrompt then
-                                    print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundSimulPrompt, 1, 50) .. "...]")
-                                    local currentNegativePromptSimul = negativePrompt
-                                    if foundNegSimulPrompt then 
-                                        currentNegativePromptSimul = foundNegSimulPrompt .. ", " .. currentNegativePromptSimul
-                                    end
-                                    local finalPromptSimul = artistPrompt .. ", " .. foundSimulPrompt .. ", " .. qualityPrompt
-                                    local inlaySimul = generateImage(triggerId, finalPromptSimul, currentNegativePromptSimul):await()
-                                    print("ONLINEMODULE: onOutput: generateImage result for OM"..omIndex..": ["..tostring(inlaySimul).."]")
-                                    local isSuccess = (inlaySimul ~= nil) and (type(inlaySimul) == "string") and (string.len(inlaySimul) > 10) and not string.find(inlaySimul, "fail", 1, true) and not string.find(inlaySimul, "error", 1, true) and not string.find(inlaySimul, "실패", 1, true)
-                                    if isSuccess then
-                                        print("ONLINEMODULE: onOutput: Image generation SUCCESS for OM"..omIndex)
-                                        local content_offset = e_simul_prefix 
-                                        local om_abs_start = content_offset + s_om_in_content
-                                        local om_abs_end = content_offset + e_om_in_content -1
-                                        table.insert(simulReplacements, {
-                                            start = om_abs_start,
-                                            finish = om_abs_end,
-                                            inlay = "<OM" .. omIndex .. ">" .. inlaySimul
-                                        })
-                                        print("ONLINEMODULE: onOutput: Adding new inlay replacement for OM" .. omIndex .. " at absolute pos " .. om_abs_start .. "-" .. om_abs_end)
-
-                                        if trimmedBlockName then
-                                            -- 캐릭터 이름으로 인레이 이미지 저장
-                                            setState(triggerId, trimmedBlockName, inlaySimul)
-
-                                            local currentList = getState(triggerId, listKey) or "null"
-                                            if currentList == "null" then currentList = "" end
-                                                print("ONLINEMODULE: onOutput: Current list for key '" .. listKey .. "': [" .. currentList .. "]")
-                                            local newList = currentList
-                                            if not string.find("," .. currentList .. ",", "," .. trimmedBlockName .. ",", 1, true) then
-                                                if currentList == "" then
-                                                    newList = trimmedBlockName
-                                                else
-                                                    newList = currentList .. "," .. trimmedBlockName
-                                                end
-                                                setState(triggerId, listKey, newList)
-                                                print("ONLINEMODULE: onOutput: Added SimCard ID '" .. trimmedBlockName .. "' to stored list (" .. listKey .. "). New list: [" .. newList .. "]")
-                                            else
-                                                print("ONLINEMODULE: onOutput: SimCard ID '" .. trimmedBlockName .. "' already exists in stored list (" .. listKey .. ").")
-                                            end
-
-                                            existingInlay = inlaySimul
-                                            print("ONLINEMODULE: onOutput: Updated existingInlay for subsequent OM tags in block #" .. statusBlocksFound)
+                                
+                                local useExistingImage = false
+                                local existingInlay = nil
+                                
+                                -- 캐릭터 이름이 있고 OMCACHE가 활성화된 경우 기존 이미지 확인
+                                if trimmedBlockName and trimmedBlockName ~= "" then
+                                    -- 메모리 캐시 먼저 확인
+                                    existingInlay = characterImageCache[trimmedBlockName]
+                                    
+                                    -- 메모리 캐시에 없으면 상태 변수에서 확인
+                                    if not existingInlay then
+                                        existingInlay = getState(triggerId, trimmedBlockName) or "null"
+                                        if existingInlay ~= "null" then
+                                            -- 상태 변수에서 찾은 이미지를 메모리 캐시에 저장
+                                            characterImageCache[trimmedBlockName] = existingInlay
+                                            print("ONLINEMODULE: onOutput: Loaded existing inlay from state for NAME: " .. trimmedBlockName)
+                                        else
+                                            existingInlay = nil
                                         end
                                     else
-                                        ERR(triggerId, "SIMULCARD", 2)
-                                        print("ONLINEMODULE: onOutput: Image generation FAILED or invalid result for OM"..omIndex)
+                                        print("ONLINEMODULE: onOutput: Using memory cached inlay for NAME: " .. trimmedBlockName)
                                     end
+                                    
+                                    -- OMCACHE 설정에 따라 기존 이미지 사용 여부 결정
+                                    if OMCACHE == "1" and existingInlay then
+                                        useExistingImage = true
+                                        print("ONLINEMODULE: onOutput: OMCACHE enabled, using existing image for " .. trimmedBlockName)
+                                    end
+                                end
+
+                                if useExistingImage then
+                                    -- 기존 이미지 사용
+                                    table.insert(simulReplacements, {
+                                        start = om_abs_end,
+                                        finish = om_abs_end,
+                                        inlay = existingInlay
+                                    })
+                                    print("ONLINEMODULE: onOutput: Added cached inlay after OM" .. omIndex .. " at absolute pos " .. om_abs_end)
                                 else
-                                    ERR(triggerId, "SIMULCARD", 0)
-                                    print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. omIndex .. " in currentLine.")
+                                    -- 새 이미지 생성
+                                    local simulPromptPattern = "%[OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                    local negSimulPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
+                                    local _, _, foundSimulPrompt = string.find(currentLine, simulPromptPattern)
+                                    local _, _, foundNegSimulPrompt = string.find(currentLine, negSimulPromptPattern)
+
+                                    if foundSimulPrompt then
+                                        print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundSimulPrompt, 1, 50) .. "...]")
+                                        local currentNegativePromptSimul = negativePrompt
+                                        if foundNegSimulPrompt then 
+                                            currentNegativePromptSimul = foundNegSimulPrompt .. ", " .. currentNegativePromptSimul
+                                        end
+                                        local finalPromptSimul = artistPrompt .. ", " .. foundSimulPrompt .. ", " .. qualityPrompt
+                                        local inlaySimul = generateImage(triggerId, finalPromptSimul, currentNegativePromptSimul):await()
+                                        
+                                        if inlaySimul and type(inlaySimul) == "string" and string.len(inlaySimul) > 10 and 
+                                           not string.find(inlaySimul, "fail", 1, true) and 
+                                           not string.find(inlaySimul, "error", 1, true) and 
+                                           not string.find(inlaySimul, "실패", 1, true) then
+                                            
+                                            print("ONLINEMODULE: onOutput: Image generation SUCCESS for OM" .. omIndex)
+                                            
+                                            table.insert(simulReplacements, {
+                                                start = om_abs_end,
+                                                finish = om_abs_end,
+                                                inlay = inlaySimul
+                                            })
+                                            
+                                            if trimmedBlockName and trimmedBlockName ~= "" then
+                                                -- 생성된 이미지를 상태 변수와 메모리 캐시에 저장
+                                                setState(triggerId, trimmedBlockName, inlaySimul)
+                                                characterImageCache[trimmedBlockName] = inlaySimul
+                                                print("ONLINEMODULE: onOutput: Stored new inlay for NAME: " .. trimmedBlockName)
+                                            end
+                                        else
+                                            ERR(triggerId, "SIMULCARD", 2)
+                                            print("ONLINEMODULE: onOutput: Image generation FAILED for OM" .. omIndex)
+                                        end
+                                    else
+                                        ERR(triggerId, "SIMULCARD", 0)
+                                        print("ONLINEMODULE: onOutput: Prompt NOT FOUND for OM" .. omIndex)
+                                    end
                                 end
                             end
                             omSearchPosInContent = e_om_in_content + 1
                         end
-                    end
-                    if omTagsFoundInBlock == 0 then
-                        ERR(triggerId, "SIMULCARD", 3)
-                        print("ONLINEMODULE: onOutput: No <OM> tags found within SIMULSTATUS block #"..statusBlocksFound.." content.")
-                    end
-                    searchPos = e_simul_suffix + 1
+                        
+                        if omTagsFoundInBlock == 0 then
+                            ERR(triggerId, "SIMULCARD", 3)
+                            print("ONLINEMODULE: onOutput: No <OM> tags found in block #" .. statusBlocksFound)
+                        end
+                        searchPos = e_simul_suffix + 1
                     else
                         ERR(triggerId, "SIMULCARD", 1)
-                        print("ONLINEMODULE: onOutput: CRITICAL - Closing bracket ']' not found for SIMULSTATUS block #" .. statusBlocksFound .. " even after nested check! Something is wrong. Skipping to next search pos.")
+                        print("ONLINEMODULE: onOutput: Closing bracket not found for block #" .. statusBlocksFound)
                         searchPos = e_simul_prefix + 1
                     end
                 end
 
                 if statusBlocksFound == 0 then
                     ERR(triggerId, "SIMULCARD", 4)
-                    print("ONLINEMODULE: onOutput: No SIMULSTATUS[...] blocks found in the entire message.")
+                    print("ONLINEMODULE: onOutput: No SIMULSTATUS blocks found in message")
                 end
-
+                
                 if #simulReplacements > 0 then
-                    print("ONLINEMODULE: onOutput: Applying ".. #simulReplacements .." simulcard replacements.")
+                    print("ONLINEMODULE: onOutput: Applying " .. #simulReplacements .. " simulcard replacements")
                     table.sort(simulReplacements, function(a, b) return a.start > b.start end)
-                    for i_rep, rep in ipairs(simulReplacements) do
+                    for _, rep in ipairs(simulReplacements) do
                         if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                            currentLine = string.sub(currentLine, 1, rep.start) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
                         end
                     end
                     lineModifiedInThisPass = true
                 else
-                    print("ONLINEMODULE: onOutput: No simulcard replacements to apply.")
+                    print("ONLINEMODULE: onOutput: No simulcard replacements to apply")
                 end
-            
             elseif OMCARD == "3" and not skipOMCARD then
                 -- 상태창 하이브리드 모드 사용할 때
                 print("ONLINEMODULE: onOutput: OMCARD == 3 (Hybrid mode)")
@@ -4283,22 +4334,24 @@ onOutput = async(function (triggerId)
                 local replacements = {}
                 local statusBlocksFound = 0
                 local characterImageCache = {} -- 캐릭터별 이미지 캐시 (시뮬레이션용)
+                local OMCACHE = getGlobalVar(triggerId, "toggle_OMCACHE") or "0"
+                print("ONLINEMODULE: onOutput: OMCACHE value:", OMCACHE)
 
                 while true do
-                    local s_ero, e_ero = string.find(currentLine, "EROSTATUS%[", searchPos)
-                    local s_sim, e_sim = string.find(currentLine, "SIMULSTATUS%[", searchPos)
+                    local s_ero, e_ero_prefix = string.find(currentLine, "EROSTATUS%[", searchPos)
+                    local s_sim, e_sim_prefix = string.find(currentLine, "SIMULSTATUS%[", searchPos)
                     
                     local s_status, e_status_prefix, isEroStatus
                     if s_ero and (not s_sim or s_ero < s_sim) then
                         s_status = s_ero
-                        e_status_prefix = e_ero 
+                        e_status_prefix = e_ero_prefix 
                         isEroStatus = true
                     elseif s_sim then
                         s_status = s_sim
-                        e_status_prefix = e_sim
+                        e_status_prefix = e_sim_prefix
                         isEroStatus = false
                     else
-                        break 
+                        break -- 더 이상 EROSTATUS 또는 SIMULSTATUS 블록이 없음
                     end
 
                     statusBlocksFound = statusBlocksFound + 1
@@ -4329,7 +4382,8 @@ onOutput = async(function (triggerId)
                             local _, _, name = string.find(blockContent, "NAME:([^|]*)|")
                             currentBlockName = name
                         else
-                            local pattern = "NAME:([^|]*)|DIALOGUE:([^|]*)|TIME:([^|]*)|LOCATION:([^|]*)|INLAY:([^%]]*)"
+                            -- SIMULSTATUS의 경우 NAME 필드 추출
+                            local pattern = "NAME:([^|]*)|"
                             local _, _, name = string.find(blockContent, pattern)
                             currentBlockName = name
                         end
@@ -4339,44 +4393,63 @@ onOutput = async(function (triggerId)
                             trimmedBlockName = currentBlockName:match("^%s*(.-)%s*$")
                         end
 
-                        -- 시뮬레이션 카드일 때만 캐시 확인/사용
-                        local cachedInlay = nil
-                        if not isEroStatus and trimmedBlockName then
-                            cachedInlay = characterImageCache[trimmedBlockName]
-                            if not cachedInlay then
-                                local existingInlay = getState(triggerId, trimmedBlockName) or "null"
-                                if existingInlay ~= "null" then
-                                    characterImageCache[trimmedBlockName] = existingInlay
-                                    cachedInlay = existingInlay
-                                end
-                            end
-                        end
-
                         local omSearchPosInContent = 1
                         local omTagsFoundInBlock = 0
 
                         while true do
-                            local s_om_in_content, e_om_in_content, omIndex = string.find(blockContent, "<OM(%d+)>", omSearchPosInContent)
+                            local s_om_in_content, e_om_in_content, omIndexStr = string.find(blockContent, "<OM(%d+)>", omSearchPosInContent)
                             if not s_om_in_content then break end
                             omTagsFoundInBlock = omTagsFoundInBlock + 1
-                            omIndex = tonumber(omIndex)
+                            local omIndex = tonumber(omIndexStr)
 
                             if omIndex then
-                                local content_offset = e_status_prefix
+                                local content_offset = e_status_prefix 
                                 local om_abs_start = content_offset + s_om_in_content
                                 local om_abs_end = content_offset + e_om_in_content
 
-                                -- 시뮬레이션이고 캐시된 이미지가 있으면 재사용
-                                if not isEroStatus and cachedInlay then
-                                    print("ONLINEMODULE: onOutput: Reusing cached image for character: " .. trimmedBlockName)
+                                local useExistingImage = false
+                                local existingInlay = nil
+                                
+                                -- 이름이 존재하면 저장된 이미지가 있는지 확인
+                                if trimmedBlockName and trimmedBlockName ~= "" then
+                                    -- 메모리 캐시 먼저 확인
+                                    existingInlay = characterImageCache[trimmedBlockName]
+                                    
+                                    -- 메모리 캐시에 없으면 상태 변수에서 확인
+                                    if not existingInlay then
+                                        existingInlay = getState(triggerId, trimmedBlockName) or "null"
+                                        if existingInlay ~= "null" then
+                                            -- 상태 변수에서 찾은 이미지를 메모리 캐시에 저장
+                                            characterImageCache[trimmedBlockName] = existingInlay
+                                            print("ONLINEMODULE: onOutput: Loaded existing inlay from state for " .. 
+                                                  (isEroStatus and "EROSTATUS" or "SIMULSTATUS") .. 
+                                                  " NAME: " .. trimmedBlockName)
+                                        else
+                                            existingInlay = nil
+                                        end
+                                    else
+                                        print("ONLINEMODULE: onOutput: Using memory cached inlay for " .. 
+                                              (isEroStatus and "EROSTATUS" or "SIMULSTATUS") .. 
+                                              " NAME: " .. trimmedBlockName)
+                                    end
+                                    
+                                    -- OMCACHE 설정에 따라 기존 이미지 사용 여부 결정
+                                    if OMCACHE == "1" and existingInlay then
+                                        useExistingImage = true
+                                        print("ONLINEMODULE: onOutput: OMCACHE enabled, using existing image for " .. trimmedBlockName)
+                                    end
+                                end
+
+                                if useExistingImage then
+                                    -- 기존 이미지 사용
                                     table.insert(replacements, {
-                                        start = om_abs_start,
+                                        start = om_abs_end,
                                         finish = om_abs_end,
-                                        inlay = "<OM" .. omIndex .. ">" .. cachedInlay
+                                        inlay = existingInlay
                                     })
                                 else
                                     -- 새 이미지 생성
-                                    local promptPattern, negPromptPattern, promptType
+                                    local promptPattern, negPromptPattern, promptType, identifier
                                     if isEroStatus then
                                         promptPattern = "%[OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
                                         negPromptPattern = "%[NEG_OMSTATUSPROMPT" .. omIndex .. ":([^%]]*)%]"
@@ -4386,6 +4459,7 @@ onOutput = async(function (triggerId)
                                         negPromptPattern = "%[NEG_OMSIMULCARDPROMPT" .. omIndex .. ":([^%]]*)%]"
                                         promptType = "SIMULCARD"
                                     end
+                                    identifier = trimmedBlockName
 
                                     local _, _, foundPrompt = string.find(currentLine, promptPattern)
                                     local _, _, foundNegPrompt = string.find(currentLine, negPromptPattern)
@@ -4404,21 +4478,18 @@ onOutput = async(function (triggerId)
                                            and not string.find(inlay, "error", 1, true)
                                            and not string.find(inlay, "실패", 1, true) then
                                             
-                                            -- 시뮬레이션 카드일 때만 캐시에 저장
-                                            if not isEroStatus then
-                                                characterImageCache[trimmedBlockName] = inlay
+                                            if identifier and identifier ~= "" then
+                                                -- 생성된 이미지를 상태 변수와 메모리 캐시에 저장
+                                                setState(triggerId, identifier, inlay)
+                                                characterImageCache[identifier] = inlay
+                                                print("ONLINEMODULE: onOutput: Stored new inlay for " .. promptType .. " NAME: " .. identifier)
                                             end
 
                                             table.insert(replacements, {
-                                                start = om_abs_start,
+                                                start = om_abs_end,
                                                 finish = om_abs_end,
-                                                inlay = "<OM" .. omIndex .. ">" .. inlay
+                                                inlay = inlay
                                             })
-
-                                            -- 캐릭터 이름으로 이미지 저장
-                                            if trimmedBlockName then
-                                                setState(triggerId, trimmedBlockName, inlay)
-                                            end
                                         else
                                             ERR(triggerId, promptType, 2)
                                         end
@@ -4436,7 +4507,7 @@ onOutput = async(function (triggerId)
                         searchPos = e_status_suffix + 1
                     else
                         ERR(triggerId, isEroStatus and "EROSTATUS" or "SIMULCARD", 1)
-                        searchPos = e_status_prefix + 1
+                        searchPos = e_status_prefix + 1 -- 다음 검색 위치 조정
                     end
                 end
 
@@ -4448,7 +4519,7 @@ onOutput = async(function (triggerId)
                         table.sort(replacements, function(a, b) return a.start > b.start end)
                         for _, rep in ipairs(replacements) do
                             if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                                currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
+                                currentLine = string.sub(currentLine, 1, rep.start) .. rep.inlay .. string.sub(currentLine, rep.finish + 1)
                             end
                         end
                         lineModifiedInThisPass = true
@@ -4463,7 +4534,7 @@ onOutput = async(function (triggerId)
                 
                 -- INLAY[<OM(INDEX)>] 블록 검색
                 while true do
-                    local s_inlay, e_inlay = string.find(currentLine, "INLAY%[([^%]]*)%]", searchPos)
+                    local s_inlay, e_inlay_prefix, blockContent = string.find(currentLine, "INLAY%[([^%]]*)%]", searchPos)
                     if not s_inlay then
                         print("ONLINEMODULE: onOutput: No more INLAY[...] blocks found starting from position " .. searchPos)
                         break
@@ -4471,11 +4542,11 @@ onOutput = async(function (triggerId)
                     inlayBlocksFound = inlayBlocksFound + 1
                     print("ONLINEMODULE: onOutput: Found INLAY block #" .. inlayBlocksFound .. " starting at index " .. s_inlay)
 
-                    local inlayContent = string.sub(currentLine, s_inlay, e_inlay)
-                    local _, _, omIndexStr = string.find(inlayContent, "<OM(%d+)>")
+                    local e_inlay = s_inlay + string.len("INLAY[" .. blockContent .. "]") - 1
+                    local s_om, e_om, omIndexStr = string.find(blockContent, "<OM(%d+)>")
                     local omIndex = tonumber(omIndexStr)
 
-                    if omIndex then
+                    if omIndex and s_om then
                         print("ONLINEMODULE: onOutput: Found OM index: " .. omIndex)
                         local promptPattern = "%[OMINLAYPROMPT" .. omIndex .. ":([^%]]*)%]"
                         local negPromptPattern = "%[NEG_OMINLAYPROMPT" .. omIndex .. ":([^%]]*)%]"
@@ -4498,13 +4569,14 @@ onOutput = async(function (triggerId)
                                not string.find(inlayImage, "error", 1, true) and 
                                not string.find(inlayImage, "실패", 1, true) then
                                 
-                                -- 기존 INLAY[<OM>] 블록을 새로운 inlay로 교체
-                                local replacement = "INLAY[<OM" .. omIndex .. ">" .. inlayImage .. "]"
+                                -- 원래 <OM> 태그는 그대로 두고 바로 뒤에 inlayImage를 삽입하는 방식으로 변경
+                                local absStartPos = s_inlay + s_om - 1
+                                local absEndPos = s_inlay + e_om - 1
                                 
+                                -- 삽입할 위치(태그 바로 뒤)와 삽입할 내용을 저장
                                 table.insert(inlayReplacements, {
-                                    start = s_inlay,
-                                    finish = e_inlay, 
-                                    replacement = replacement
+                                    pos = absEndPos,
+                                    inlay = "{{inlay::" .. inlayImage .. "}}"
                                 })
 
                                 -- 인레이 식별자로 이미지만 저장
@@ -4528,12 +4600,12 @@ onOutput = async(function (triggerId)
                     searchPos = e_inlay + 1
                 end
 
-                -- 모든 교체작업 수행
+                -- 모든 교체작업 수행 (태그 뒤에 inlay 삽입)
                 if #inlayReplacements > 0 then
-                    table.sort(inlayReplacements, function(a, b) return a.start > b.start end)
+                    table.sort(inlayReplacements, function(a, b) return a.pos > b.pos end)
                     for _, rep in ipairs(inlayReplacements) do
-                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.replacement .. string.sub(currentLine, rep.finish + 1)
+                        if rep.pos > 0 and rep.pos <= #currentLine then
+                            currentLine = string.sub(currentLine, 1, rep.pos) .. rep.inlay .. string.sub(currentLine, rep.pos + 1)
                         end
                     end
                 end
