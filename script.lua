@@ -2644,15 +2644,18 @@ html { box-sizing: border-box; height: 100%; } *, *::before, *::after { box-sizi
                     local last_end = 1
                     rawPostContent = string.gsub(rawPostContent, "<!%-%-.-%-%->", "")
                     local om_pattern = "(<OM%d+>)"
-                    local inlayIndex = nil
+                    local inlayIndex = 0
 
                     while true do
                         local omStart, omEnd, omTag = string.find(rawPostContent, om_pattern, last_end)
                         if not omStart then
                             break
                         end
-
+                        
                         inlayIndex = string.match(omTag, "<OM(%d+)>")
+                        if not inlayIndex then
+                            print("ONLINEMODULE: No valid index found in OM tag:", omTag)
+                        end
 
                         local text_part = string.sub(rawPostContent, last_end, omStart - 1)
                         local processed_text = escapeHtml(text_part)
