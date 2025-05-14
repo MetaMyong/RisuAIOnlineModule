@@ -4716,7 +4716,7 @@ onOutput = async(function (triggerId)
                         local replacementTwitter = "TWITTER[NAME:" .. (twName or "") .. 
                             "|TNAME:" .. (twTname or "") .. 
                             "|TID:" .. (twTid or "") .. 
-                            "|TPROFILE:" .. (profileInlayToUse or twTprofile or "") .. 
+                            "|TPROFILE:" .. "<OM>" .. (profileInlayToUse or twTprofile or "") .. 
                             "|TWEET:" .. (twTweet or "") .. 
                             "|MEDIA:" .. "<OM>" .. inlayTwitter ..
                             "|HASH:" .. (twHash or "") .. 
@@ -4737,7 +4737,7 @@ onOutput = async(function (triggerId)
                             "|TID:" .. (twTid or "") .. 
                             "|TPROFILE:" .. "<OM>" .. profileInlayToUse ..
                             "|TWEET:" .. (twTweet or "") .. 
-                            "|MEDIA:" .. (twMedia or "") .. 
+                            "|MEDIA:" .. "<OM>" .. (twMedia or "") .. 
                             "|HASH:" .. (twHash or "") .. 
                             "|TIME:" .. (twTime or "") .. 
                             "|VIEW:" .. (twView or "") .. 
@@ -4755,7 +4755,7 @@ onOutput = async(function (triggerId)
                         "|TID:" .. (twTid or "") .. 
                         "|TPROFILE:" .. "<OM>" .. profileInlayToUse ..
                         "|TWEET:" .. (twTweet or "") .. 
-                        "|MEDIA:" .. (twMedia or "") .. 
+                        "|MEDIA:" .. "<OM>" .. (twMedia or "") .. 
                         "|HASH:" .. (twHash or "") .. 
                         "|TIME:" .. (twTime or "") .. 
                         "|VIEW:" .. (twView or "") .. 
@@ -4867,7 +4867,7 @@ onOutput = async(function (triggerId)
                         print("ONLINEMODULE: onOutput: Post image generation successful")
                         local replacementInsta = "INSTA[NAME:" .. (instaName or "") .. 
                             "|IID:" .. (instaIid or "") .. 
-                            "|IPROFILE:" .. (profileInlayToUse or instaIprofile or "") .. 
+                            "|IPROFILE:" .. "<OM>" .. (profileInlayToUse or instaIprofile or "") .. 
                             "|POST:" .. (instaPost or "") .. 
                             "|MEDIA:" .. "<OM>" .. inlayInsta ..
                             "|HASH:" .. (instaHash or "") .. 
@@ -4885,7 +4885,7 @@ onOutput = async(function (triggerId)
                             "|IID:" .. (instaIid or "") .. 
                             "|IPROFILE:" .. "<OM>" .. profileInlayToUse ..
                             "|POST:" .. (instaPost or "") .. 
-                            "|MEDIA:" .. (instaMedia or "") .. 
+                            "|MEDIA:" .. "<OM>" .. (instaMedia or "") .. 
                             "|HASH:" .. (instaHash or "") .. 
                             "|TIME:" .. (instaTime or "") .. 
                             "|LIKES:" .. (instaLikes or "") .. 
@@ -4900,7 +4900,7 @@ onOutput = async(function (triggerId)
                         "|IID:" .. (instaIid or "") .. 
                         "|IPROFILE:" .. "<OM>" .. profileInlayToUse ..
                         "|POST:" .. (instaPost or "") .. 
-                        "|MEDIA:" .. (instaMedia or "") .. 
+                        "|MEDIA:" .. "<OM>" .. (instaMedia or "") .. 
                         "|HASH:" .. (instaHash or "") .. 
                         "|TIME:" .. (instaTime or "") .. 
                         "|LIKES:" .. (instaLikes or "") .. 
@@ -5092,7 +5092,7 @@ onOutput = async(function (triggerId)
                             "INSTA[NAME:%s|IID:%s|IPROFILE:%s|POST:%s|MEDIA:%s|HASH:%s|TIME:%s|LIKES:%s|REPLY:%s|SHARE:%s]",
                             instaName or "", instaIid or "",
                             "<OM>" .. profileInlayToUse,
-                            instaPost or "", instaMedia or "",
+                            instaPost or "", "<OM>" .. instaMedia or "",
                             instaHash or "", instaTime or "",
                             instaLikes or "", instaReply or "", instaShare or ""
                         )
