@@ -3077,7 +3077,9 @@ local function inputImage(triggerId, data)
 	- [NEG_PROMPTPLACEHOLDER: 1girl,female,...]
 
 ### Image Prompt: Usage
-- DO NOT INCLUDE ( AND ) when REPLACING PLACEHOLDER
+- DO NOT INCLUDE '(''PLACEHOLDER'')' when REPLACING
+    - Invalid: (SITUATION: {{user}} is in a situation where they are being kissed by someone else.)
+    - Valid: {{user}} is in a situation where they are being kissed by someone else.
 - NEVER refer to the past chat history when outputting the prompt below:
 ]]
 
@@ -3099,10 +3101,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - SIMULSTATUS[...|INLAY:<OM1>]
-        - [OMSIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(AGE),(APPEARANCE),(BODY),(DRESSES)]
+        - [OMSIMULCARDPROMPT1:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{detailed face,portrait,upper body},{{white background,simple background}}]
         - [NEG_OMSIMULCARDPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]
-        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(AGE),(APPEARANCE),(BODY),(DRESSES)]
+        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{detailed face,portrait,upper body},{{white background,simple background}}]
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
@@ -3114,7 +3116,7 @@ local function inputImage(triggerId, data)
         - [OMSTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
         - [NEG_OMSTATUSPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]  --> MALE
-        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(AGE),(APPEARANCE),(BODY),(DRESSES)]
+        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{detailed face,portrait,upper body},{{white background,simple background}}]
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]] 
