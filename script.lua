@@ -3099,10 +3099,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - SIMULSTATUS[...|INLAY:<OM1>]
-        - [OMSIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [OMSIMULCARDPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(AGE),(APPEARANCE),(BODY),(DRESSES)]
         - [NEG_OMSIMULCARDPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]
-        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(AGE),(APPEARANCE),(BODY),(DRESSES)]
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
@@ -3114,7 +3114,7 @@ local function inputImage(triggerId, data)
         - [OMSTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
         - [NEG_OMSTATUSPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]  --> MALE
-        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(AGE),(APPEARANCE),(BODY),(DRESSES)]
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]] 
