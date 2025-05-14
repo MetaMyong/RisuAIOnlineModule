@@ -3772,9 +3772,9 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
         qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
         negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     elseif OMPRESETPROMPT == "4" then
-        artistPrompt = "1.1::artist:tianliang duohe fangdongye ::, 0.95::artist:namako daibakuhatsu ::, 0.5::channel(caststation) ::, 0.75::jtveemo ::, 1.2::pixel art ::, year 2024, year 2025"
+        artistPrompt = "1.1::artist:ningen mame::, 0.6::artist:hella p::, 0.7::artist:taesi::, 0.8::artist:blue gk::, 1::artist:mx2j::,1.1::artist:zankuro::, 0.9::artist:null(nyanpyoun)::, 1.1::artist:xipa::. 1::artist:wagashi(dagashiya)::, 0.9::artist:jtveemo::, 1.1::artist:naga U::, 1.2::artist:namako daibakuhatsu::, 1.5::pixel art, low poly::, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
+        negativePrompt = "1.2::worst quality ::, 1.2::bad quality ::, 1.2::lowres ::, 1.2::censored ::, 1.2::Imperfect Fingers ::, 1.1::Imperfect Fingers ::, 1.2::Approximate ::, 1.1::very displeasing ::, 1.1::mess ::, 1::unfinished ::, 1::unclear fingertips ::, 1::twist ::, 1::Squiggly ::, 1::Grumpy ::, 1::incomplete ::, 1::Cheesy ::"
     end
 
     print("---------------------------------ONLINEMODULE PROMPT---------------------------------")
@@ -3892,7 +3892,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
                 local negPromptText = getPrompt(currentLine, actualNegPromptKey)
 
                 if promptText then
-                    local finalGenPrompt = artistPrompt .. promptText .. qualityPrompt
+                    local finalGenPrompt = artistPrompt .. ", " .. promptText .. ", " .. qualityPrompt
                     local currentNegative = negativePrompt
                 
                     if negPromptText then
@@ -3962,7 +3962,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
                 local profPromptText = getPrompt(currentLine, p_subPromptKey)
                 local profNegPromptText = getPrompt(currentLine, p_subNegPromptKey)
                 if profPromptText then
-                    local finalProfP = artistPrompt .. profPromptText .. qualityPrompt
+                    local finalProfP = artistPrompt .. ", " .. profPromptText .. ", " .. qualityPrompt
                     local currentNegP = negativePrompt
                     if profNegPromptText then currentNegP = profNegPromptText .. ", " .. currentNegP
                     end
@@ -3986,7 +3986,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
         local mainPromptText = getPrompt(currentLine, p_mainPromptKey)
         if mainPromptText then
             local mainNegPromptText = getPrompt(currentLine, p_mainNegPromptKey)
-            local finalMainP = artistPrompt .. mainPromptText .. qualityPrompt
+            local finalMainP = artistPrompt .. ", " .. mainPromptText .. ", " .. qualityPrompt
             local currentNegM = negativePrompt -- local storedNegM = "" -- 저장 안함
             if mainNegPromptText then currentNegM = mainNegPromptText .. ", " .. currentNegM -- storedNegM = mainNegPromptText -- 저장 안함
             end
@@ -4101,7 +4101,7 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
                 local negPromptText = getPrompt(originalLine, specificNegPromptKey)
                 
                 if promptText then
-                    local finalGenPrompt = artistPrompt .. promptText .. qualityPrompt
+                    local finalGenPrompt = artistPrompt .. ", " .. promptText .. ", " .. qualityPrompt
                     local currentNegative = negativePrompt
                     
                     if negPromptText then
@@ -4497,7 +4497,7 @@ onButtonClick = async(function(triggerId, data)
         qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
         negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     elseif OMPRESETPROMPT == "4" then
-        artistPrompt = "1.1::artist:tianliang duohe fangdongye ::, 0.95::artist:namako daibakuhatsu ::, 0.5::channel(caststation) ::, 0.75::jtveemo ::, 1.2::pixel art ::, year 2024, year 2025"
+        artistPrompt = "1.1::artist:ningen mame::, 0.6::artist:hella p::, 0.7::artist:taesi::, 0.8::artist:blue gk::, 1::artist:mx2j::,1.1::artist:zankuro::, 0.9::artist:null(nyanpyoun)::, 1.1::artist:xipa::. 1::artist:wagashi(dagashiya)::, 0.9::artist:jtveemo::, 1.1::artist:naga U::, 1.2::artist:namako daibakuhatsu::, 1.5::pixel art, dithering::, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     end
