@@ -3089,10 +3089,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the EROTIC STATUS INTERFACE
     - Output Format:
         - EROSTATUS[...|INLAY:<OM1>]
-        - [OMSTATUSPROMPT1:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [OMSTATUSPROMPT1:(SITUATION),(LABEL),cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
         - [NEG_OMSTATUSPROMPT1:(NEGATIVE PROMPT)]
         - EROSTATUS[...|INLAY:<OM2>]
-        - [OMSTATUSPROMPT2:(SITUATION),(LABEL),portrait,cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [OMSTATUSPROMPT2:(SITUATION),(LABEL),cowboy shot,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
         - [NEG_OMSTATUSPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
@@ -3101,10 +3101,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - SIMULSTATUS[...|INLAY:<OM1>]
-        - [OMSIMULCARDPROMPT1:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{detailed face,portrait,upper body},{{white background,simple background}}]
+        - [OMSIMULCARDPROMPT1:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{full body, white background,simple background}}}]
         - [NEG_OMSIMULCARDPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]
-        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{detailed face,portrait,upper body},{{white background,simple background}}]
+        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{full body, white background,simple background}}}]
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
@@ -3113,10 +3113,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - EROSTATUS[...|INLAY:<OM1>]  --> FEMALE
-        - [OMSTATUSPROMPT1:(SITUATION),(LABEL),detailed face,portrait,upper body,white background,simple background,(ACTIONS),(EXPRESSIONS),(AGE),(APPEARANCE),(BODY),(DRESSES),(PLACE),(SCENE)]
+        - [OMSTATUSPROMPT1:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{full body, white background,simple background}}}]
         - [NEG_OMSTATUSPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]  --> MALE
-        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{detailed face,portrait,upper body},{{white background,simple background}}]
+        - [OMSIMULCARDPROMPT2:(SITUATION),(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{full body, white background,simple background}}}]
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]] 
@@ -3772,9 +3772,9 @@ local changeKeyValue = async(function (triggerId, currentLine, startPrefix)
         qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
         negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     elseif OMPRESETPROMPT == "4" then
-        artistPrompt = "1.1::artist:ningen mame::, 0.6::artist:hella p::, 0.7::artist:taesi::, 0.8::artist:blue gk::, 1::artist:mx2j::,1.1::artist:zankuro::, 0.9::artist:null(nyanpyoun)::, 1.1::artist:xipa::. 1::artist:wagashi(dagashiya)::, 0.9::artist:jtveemo::, 1.1::artist:naga U::, 1.2::artist:namako daibakuhatsu::, 1.5::pixel art, low poly::, year 2024"
+        artistPrompt = "1.3::artist:namako daibakuhatsu ::, 0.6::artist:tianliang duohe fangdongye ::, 0.5::channel(caststation) ::, 0.8::jtveemo ::, 1.3::pixel art,  8-bit, pixel size: 4 ::, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
-        negativePrompt = "1.2::worst quality ::, 1.2::bad quality ::, 1.2::lowres ::, 1.2::censored ::, 1.2::Imperfect Fingers ::, 1.1::Imperfect Fingers ::, 1.2::Approximate ::, 1.1::very displeasing ::, 1.1::mess ::, 1::unfinished ::, 1::unclear fingertips ::, 1::twist ::, 1::Squiggly ::, 1::Grumpy ::, 1::incomplete ::, 1::Cheesy ::"
+        negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     end
 
     print("---------------------------------ONLINEMODULE PROMPT---------------------------------")
@@ -4497,7 +4497,7 @@ onButtonClick = async(function(triggerId, data)
         qualityPrompt = "illustration, best quality, amazing quality, very aesthetic, highres, incredibly absurdres, 1::perfect_eyes::, 1::beautiful detail eyes::, incredibly absurdres, finely detailed beautiful eyes"
         negativePrompt = "3D, blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, multiple views, logo, too many watermarks, white blank page, blank page, 1.2::worst quality::, 1.2::bad quality::, 1.2::Imperfect Fingers::, 1.1::Imperfect Fingers::, 1.2::Approximate::, 1.1::very displeasing::, 1.1::mess::, 1::unfinished::, 1::unclear fingertips::, 1::twist::, 1::Squiggly::, 1::Grumpy::, 1::incomplete::, 1::Cheesy::, 1.3::mascot::, 1.3::puppet::, 1.3::character doll::, 1.3::pet::, 1.3::cake::, 1.3::stuffed toy::, 1::reference::, 1.1::multiple views::, 1.1::monochrome::, 1.1::greyscale::, 1.1::sketch::, 1.1::flat color::, 1.1::3D::, 1::aged down::, 1.:bestiality::, 1::furry::, 1::crowd::, 1::animals::, 1::pastie::, 1::maebari::, 1::eyeball::, 1::slit pupils::, 1::bright pupils::"
     elseif OMPRESETPROMPT == "4" then
-        artistPrompt = "1.1::artist:ningen mame::, 0.6::artist:hella p::, 0.7::artist:taesi::, 0.8::artist:blue gk::, 1::artist:mx2j::,1.1::artist:zankuro::, 0.9::artist:null(nyanpyoun)::, 1.1::artist:xipa::. 1::artist:wagashi(dagashiya)::, 0.9::artist:jtveemo::, 1.1::artist:naga U::, 1.2::artist:namako daibakuhatsu::, 1.5::pixel art, dithering::, year 2024"
+        artistPrompt = "0.8::artist:namako daibakuhatsu ::, 0.5::artist:tianliang duohe fangdongye ::, 0.4::channel(caststation) ::, 0.7::jtveemo ::, 1.3::pixel art,  8-bit, pixel size: 4 ::, year 2024"
         qualityPrompt = "Detail Shading, {{{{{{{{{{amazing quality}}}}}}}}}}, very aesthetic, highres, incredibly absurdres"
         negativePrompt = "dark lighting,{{{blurry}}},{{{{{{{{worst quality, bad quality, japanese text}}}}}}}}, {{{{bad hands, closed eyes}}}}, {{{bad eyes, bad pupils, bad glabella}}}, {{{undetailed eyes}}}, multiple views, error, extra digit, fewer digits, jpeg artifacts, signature, watermark, username, reference, {{unfinished}}, {{unclear fingertips}}, {{twist}}, {{squiggly}}, {{grumpy}}, {{incomplete}}, {{imperfect fingers}}, disorganized colors, cheesy, {{very displeasing}}, {{mess}}, {{approximate}}, {{sloppiness}}"
     end
