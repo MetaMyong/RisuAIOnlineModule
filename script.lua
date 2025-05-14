@@ -4534,7 +4534,7 @@ onOutput = async(function (triggerId)
                 
                 -- INLAY[<OM(INDEX)>] 블록 검색
                 while true do
-                    local s_inlay, e_inlay_prefix, blockContent = string.find(currentLine, "INLAY%[([^%]]*)%]", searchPos)
+                    local s_inlay, e_inlay = string.find(currentLine, "INLAY%[([^%]]*)%]", searchPos)
                     if not s_inlay then
                         print("ONLINEMODULE: onOutput: No more INLAY[...] blocks found starting from position " .. searchPos)
                         break
@@ -4542,11 +4542,11 @@ onOutput = async(function (triggerId)
                     inlayBlocksFound = inlayBlocksFound + 1
                     print("ONLINEMODULE: onOutput: Found INLAY block #" .. inlayBlocksFound .. " starting at index " .. s_inlay)
 
-                    local e_inlay = s_inlay + string.len("INLAY[" .. blockContent .. "]") - 1
-                    local s_om, e_om, omIndexStr = string.find(blockContent, "<OM(%d+)>")
+                    local inlayContent = string.sub(currentLine, s_inlay, e_inlay)
+                    local _, _, omIndexStr = string.find(inlayContent, "<OM(%d+)>")
                     local omIndex = tonumber(omIndexStr)
 
-                    if omIndex and s_om then
+                    if omIndex then
                         print("ONLINEMODULE: onOutput: Found OM index: " .. omIndex)
                         local promptPattern = "%[OMINLAYPROMPT" .. omIndex .. ":([^%]]*)%]"
                         local negPromptPattern = "%[NEG_OMINLAYPROMPT" .. omIndex .. ":([^%]]*)%]"
@@ -4556,12 +4556,13 @@ onOutput = async(function (triggerId)
                         if foundInlayPrompt then
                             print("ONLINEMODULE: onOutput: Found prompt for OM" .. omIndex .. ": [" .. string.sub(foundInlayPrompt, 1, 50) .. "...]")
                             local currentNegativePromptInlay = negativePrompt
-                            
+                            local storedNegInlayPrompt = ""
                             if foundInlayNegPrompt then 
                                 currentNegativePromptInlay = foundInlayNegPrompt .. ", " .. currentNegativePromptInlay
+                                storedNegInlayPrompt = foundInlayNegPrompt 
                             end
 
-                            local finalPromptInlay = artistPrompt .. ", " .. foundInlayPrompt .. ", " .. qualityPrompt
+                            local finalPromptInlay = artistPrompt .. foundInlayPrompt .. qualityPrompt
                             local inlayImage = generateImage(triggerId, finalPromptInlay, currentNegativePromptInlay):await()
                             
                             if inlayImage and type(inlayImage) == "string" and string.len(inlayImage) > 10 and 
@@ -4569,19 +4570,23 @@ onOutput = async(function (triggerId)
                                not string.find(inlayImage, "error", 1, true) and 
                                not string.find(inlayImage, "실패", 1, true) then
                                 
-                                -- 원래 <OM> 태그는 그대로 두고 바로 뒤에 inlayImage를 삽입하는 방식으로 변경
-                                local absStartPos = s_inlay + s_om - 1
-                                local absEndPos = s_inlay + e_om - 1
+                            -- 기존 INLAY[<OM>] 블록을 새로운 inlay로 교체
+                                local replacement = "INLAY[<OM" .. omIndex .. ">" .. inlayImage .. "]"
                                 
-                                -- 삽입할 위치(태그 바로 뒤)와 삽입할 내용을 저장
                                 table.insert(inlayReplacements, {
-                                    pos = absEndPos,
-                                    inlay = inlayImage
+                                    start = s_inlay,
+                                    finish = e_inlay, 
+                                    replacement = replacement
                                 })
 
-                                -- 인레이 식별자로 이미지만 저장
-                                setState(triggerId, "INLAY_" .. omIndex, inlayImage)
-                                
+                                -- 이미지 정보 저장
+                                local infoInlay = {
+                                    type = "INLAY",
+                                    identifier = "INLAY_" .. omIndex,
+                                    inlay = inlayImage
+                                }
+                                table.insert(generatedImagesInfo, infoInlay)
+                                                                
                                 print("ONLINEMODULE: onOutput: Successfully processed INLAY block #" .. inlayBlocksFound)
                                 lineModifiedInThisPass = true
                             else
@@ -4600,12 +4605,12 @@ onOutput = async(function (triggerId)
                     searchPos = e_inlay + 1
                 end
 
-                -- 모든 교체작업 수행 (태그 뒤에 inlay 삽입)
+                -- 모든 교체작업 수행
                 if #inlayReplacements > 0 then
-                    table.sort(inlayReplacements, function(a, b) return a.pos > b.pos end)
+                    table.sort(inlayReplacements, function(a, b) return a.start > b.start end)
                     for _, rep in ipairs(inlayReplacements) do
-                        if rep.pos > 0 and rep.pos <= #currentLine then
-                            currentLine = string.sub(currentLine, 1, rep.pos) .. rep.inlay .. string.sub(currentLine, rep.pos + 1)
+                        if rep.start > 0 and rep.finish >= rep.start and rep.finish <= #currentLine then
+                            currentLine = string.sub(currentLine, 1, rep.start - 1) .. rep.replacement .. string.sub(currentLine, rep.finish + 1)
                         end
                     end
                 end
