@@ -4576,7 +4576,7 @@ onOutput = async(function (triggerId)
                                 -- 삽입할 위치(태그 바로 뒤)와 삽입할 내용을 저장
                                 table.insert(inlayReplacements, {
                                     pos = absEndPos,
-                                    inlay = "{{inlay::" .. inlayImage .. "}}"
+                                    inlay = inlayImage
                                 })
 
                                 -- 인레이 식별자로 이미지만 저장
