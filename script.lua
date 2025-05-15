@@ -3225,10 +3225,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT SIMULATION STATUS INTERFACE PROMPT and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - SIMULSTATUS[...|INLAY:<OM1>]
-        - [OMSIMULCARDPROMPT1:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}]
+        - [OMSIMULCARDPROMPT1:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}] -> Do not describe the scene or place
         - [NEG_OMSIMULCARDPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]
-        - [OMSIMULCARDPROMPT2:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}]
+        - [OMSIMULCARDPROMPT2:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}] -> Do not describe the scene or place
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]]
@@ -3237,10 +3237,10 @@ local function inputImage(triggerId, data)
     - ALWAYS PRINT OUT EROTIC STATUS INTERFACE PROMPT for FEMALE, SIMULATION STATUS INTERFACE PROMPT for MALE and NEGATIVE PROMPT at the BELOW of the SIMULATION STATUS INTERFACE
     - Output Format:
         - EROSTATUS[...|INLAY:<OM1>]  --> FEMALE
-        - [OMSTATUSPROMPT1:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}]
+        - [OMSTATUSPROMPT1:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}] -> Do not describe the scene or place
         - [NEG_OMSTATUSPROMPT1:(NEGATIVE PROMPT)]
         - SIMULSTATUS[...|INLAY:<OM2>]  --> MALE
-        - [OMSIMULCARDPROMPT2:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}]
+        - [OMSIMULCARDPROMPT2:(SITUATION),solo,(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES),{{{detailed face,cowboy shot,white background,simple background}}}] -> Do not describe the scene or place
         - [NEG_OMSIMULCARDPROMPT2:(NEGATIVE PROMPT)]
         - ..., etc.
 ]] 
