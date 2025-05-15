@@ -38,38 +38,6 @@ local function ERR(triggerId, str, code)
     alertNormal(triggerId, "ERROR: " .. str .. ": " .. message)
 end
 
-local function inputAssetBot(triggerId, data)
-    local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
-    local OMCARDTARGET = getGlobalVar(triggerId, "toggle_OMCARDTARGET") or "0"
-
-    data = data .. [[
-# Output Format Guide
-- Always print the dialogues via [NAME:EMOTION|"DIALOGUE"] format.
-    - NAME: The english name of the NPC.
-    - EMOTION: The emotion keyword of the NPC.
-        - Must be in all capital letters.
-        - Default emotion keyword is: "GREETING", "ANGRY", "CRYING", "SHOCKED", "HAPPY", "CONFUSED", "SHY", "SATISFIED", "AROUSED"
-        - You can add your own emotion keyword.
-            - But you must use the existing emotion keyword if you can.
-            - Example:
-                - if you used "HAPPY" keyword before, you can use "HAPPY" keyword instead of "EXCITED" keywords.
-                - if you used "EXCITED" keyword before, you can use "EXCITED" keyword instead of "HAPPY" keywords.
-            - Do not use "_" in the normal keyword.
-                - Example: "LAUGH" is correct, but "NERVOUS_LAUGH" is wrong.
-            - Example: "HAPPY" is correct, but "HAPPY_SMILING" is wrong.
-        - If character is under NSFW situation, you must use "SEX" keyword as below.
-            - "SEX_BLOWJOB", "SEX_DEEPTHROAT", "SEX_MISSIONARY", "SEX_COWGIRL", "SEX_DOGGY", "SEX_MASTURBATE_FINGERING", "SEX_MASTURBATE_DILDO", ... , etc.
-            - Example: [Eun-young:SEX_BLOWJOB|"Haa... I can't take it anymore!"]                
-    - DIALOGUE: The dialogue of the NPC, must include the "".
-    - After the dialogue, describe the situation.
-        - Example:
-            - [Eun-young:HAPPY|"If I'm with Siwoo, anyth-anything is good!"]
-            - Eun-young was happy, and her cheeks were slightly flushed. She looked at you with a shy smile, as if she was about to say something more.
-]]
-
-    return data
-end
-
 local function changeAssetBot(triggerId, data)
     local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
 
@@ -565,66 +533,6 @@ AI MUST output the image prompt and negative prompt in the format below.
     end
 
     return true
-end)
-
-listenEdit("editRequest", function(triggerId, data)
-    print("---------------------------------editREQUEST---------------------------------------")
-    print("ONLINEMODULE: editRequest: Triggered with ID:", triggerId)
-    local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
-    local OMGLOBAL = getGlobalVar(triggerId, "toggle_OMGLOBAL") or "0"
-    local UTILFORCEOUTPUT = getGlobalVar(triggerId, "toggle_UTILFORCEOUTPUT") or "0"
-
-    local currentInput = nil
-    local currentIndex = nil
-
-    local convertDialogueFlag = false
-    local changedValue = false
-
-    local chat = data[#data]
-        -- 가장 마지막에 로직 삽입
-    currentInput = chat.content .. [[
-
-<-----ONLINEMODULESTART----->
-
-]]
-
-    if OMMESSENGER == "0" then
-        if tonumber(OMCARD) >= 1 then
-            currentInput = inputAssetBot(triggerId, currentInput)
-            changedValue = true
-        end
-        
-    elseif OMMESSENGER == "1" then
-        changedValue = true
-    end
-
-    currentInput = currentInput .. [[
-
-<-----ONLINEMODULEEND----->
-
-]] 
-    currentInput = currentInput .. [[
-    
-]]
-
-    print([[FINAL EDIT REQUEST is
-
-]] .. currentInput)
-
-    data[#data].content = currentInput
-    
-    if changedValue then
-        print("Successful.")
-    else
-        print("Failed.")        
-    end
-
-    print("---------------------------------editREQUEST---------------------------------------")
-
-    return data
 end)
 
 
