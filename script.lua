@@ -106,14 +106,7 @@ local getImagePromptToProcessImage = async(function(triggerId, data)
     print("ONLINEMODULE: getImagePromptToProcessImage: PROCESSING")
 
     local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
-
     local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
-    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
-    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
 
     local OMORIGINAL = getGlobalVar(triggerId, "toggle_OMORIGINAL") or "0"
     local OMORIGINALTEXT = getGlobalVar(triggerId, "toggle_OMORIGINALTEXT") or "0"
@@ -540,9 +533,6 @@ listenEdit("editDisplay", function(triggerId, data)
     if not data or data == "" then return "" end
 
     local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
     
     local rerollTemplate = [[
 <style>
@@ -582,29 +572,11 @@ onOutput = async(function (triggerId)
         return
     end
     local OMCARD = getGlobalVar(triggerId, "toggle_OMCARD") or "0"
-    local OMSNS = getGlobalVar(triggerId, "toggle_OMSNS") or "0"
-    local OMCOMMUNITY = getGlobalVar(triggerId, "toggle_OMCOMMUNITY") or "0"
-    local OMMESSENGER = getGlobalVar(triggerId, "toggle_OMMESSENGER") or "0"
     local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
-    local OMSNSNOIMAGE = getGlobalVar(triggerId, "toggle_OMSNSNOIMAGE") or "0"
-    local OMCOMMUNITYNOIMAGE = getGlobalVar(triggerId, "toggle_OMCOMMUNITYNOIMAGE") or "0"
-    local OMMESSENGERNOIMAGE = getGlobalVar(triggerId, "toggle_OMMESSENGERNOIMAGE") or "0"
-
     
     print("ONLINEMODULE: onOutput: OMCARD value:", OMCARD)
-    print("ONLINEMODULE: onOutput: OMSNS value:", OMSNS)
-	print("ONLINEMODULE: onOutput: OMCOMMUNITY value:", OMCOMMUNITY)
-    print("ONLINEMODULE: onOutput: OMMESSENGER value:", OMMESSENGER)
-    
 
-    if OMMESSENGER == "1" then
-        print("ONLINEMODULE: onOutput: FORCE SETTING VALUES to 0")
-        OMCARD = "0"
-        OMSNS = "0"
-        OMCOMMUNITY = "0"
-    end
-
-    local togglesActive = OMCARD ~= "0" or OMSNS ~= "0" or OMCOMMUNITY ~= "0" or OMMESSENGER ~= "0"
+    local togglesActive = OMCARD ~= "0"
 
     if not togglesActive then
         print("ONLINEMODULE: onOutput: Skipping OM generation modifications as all relevant toggles are off.")
@@ -631,14 +603,8 @@ onOutput = async(function (triggerId)
     local lastIndex = #chatHistoryTable
     
     local skipOMCARD = false
-    local skipOMSNS = false
-    local skipOMCOMMUNITY = false
-    local skipOMMESSENGER = false
     
-    if OMCARDNOIMAGE == "1" then skipOMCARD = 1 end
-    if OMSNSNOIMAGE == "1" then skipOMSNS = 1 end
-    if OMCOMMUNITYNOIMAGE == "1" then skipOMCOMMUNITY = 1 end
-    if OMMESSENGERNOIMAGE == "1" then skipOMMESSENGER = 1 end
+    if OMCARDNOIMAGE == "1" then skipOMCARD = true end
 
     local chat = chatHistoryTable[lastIndex]
     local currentInput = chat.data
