@@ -3,7 +3,12 @@
 
 {{#if {{? {{getglobalvar::toggle_OMCARD}} > 0 }}}}
 # Output Format Guide
+{{#if {{? {{getglobalvar::toggle_OMCARD}} == 1 }}}}
 - YOU MUST WRAP ALL THE "" DIALOGUES VIA [NAME:EMOTION|"DIALOGUE"] FORMAT:
+{{/if}}
+{{#if {{? {{getglobalvar::toggle_OMCARD}} == 2 }}}}
+- YOU MUST WRAP ALL FEMALE'S "" DIALOGUES VIA [NAME:EMOTION|"DIALOGUE"] FORMAT:
+{{/if}}
     - NAME: The name of the NPC.
         - Must be in all english capital letters.
             - ONLY ENGLISH LAST NAME ALLOWED.

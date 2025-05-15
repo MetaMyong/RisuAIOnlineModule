@@ -815,6 +815,7 @@ end
     newImagePrompt = newImagePrompt .. [[
 
 Now, Generate the KEYWORD, IMAGE PROMPT, and NEGATIVE PROMPT.
+- You must print out the keyword, image prompt, and negative prompt ONLY.
 
 ]]
 
