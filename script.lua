@@ -145,26 +145,30 @@ body { background-color: #f0f0f0;padding: 20px;}
 end
 
 local function updateEroStatus(triggerId, data)
+    local function tableContains(tbl, value)
+        for _, v in ipairs(tbl) do
+            if v == value then
+                return true
+            end
+        end
+        return false
+    end
+
     local dialoguePattern = "%[([^:]+):([^|]+)|\"([^\"]+)\"%]"
     local erostatusCharacter = {}
 
     data = string.gsub(data, dialoguePattern, function(name, keyword, dialogue)
-        -- 각 장면에 등장하는 모든 캐릭터의 이름을 파싱
-        local eroStatus = getState(triggerId, name .. "_ERO") or ""
+        -- 에로스테이터스에 등록된 캐릭터 리스트 EROSTATUS를 getState로 가져옴
+        local eroStatus = getState(triggerId, "EROSTATUS") or ""
 
-        -- name 중복 방지
-        local exists = false
-        for _, existingName in ipairs(erostatusCharacter) do
-            if existingName == name then
-                exists = true
-                break
-            end
-        end
-        if not exists then
+        -- 추출한 캐릭터 이름 name을 erostatusCharacter에 추가, 있을 경우 중복 방지
+        if not tableContains(erostatusCharacter, name) then
             table.insert(erostatusCharacter, name)
         end
-
-        return data
+        
+        setState(triggerId, "EROSTATUS", eroStatus)
+        
+        return "[" .. name .. ":" .. keyword .. "|\"" .. dialogue .. "\"]"
     end)
 
     print("ONLINEMODULE: updateEroStatus: Captured NPC is " .. table.concat(erostatusCharacter, ", "))
@@ -254,9 +258,41 @@ local function updateEroStatus(triggerId, data)
 - Final Output Example:
     - ERO[NAME:Eun-Young|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times]
     - ERO[NAME:Akari|MOUTH:....]
+]]
 
+    -- erostatusCharacter를 순회하며 getState로 받아온 EroStatus 정보를 requestEroStatus에 추가
+    local requestEroStatus = ""
 
-Now, you have to update the EroStatus for the each female character in the scene.
+    for _, name in ipairs(erostatusCharacter) do
+        local eroStatus = getState(triggerId, name .. "_ERO") or ""
+        if eroStatus and eroStatus ~= "" then
+            requestEroStatus = requestEroStatus .. "ERO[" .. eroStatus .. "]\n"
+        end
+        local eroMouth = getState(triggerId, name .. "_ERO_MOUTH") or ""
+        local eroNipples = getState(triggerId, name .. "_ERO_NIPPLES") or ""
+        local eroUterus = getState(triggerId, name .. "_ERO_UTERUS") or ""
+        local eroVaginal = getState(triggerId, name .. "_ERO_VAGINAL") or ""
+        local eroAnal = getState(triggerId, name .. "_ERO_ANAL") or ""
+        
+        if name and name ~= "" then
+            -- ERO[NAME:...] 형식으로 작성 후 requestEroStatus에 추가, 마지막은 \n으로 구분
+            requestEroStatus = requestEroStatus .. "ERO[NAME:" .. name
+            requestEroStatus = requestEroStatus .. "|MOUTH:" .. (eroMouth or "")
+            requestEroStatus = requestEroStatus .. "|NIPPLES:" .. (eroNipples or "")
+            requestEroStatus = requestEroStatus .. "|UTERUS:" .. (eroUterus or "")
+            requestEroStatus = requestEroStatus .. "|VAGINAL:" .. (eroVaginal or "")
+            requestEroStatus = requestEroStatus .. "|ANAL:" .. (eroAnal or "")
+            requestEroStatus = requestEroStatus .. "]\n"
+        end
+    end
+
+    print("ONLINEMODULE: updateEroStatus: ERO Status is \n" .. requestEroStatus)
+
+    requestForUpdate = requestForUpdate .. [[
+Currently, the EroStatus is:
+]] .. requestEroStatus .. [[
+
+Now, you have to update the EroStatus for each female character in the scene.
 Bodypart Comment and Bodypart Info must be printed out with KOREAN.
 else, Make sure to print out in ENGLISH.
 ]]
@@ -380,40 +416,48 @@ local function changeEroStatus(triggerId, data)
         if mouthImg and mouthImg ~= "" then
             table.insert(html, "<img src=\"{{raw::" .. (mouthImg or "MOUTH_0").. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
-        table.insert(html, "<div class=\"placeholder-text-box\">" .. mouthText .. "</div>")
-        table.insert(html, "<div class=\"hover-text-content\">" .. mouthHover .. "</div>")
+        table.insert(html, "<div class=\"placeholder-text-box\">" .. (mouthText or "") .. "</div>")
+        table.insert(html, "<div class=\"hover-text-content\">" .. (mouthHover or "") .. "</div>")
         table.insert(html, "</div>")
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
         if nipplesImg and nipplesImg ~= "" then
             table.insert(html, "<img src=\"{{raw::" .. (nipplesImg or "NIPPLES_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
-        table.insert(html, "<div class=\"placeholder-text-box\">" .. nipplesText .. "</div>")
-        table.insert(html, "<div class=\"hover-text-content\">" .. nipplesHover .. "</div>")
+        table.insert(html, "<div class=\"placeholder-text-box\">" .. (nipplesText or "") .. "</div>")
+        table.insert(html, "<div class=\"hover-text-content\">" .. (nipplesHover or "") .. "</div>")
         table.insert(html, "</div>")
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
         if uterusImg and uterusImg ~= "" then
             table.insert(html, "<img src=\"{{raw::" .. (uterusImg or "UTERUS_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
-        table.insert(html, "<div class=\"placeholder-text-box\">" .. uterusText .. "</div>")
-        table.insert(html, "<div class=\"hover-text-content\">" .. uterusHover .. "</div>")
+        table.insert(html, "<div class=\"placeholder-text-box\">" .. (uterusText or "") .. "</div>")
+        table.insert(html, "<div class=\"hover-text-content\">" .. (uterusHover or "") .. "</div>")
+        table.insert(html, "</div>")
+
+        table.insert(html, "<div class=\"placeholder-wrapper\">")
+        if uterusImg and uterusImg ~= "" then
+            table.insert(html, "<img src=\"{{raw::" .. (uterusImg or "UTERUS_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
+        end
+        table.insert(html, "<div class=\"placeholder-text-box\">" .. (uterusText or "") .. "</div>")
+        table.insert(html, "<div class=\"hover-text-content\">" .. (uterusHover or "") .. "</div>")
         table.insert(html, "</div>")
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
         if vaginalImg and vaginalImg ~= "" then
             table.insert(html, "<img src=\"{{raw::" .. (vaginalImg or "VAGINAL_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
-        table.insert(html, "<div class=\"placeholder-text-box\">" .. vaginalText .. "</div>")
-        table.insert(html, "<div class=\"hover-text-content\">" .. vaginalHover .. "</div>")
+        table.insert(html, "<div class=\"placeholder-text-box\">" .. (vaginalText or "") .. "</div>")
+        table.insert(html, "<div class=\"hover-text-content\">" .. (vaginalHover or "") .. "</div>")
         table.insert(html, "</div>")
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
         if analImg and analImg ~= "" then
             table.insert(html, "<img src=\"{{raw::" .. (analImg or "ANAL_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
-        table.insert(html, "<div class=\"placeholder-text-box\">" .. analText .. "</div>")
-        table.insert(html, "<div class=\"hover-text-content\">" .. analHover .. "</div>")
+        table.insert(html, "<div class=\"placeholder-text-box\">" .. (analText or "") .. "</div>")
+        table.insert(html, "<div class=\"hover-text-content\">" .. (analHover or "") .. "</div>")
         table.insert(html, "</div>")
 
         table.insert(html, "</div>")
