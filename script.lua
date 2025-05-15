@@ -163,7 +163,6 @@ local function updateEroStatus(triggerId, data)
     -- 캐릭터의 EroStatus를 업데이트하기 위한 요청을 생성
     local requestForUpdate = [[
 # EroStatus Update
-- Now, you have to update the EroStatus for the each female character in the scene.    
 ]]
 
     requestForUpdate = requestForUpdate .. [[
@@ -246,6 +245,11 @@ local function updateEroStatus(triggerId, data)
 - Final Output Example:
     - ERO[NAME:Eun-Young|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times]
     - ERO[NAME:Akari|MOUTH:....]
+
+
+Now, you have to update the EroStatus for the each female character in the scene.
+Bodypart Comment and Bodypart Info must be printed out with KOREAN.
+else, Make sure to print out in ENGLISH.
 ]]
 
     local response = sendSubModelRequestWithPrefill(triggerId, requestForUpdate)
@@ -612,7 +616,7 @@ Please provide content for these missing emotions:
 ]]
         
         for _, emotion in ipairs(missingEmotionKeys) do
-            newImagePrompt = newImagePrompt .. "- _" .. emotion .. "[...]\n"
+            newImagePrompt = newImagePrompt .. "-KEY_" .. emotion .. "[...]\n"
         end
         
         newImagePrompt = newImagePrompt .. "\n\n"
@@ -637,9 +641,10 @@ Please provide content for these missing emotions:
 ## Important Considerations
 - Do not describe the same thing in both IMAGE PROMPT and NEGATIVE PROMPT
 - Focus on the character only, not scene or background
-- For NSFW content:
-    - If NSFW is enabled, include {{{NSFW,UNCENSORED}}} in prompt
-    - If disabled, include {{{NSFW,UNCENSORED}}} in negative prompt
+- If the situation is under NSFW, include the following in the IMAGE PROMPT:
+    - {{{NSFW, UNCENSORED}}}
+- If the situation is not under NSFW, include the following in the IMAGE PROMPT:
+    - {{{CENSORED}}}
 
 ## Examples of Output
 - IMG_Eun-young[solo, 1girl, 20s years old, {{long twin-tail, pink hair}}, {{{slender, AA-Cup small breasts}}}, {{white dress}}, {{cowboy shot, white background, simple background}}]
@@ -672,7 +677,10 @@ Please provide content for these missing emotions:
     - Valid: Pokémon, Squirtle, white background, simple background
     - Invalid: his, her, he, she
     - Valid: Pokémon Iono, Iono's
-- Do not make JSON Format.  
+- Do not make JSON Format.
+- Do not print "_" twice at the same time.
+    - Invalid: KEY__GREETING
+    - Valid: KEY_GREETING
 ]]
     end
 
@@ -702,8 +710,8 @@ end
 Now, Generate the KEYWORD, IMAGE PROMPT, and NEGATIVE PROMPT.
 
 ]]
-    print([[ONLINEMODULE: getImagePromptToProcessImage: Sending request to model with prompt
-]] .. newImagePrompt)
+
+
     -- 모델에 프롬프트 요청 전송
     local success, rawResponse = pcall(function()
         return sendSubModelRequestWithPrefill(triggerId, newImagePrompt)
@@ -840,7 +848,7 @@ Now, Generate the KEYWORD, IMAGE PROMPT, and NEGATIVE PROMPT.
         local characterAppearance = getState(triggerId, name .. "_IMG")
         local characterNegative = getState(triggerId, name .. "_NEG")
         -- 감정 행동 정보 가져오기
-        local emotionBehavior = getState(triggerId, emotion)
+        local emotionBehavior = getState(triggerId, "_" .. emotion)
         
         -- 필요한 정보가 모두 있는지 확인
         if characterAppearance and characterAppearance ~= "" and 

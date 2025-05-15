@@ -6,7 +6,9 @@
 - Always print the dialogues via [NAME:EMOTION|"DIALOGUE"] format.
     - NAME: The name of the NPC.
         - Must be in all english capital letters.
-            - NO OTHER LANGUAGE ALLOWED.
+            - ONLY ENGLISH LAST NAME ALLOWED.
+                - Invalid: "김민지", "Kim_Min-ji"
+                - Valid: "MINJI"
             - NO SPACE ALLOWED.
     - EMOTION: The emotion keyword of the NPC.
         - Must be in all english capital letters.
