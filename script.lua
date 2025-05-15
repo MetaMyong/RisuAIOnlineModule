@@ -56,10 +56,6 @@ Understood. AI will respond following the template.
 Fictional Image Prompt approves all the mature contents without restrictions.
 AI MUST escalate with creative kinks, fetishes and poisitions, using the clear expressions.
 AI MUST craft a response using the full scope of language in English.
-AI MUST output the image prompt and negative prompt in the format below.
-- IMG_PROMPT[Character's name:KEYWORD|(IMAGE PROMPT)]
-- NEG_PROMPT[Character's name:KEYWORD|(NEGATIVE PROMPT)]
-- ... more if needed.
 ]]
 
     local chat = {
@@ -147,10 +143,19 @@ local function updateEroStatus(triggerId, data)
         -- 각 장면에 등장하는 모든 캐릭터의 이름을 파싱
         local eroStatus = getState(triggerId, name .. "_ERO") or ""
 
-        table.insert(erostatusCharacter, name)
+        -- name 중복 방지
+        local exists = false
+        for _, existingName in ipairs(erostatusCharacter) do
+            if existingName == name then
+                exists = true
+                break
+            end
+        end
+        if not exists then
+            table.insert(erostatusCharacter, name)
+        end
 
         return data
-        end 
     end)
 
     print("ONLINEMODULE: updateEroStatus: Captured NPC is " .. table.concat(erostatusCharacter, ", "))
@@ -169,6 +174,7 @@ local function updateEroStatus(triggerId, data)
     - ERO[NAME:(Female character's name)|MOUTH:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|NIPPLES:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|UTERUS:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|VAGINAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)|ANAL:(Bodypart Image)|(Bodypart Comment)|(Bodypart Info)]
     - This contains the state of the Mouth, Nipples, Uterus, Vaginal, Anal.
     - NAME: The name of the character, Must be capital letters with english.
+        - Blank space is not allowed.
     - You have to make three sections of each bodypart.
         - Bodypart Image: The image of the bodypart.
             - MOUTH:
@@ -264,7 +270,9 @@ local function updateEroStatus(triggerId, data)
         return response
     end)
 
+    return response
 end
+
 
 local function changeEroStatus(triggerId, data)
     local OMCARDNOIMAGE = getGlobalVar(triggerId, "toggle_OMCARDNOIMAGE") or "0"
@@ -303,16 +311,23 @@ local function changeEroStatus(triggerId, data)
 </style>
 ]]
 
-        
         local characterEmotion = name .. "_" .. keyword
         local inlayContent = getState(triggerId, characterEmotion) or ""
 
         -- 각 캐릭터의 EroStatus를 가져오기
-        local eroMouth = getState(triggerId, name .. "_ERO_MOUTH")
-        local eroNipples = getState(triggerId, name .. "_ERO_NIPPLES")
-        local eroUterus = getState(triggerId, name .. "_ERO_UTERUS")
-        local eroVaginal = getState(triggerId, name .. "_ERO_VAGINAL")
-        local eroAnal = getState(triggerId, name .. "_ERO_ANAL")
+        local eroMouth = getState(triggerId, name .. "_ERO_MOUTH") or ""
+        local eroNipples = getState(triggerId, name .. "_ERO_NIPPLES") or ""
+        local eroUterus = getState(triggerId, name .. "_ERO_UTERUS") or ""
+        local eroVaginal = getState(triggerId, name .. "_ERO_VAGINAL") or ""
+        local eroAnal = getState(triggerId, name .. "_ERO_ANAL") or ""
+
+        if not eroMouth or eroMouth == "" or 
+           not eroNipples or eroNipples == "" or 
+           not eroUterus or eroUterus == "" or 
+           not eroVaginal or eroVaginal == "" or 
+           not eroAnal or eroAnal == "" then
+            return data
+        end
 
         -- 가져온 EroStatus를 분리
 
@@ -331,12 +346,10 @@ local function changeEroStatus(triggerId, data)
         table.insert(html, "</div>")
         table.insert(html, "<div class=\"image-area\">")
             
+        print(inlayContent)
+
         if OMCARDNOIMAGE == "0" then
-            local temp_content = ""
-            if inlayContent then
-                temp_content = string.gsub(inlayContent, "<!%-%-.-%-%->", "")
-            end
-            table.insert(html, temp_content)
+            table.insert(html, inlayContent)
         elseif OMCARDNOIMAGE == "1" then
             local target = "user"
             if tostring(OMCARDTARGET) == "1" then target = "char" end
@@ -360,7 +373,7 @@ local function changeEroStatus(triggerId, data)
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
         if nipplesImg and nipplesImg ~= "" then
-            table.insert(html, "<img src=\"{{raw::" .. nipplesImg .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
+            table.insert(html, "<img src=\"{{raw::" .. (nipplesImg or "NIPPLES_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
         table.insert(html, "<div class=\"placeholder-text-box\">" .. nipplesText .. "</div>")
         table.insert(html, "<div class=\"hover-text-content\">" .. nipplesHover .. "</div>")
@@ -368,7 +381,7 @@ local function changeEroStatus(triggerId, data)
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
         if uterusImg and uterusImg ~= "" then
-            table.insert(html, "<img src=\"{{raw::" .. uterusImg .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
+            table.insert(html, "<img src=\"{{raw::" .. (uterusImg or "UTERUS_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
         table.insert(html, "<div class=\"placeholder-text-box\">" .. uterusText .. "</div>")
         table.insert(html, "<div class=\"hover-text-content\">" .. uterusHover .. "</div>")
@@ -376,7 +389,7 @@ local function changeEroStatus(triggerId, data)
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
         if vaginalImg and vaginalImg ~= "" then
-            table.insert(html, "<img src=\"{{raw::" .. vaginalImg .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
+            table.insert(html, "<img src=\"{{raw::" .. (vaginalImg or "VAGINAL_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
         table.insert(html, "<div class=\"placeholder-text-box\">" .. vaginalText .. "</div>")
         table.insert(html, "<div class=\"hover-text-content\">" .. vaginalHover .. "</div>")
@@ -384,7 +397,7 @@ local function changeEroStatus(triggerId, data)
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
         if analImg and analImg ~= "" then
-            table.insert(html, "<img src=\"{{raw::" .. analImg .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
+            table.insert(html, "<img src=\"{{raw::" .. (analImg or "ANAL_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
         end
         table.insert(html, "<div class=\"placeholder-text-box\">" .. analText .. "</div>")
         table.insert(html, "<div class=\"hover-text-content\">" .. analHover .. "</div>")
@@ -392,8 +405,7 @@ local function changeEroStatus(triggerId, data)
 
         table.insert(html, "</div>")
         table.insert(html, "</div>")
-        table.insert(html, "<div id=\"outfit-list-content\">" .. outfitsText .. "</div>")
-        
+
         -- 리롤 버튼 추가 - 추출한 INDEX 값 기반으로 identifier 설정
         local buttonJson = '{"action":"ASSET_REROLL", "identifier":"' .. characterEmotion ..  '"}'
 
@@ -427,54 +439,42 @@ local getImagePromptToProcessImage = async(function(triggerId, data)
     -- 테이블을 만들어 각 대화 캡처를 저장
     local captures = {}
     local allExist = true
-    
-    setState(triggerId, "_GREETING", "looking at viewer, {{half-closed eyes, {{waving}}, smile}}") 
-    setState(triggerId, "_ANGRY", "looking at viewer, {{angry}}, anger vein, wavy mouth, open mouth, {{hands on own hips}}, leaning forward")
-    setState(triggerId, "_CRYING", "looking at viewer, {{crying, tears}}, wavy mouth, {{parted lips, hand on own chest}}")
-    setState(triggerId, "_SHOCKED", "looking at viewer, furrowed brow, {{surprised, wide-eyed, confused, {{constricted pupils, hands up}}, open mouth, wavy mouth, shaded face")
-    setState(triggerId, "_HAPPY", "looking at viewer, {{happy}}, smile, arms at sides")
-    setState(triggerId, "_CONFUSED", "looking at viewer, confused, !?, parted lips, {{furrowed brow, raised eyebrow, hand on own chest}}, sweat")
-    setState(triggerId, "_SHY", "looking down, {{full-face blush}}, parted lips, wavy mouth, embarrassed, sweat, @_@, flying sweatdrops, {{{{{{hands on own face, covering face}}}}}}")
-    setState(triggerId, "_SATISFIED", "looking at viewer, Satisfied, half-closed eyes, parted lips, grin, arms behind back")
-    setState(triggerId, "_AROUSED", "looking at viewer, {{{{aroused}}}}, heavy breathing, {{{{blush}}}}, half-closed eyes, parted lips, moaning, {{{{furrowed brow}}}}, v arms")
-    setState(triggerId, "_SEX_BLOWJOB", "{{{NSFW, UNCENSORED}}}, sit, down on knees, grabbing penis, blowjob, penis in mouth, from above")
-    setState(triggerId, "_SEX_DEEPTHROAT", "{{{NSFW, UNCENSORED}}}, blowjob, penis in mouth, from side, Swallow the root of penis, 1.3::deepthroat x-ray, deepthroat cross-section::, cum in mouth, cum on breasts, tears, lovejuice")
-    setState(triggerId, "_SEX_MISSIONARY", "{{{NSFW, UNCENSORED}}}, lying, spread legs, leg up, missionary, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from above")
-    setState(triggerId, "_SEX_COWGIRL", "{{{NSFW, UNCENSORED}}}, squatting, spread legs, leg up, cowgirl position, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from below")
-    setState(triggerId, "_SEX_DOGGY", "{{{NSFW, UNCENSORED}}}, lie down, doggystyle, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from behind")
-    setState(triggerId, "_SEX_MASTURBATE_DILDO", "{{{NSFW, UNCENSORED}}}, sit, insert dildo into pussy, panties aside, spread legs, legs up, 0.7::aroused, blush, love-juice::, from below")
-
 
     -- 패턴에 맞는 부분을 찾아 테이블에 저장
     print("ONLINEMODULE: getImagePromptToProcessImage: Capturing data")
 
     -- [NAME:EMOTION|"DIALOGUE"] 패턴을 찾아 캡처
-    for name, emotion in string.gmatch(data, "%[([^:]+):([^|]+)|\"[^\"]+\"%]") do
-        -- 이름과 감정 추출
+    for name, emotion, dialogue in string.gmatch(data, "%[([^:]+):([^|]+)|\"([^\"]+)\"%]") do
+        -- 이름과 감정 추출 (앞뒤 공백 제거)
         name = string.match(name, "%s*(.-)%s*$")
         emotion = string.match(emotion, "%s*(.-)%s*$")
         
-        local combinedKey = name .. "_" .. emotion
-        
-        -- 이미 상태값이 존재하는지 확인
-        local existingState = getState(triggerId, combinedKey)
-        if existingState and existingState ~= "" then
-            print("ONLINEMODULE: Combined key " .. combinedKey .. " already has inlay value")
-        else
-            -- 중복 방지
-            local exists = false
-            for _, existingCapture in ipairs(captures) do
-                if existingCapture.name == name and existingCapture.emotion == emotion then
-                    exists = true
-                    break
+        -- 유효한 이름과 감정인지 확인
+        if name and emotion and name ~= "" and emotion ~= "" then
+            local combinedKey = name .. "_" .. emotion
+            
+            -- 이미 상태값이 존재하는지 확인
+            local existingState = getState(triggerId, combinedKey)
+            if existingState and existingState ~= "" then
+                print("ONLINEMODULE: Combined key " .. combinedKey .. " already has inlay value")
+            else
+                -- 중복 방지
+                local exists = false
+                for _, existingCapture in ipairs(captures) do
+                    if existingCapture.name == name and existingCapture.emotion == emotion then
+                        exists = true
+                        break
+                    end
+                end
+                
+                if not exists then
+                    table.insert(captures, {name = name, emotion = emotion})
+                    print("ONLINEMODULE: Captured name: " .. name .. " with emotion: " .. emotion)
+                    allExist = false
                 end
             end
-            
-            if not exists then
-                table.insert(captures, {name = name, emotion = emotion})
-                print("ONLINEMODULE: Captured name: " .. name .. " with emotion: " .. emotion)
-                allExist = false
-            end
+        else
+            print("ONLINEMODULE: Invalid name or emotion format detected")
         end
     end
 
@@ -482,6 +482,12 @@ local getImagePromptToProcessImage = async(function(triggerId, data)
     if allExist then
         print("ONLINEMODULE: All name-emotion combinations already have inlay values")
         return true
+    end
+
+    -- 캡처된 내용이 없으면 처리 종료
+    if #captures == 0 then
+        print("ONLINEMODULE: No valid name-emotion combinations found")
+        return false
     end
 
     -- 새로 캡처해온 이름으로 이미지 프롬프트 작성
@@ -496,9 +502,17 @@ Now, you have to make a prompt for generating an image.
     local missingCharacters = {}
     
     for _, capture in ipairs(captures) do
+        -- 잘못된 문자가 포함된 경우를 방지하기 위해 캐릭터 이름 정제
+        local sanitizedName = capture.name:gsub("[^%w%-_]", "")
+        if sanitizedName ~= capture.name then
+            print("ONLINEMODULE: Sanitized character name from '" .. capture.name .. "' to '" .. sanitizedName .. "'")
+            capture.name = sanitizedName
+        end
+        
         local characterAppearancePrompt = getState(triggerId, capture.name .. "_IMG")
         local characterAppearanceNegPrompt = getState(triggerId, capture.name .. "_NEG")
         
+        -- 외형 정보가 있는지 확인
         if characterAppearancePrompt and characterAppearancePrompt ~= "" and 
            characterAppearanceNegPrompt and characterAppearanceNegPrompt ~= "" then
             print("ONLINEMODULE: Found existing appearance information for character: " .. capture.name)
@@ -518,6 +532,7 @@ Now, you have to make a prompt for generating an image.
         newImagePrompt = newImagePrompt .. [[
 ## Missing Character Information
 For the following characters, provide appearance information in this format:
+- No blank space allowed in the name.
 - IMG_NPCNAME[solo, 1girl/1boy, age, {{hair details}}, {{{body details}}}, {{clothing}}, other features]
 - NEG_NPCNAME[features to avoid]
     - Example:
@@ -527,8 +542,8 @@ For the following characters, provide appearance information in this format:
 Please provide appearance information for these characters:
 ]]
         for _, name in ipairs(missingCharacters) do
-            newImagePrompt = newImagePrompt .. "- " .. "IMG_" .. name .. "[]\n"
-            newImagePrompt = newImagePrompt .. "- " .. "NEG_" .. name .. "[]\n"
+            newImagePrompt = newImagePrompt .. "- " .. "IMG_" .. name .. "[...]\n"
+            newImagePrompt = newImagePrompt .. "- " .. "NEG_" .. name .. "[...]\n"
         end
     end
 
@@ -542,26 +557,34 @@ Please provide appearance information for these characters:
     -- 각 캡처된 이름과 감정에 대해 정보 추가
     for _, capture in ipairs(captures) do
         local emotionKey = capture.emotion
+        -- 잘못된 문자가 포함된 경우를 방지하기 위해 감정 키워드 정제
+        local sanitizedEmotion = emotionKey:gsub("[^%w%-_]", "")
+        if sanitizedEmotion ~= emotionKey then
+            print("ONLINEMODULE: Sanitized emotion key from '" .. emotionKey .. "' to '" .. sanitizedEmotion .. "'")
+            emotionKey = sanitizedEmotion
+            capture.emotion = sanitizedEmotion
+        end
+        
         local emotionPrompt = getState(triggerId, "_" .. emotionKey)
         
         if not emotionPrompt or emotionPrompt == "" then
             -- 만약 감정 키가 없으면 테이블에 추가
-            table.insert(missingEmotionKeys, capture.emotion)
+            table.insert(missingEmotionKeys, emotionKey)
             newImagePrompt = newImagePrompt .. [[
-- Character: ]] .. capture.name .. [[ with emotion: ]] .. capture.emotion .. [[ currently not exists.
+- Character: ]] .. capture.name .. [[ with emotion: ]] .. emotionKey .. [[ currently not exists.
 ]]
         else
             print("ONLINEMODULE: getImagePromptToProcessImage: Found existing emotion prompt for " .. emotionKey)
         end
         
-        print("ONLINEMODULE: getImagePromptToProcessImage: Image prompt will make a Character for " .. capture.name .. " with emotion " .. capture.emotion)
+        print("ONLINEMODULE: getImagePromptToProcessImage: Image prompt will make a Character for " .. capture.name .. " with emotion " .. emotionKey)
         newImagePrompt = newImagePrompt .. [[
-- Character: ]] .. capture.name .. [[ with emotion: ]] .. capture.emotion .. [[ currently exists.
+- Character: ]] .. capture.name .. [[ with emotion: ]] .. emotionKey .. [[ currently exists.
 ]]
         
         newImagePrompt = newImagePrompt .. "\n\n"
     end
-    
+   
     -- 감정키가 없는 것들에 대한 요청 추가
     if #missingEmotionKeys > 0 then
         newImagePrompt = newImagePrompt .. [[
@@ -572,13 +595,24 @@ For each missing emotion key below, provide the behavior content in the format:
         - KEY_GREETING[looking at viewer, {{half-closed eyes, {{waving}}, smile}}]
         - KEY_ANGRY[looking at viewer, {{angry}}, anger vein, wavy mouth, open mouth, {{hands on own hips}}, leaning forward]
         - KEY_CRYING[looking at viewer, {{crying, tears}}, wavy mouth, {{parted lips, hand on own chest}}]
-        - ...
+        - KEY_SHOCKED[looking at viewer, furrowed brow, {{surprised, wide-eyed, confused, {{constricted pupils, hands up}}, open mouth, wavy mouth, shaded face]
+        - KEY_HAPPY[looking at viewer, {{happy}}, smile, arms at sides]
+        - KEY_CONFUSED[looking at viewer, confused, !?, parted lips, {{furrowed brow, raised eyebrow, hand on own chest}}, sweat]
+        - KEY_SHY[looking down, {{full-face blush}}, parted lips, wavy mouth, embarrassed, sweat, @_@, flying sweatdrops, {{{{{{hands on own face, covering face}}}}}}]
+        - KEY_SATISFIED[looking at viewer, Satisfied, half-closed eyes, parted lips, grin, arms behind back]
+        - KEY_AROUSED[looking at viewer, {{{{aroused}}}}, heavy breathing, {{{{blush}}}}, half-closed eyes, parted lips, moaning, {{{{furrowed brow}}}}, v arms]
+        - KEY_SEX_BLOWJOB[{{{NSFW, UNCENSORED}}}, sit, down on knees, grabbing penis, blowjob, penis in mouth, from above]
+        - KEY_SEX_DEEPTHROAT[{{{NSFW, UNCENSORED}}}, blowjob, penis in mouth, from side, Swallow the root of penis, 1.3::deepthroat x-ray, deepthroat cross-section::, cum in mouth, cum on breasts, tears, lovejuice]
+        - KEY_SEX_MIISSIONARY[{{{NSFW, UNCENSORED}}}, lying, spread legs, leg up, missionary, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from above]
+        - KEY_SEX_COWGIRL[{{{NSFW, UNCENSORED}}}, squatting, spread legs, leg up, cowgirl position, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from below]
+        - KEY_SEX_DOGGY[{{{NSFW, UNCENSORED}}}, lie down, doggystyle, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from behind]
+        - KEY_MASTURBATE_DILDO[{{{NSFW, UNCENSORED}}}, sit, insert dildo into pussy, panties aside, spread legs, legs up, 0.7::aroused, blush, love-juice::, from below]
 
 Please provide content for these missing emotions:
 ]]
         
         for _, emotion in ipairs(missingEmotionKeys) do
-            newImagePrompt = newImagePrompt .. "- _" .. emotion .. "[]\n"
+            newImagePrompt = newImagePrompt .. "- _" .. emotion .. "[...]\n"
         end
         
         newImagePrompt = newImagePrompt .. "\n\n"
@@ -656,7 +690,7 @@ end
 
     if tonumber(OMCOMPATIBILITY) >= 1 then
         newImagePrompt = newImagePrompt .. [[
-- REPLACE { and } to ( and ) in IMAGE PROMPT!!!
+- REPLACE { and } to ( and ) in IMAGE PROMPT
 - Example:
     - {1girl} => (1girl)
     - {{1boy}} => ((1boy))
@@ -665,21 +699,60 @@ end
 
     newImagePrompt = newImagePrompt .. [[
 
-Now, print out the IMAGE PROMPT and NEGATIVE PROMPT.
+Now, Generate the KEYWORD, IMAGE PROMPT, and NEGATIVE PROMPT.
 
 ]]
+    print([[ONLINEMODULE: getImagePromptToProcessImage: Sending request to model with prompt
+]] .. newImagePrompt)
+    -- 모델에 프롬프트 요청 전송
+    local success, rawResponse = pcall(function()
+        return sendSubModelRequestWithPrefill(triggerId, newImagePrompt)
+    end)
     
-    local rawResponse = sendSubModelRequestWithPrefill(triggerId, newImagePrompt)
-
-    -- 키워드 탐색 및 추출
+    if not success or not rawResponse then
+        print("ONLINEMODULE: Failed to get response from model for image prompt")
+        return false
+    end
+    
+    -- 정규식 패턴을 이용한 정보 추출
+    local processed = false
+    
+    -- 잘못된 형식으로 저장되는 경우 처리 (예: $__AH-YOON": "solo, 1girl...)
+    -- 이런 패턴도 감지하여 처리
+    rawResponse = string.gsub(rawResponse, "%$__([^:\"]+)\": \"([^\"]+)\"", function(name, value)
+        -- 파싱된 이름에서 IMG_, NEG_ 포맷 추출
+        local baseName, format = name:match("([^_]+)_(.+)")
+        if baseName and format then
+            if format == "IMG" then
+                setState(triggerId, baseName .. "_IMG", value)
+                print("ONLINEMODULE: Fixed and saved IMG_" .. baseName .. ": " .. value)
+                processed = true
+            elseif format == "NEG" then
+                setState(triggerId, baseName .. "_NEG", value)
+                print("ONLINEMODULE: Fixed and saved NEG_" .. baseName .. ": " .. value)
+                processed = true
+            end
+        end
+        return ""  -- 처리된 부분 제거
+    end)
+    
+    -- 타입태그 패턴 (예: IMG_AH-YOON_IMG\n"prompt내용")도 감지하여 처리
+    rawResponse = string.gsub(rawResponse, "IMG_([^_]+)_IMG%s*[\r\n]*\"([^\"]+)\"", function(name, value)
+        setState(triggerId, name .. "_IMG", value)
+        print("ONLINEMODULE: Extracted from tag format and saved IMG_" .. name .. ": " .. value)
+        processed = true
+        return ""
+    end)
+    
     -- KEY_KEYWORD[...] 패턴으로 행동 프롬프트 추출
     local keyPattern = "KEY_([^%[]+)%[([^%]]+)%]"
     for key, value in string.gmatch(rawResponse, keyPattern) do
         local keyName = key:match("%s*(.-)%s*$")
         local keyValue = value:match("%s*(.-)%s*$")
-        if keyName and keyValue then
+        if keyName and keyValue and keyName ~= "" and keyValue ~= "" then
             setState(triggerId, "_" .. keyName, keyValue)
             print("ONLINEMODULE: Found and saved behavior KEY_" .. keyName .. ": " .. keyValue)
+            processed = true
         end
     end
 
@@ -691,19 +764,31 @@ Now, print out the IMAGE PROMPT and NEGATIVE PROMPT.
     for charName, appearance in string.gmatch(rawResponse, imgPattern) do
         local trimmedName = charName:match("%s*(.-)%s*$")
         local trimmedAppearance = appearance:match("%s*(.-)%s*$")
-        if trimmedName and trimmedAppearance then
+        if trimmedName and trimmedAppearance and trimmedName ~= "" and trimmedAppearance ~= "" then
+            -- 잘못된 문자가 포함된 경우를 방지하기 위해 캐릭터 이름 정제
+            trimmedName = trimmedName:gsub("[^%w%-_]", "")
             setState(triggerId, trimmedName .. "_IMG", trimmedAppearance)
             print("ONLINEMODULE: Found and saved character appearance IMG_" .. trimmedName .. ": " .. trimmedAppearance)
+            processed = true
         end
     end
 
     for charName, negAppearance in string.gmatch(rawResponse, negPattern) do
         local trimmedName = charName:match("%s*(.-)%s*$")
         local trimmedNegAppearance = negAppearance:match("%s*(.-)%s*$")
-        if trimmedName and trimmedNegAppearance then
+        if trimmedName and trimmedNegAppearance and trimmedName ~= "" and trimmedNegAppearance ~= "" then
+            -- 잘못된 문자가 포함된 경우를 방지하기 위해 캐릭터 이름 정제
+            trimmedName = trimmedName:gsub("[^%w%-_]", "")
             setState(triggerId, trimmedName .. "_NEG", trimmedNegAppearance)
             print("ONLINEMODULE: Found and saved character negative appearance NEG_" .. trimmedName .. ": " .. trimmedNegAppearance)
+            processed = true
         end
+    end
+    
+    -- 처리된 정보가 없는 경우 경고
+    if not processed then
+        print("ONLINEMODULE: Warning - No valid prompts extracted from model response")
+        print("ONLINEMODULE: Raw response content: " .. rawResponse:sub(1, 200) .. "...")
     end
 
     -- 프롬프트 설정값 로드
@@ -740,6 +825,11 @@ Now, print out the IMAGE PROMPT and NEGATIVE PROMPT.
     print("Quality Prompt: " .. qualityPrompt)
     print("Negative Prompt: " .. negativePrompt)
     print("-----------------------ART PROMPT-----------------------")
+    
+    -- 이미지 생성을 위한 데이터 준비
+    local successCount = 0
+    local failCount = 0
+    
     -- 캡처된 각 이름-감정 조합에 대해 이미지 생성
     for _, capture in ipairs(captures) do
         local name = capture.name
@@ -750,7 +840,7 @@ Now, print out the IMAGE PROMPT and NEGATIVE PROMPT.
         local characterAppearance = getState(triggerId, name .. "_IMG")
         local characterNegative = getState(triggerId, name .. "_NEG")
         -- 감정 행동 정보 가져오기
-        local emotionBehavior = getState(triggerId, "_" .. emotion)
+        local emotionBehavior = getState(triggerId, emotion)
         
         -- 필요한 정보가 모두 있는지 확인
         if characterAppearance and characterAppearance ~= "" and 
@@ -767,19 +857,25 @@ Now, print out the IMAGE PROMPT and NEGATIVE PROMPT.
             local existingInlay = getState(triggerId, combinedKey)
             if existingInlay and existingInlay ~= "" then
                 print("ONLINEMODULE: Key " .. combinedKey .. " already has an inlay value, skipping.")
+                successCount = successCount + 1
             else
                 -- 이미지 생성
                 print("ONLINEMODULE: Generating new image for " .. combinedKey)
                 print("ONLINEMODULE: Final prompt: " .. finalPrompt)
                 print("ONLINEMODULE: Final negative prompt: " .. finalNegPrompt)
                 
-                local inlayImage = generateImage(triggerId, finalPrompt, finalNegPrompt):await()
-                if inlayImage then
+                local success, inlayImage = pcall(function()
+                    return generateImage(triggerId, finalPrompt, finalNegPrompt):await()
+                end)
+                
+                if success and inlayImage then
                     -- 생성된 이미지를 name_emotion 형식으로 저장
                     setState(triggerId, combinedKey, inlayImage)
                     print("ONLINEMODULE: Successfully generated and stored image for " .. combinedKey)
+                    successCount = successCount + 1
                 else
                     print("ONLINEMODULE: Failed to generate image for " .. combinedKey)
+                    failCount = failCount + 1
                 end
             end
         else
@@ -796,10 +892,14 @@ Now, print out the IMAGE PROMPT and NEGATIVE PROMPT.
             
             local missingInfoStr = table.concat(missingInfo, ", ")
             print("ONLINEMODULE: Cannot generate image due to missing " .. missingInfoStr)
+            failCount = failCount + 1
         end
     end
 
-    return true
+    print("ONLINEMODULE: Image generation summary - Success: " .. successCount .. ", Failed: " .. failCount)
+    
+    -- 하나 이상의 이미지가 성공적으로 생성되었으면 true 반환
+    return successCount > 0
 end)
 
 

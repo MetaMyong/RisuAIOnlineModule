@@ -1,12 +1,13 @@
 
 @@ depth 00 
 
-{{#if {{? {{getglobalvar::toggle_OMCARD}} == 1}}}}
+{{#if {{? {{getglobalvar::toggle_OMCARD}} > 0 }}}}
 # Output Format Guide
 - Always print the dialogues via [NAME:EMOTION|"DIALOGUE"] format.
     - NAME: The name of the NPC.
         - Must be in all english capital letters.
             - NO OTHER LANGUAGE ALLOWED.
+            - NO SPACE ALLOWED.
     - EMOTION: The emotion keyword of the NPC.
         - Must be in all english capital letters.
             - NO OTHER LANGUAGE ALLOWED.
