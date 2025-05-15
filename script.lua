@@ -395,8 +395,6 @@ local function changeEroStatus(triggerId, data)
         table.insert(html, "</div>")
         table.insert(html, "<div class=\"image-area\">")
             
-        print(inlayContent)
-
         if OMCARDNOIMAGE == "0" then
             table.insert(html, inlayContent)
         elseif OMCARDNOIMAGE == "1" then
@@ -426,14 +424,6 @@ local function changeEroStatus(triggerId, data)
         end
         table.insert(html, "<div class=\"placeholder-text-box\">" .. (nipplesText or "") .. "</div>")
         table.insert(html, "<div class=\"hover-text-content\">" .. (nipplesHover or "") .. "</div>")
-        table.insert(html, "</div>")
-
-        table.insert(html, "<div class=\"placeholder-wrapper\">")
-        if uterusImg and uterusImg ~= "" then
-            table.insert(html, "<img src=\"{{raw::" .. (uterusImg or "UTERUS_0") .. ".png}}\" class=\"placeholder-image\" draggable=\"false\">")
-        end
-        table.insert(html, "<div class=\"placeholder-text-box\">" .. (uterusText or "") .. "</div>")
-        table.insert(html, "<div class=\"hover-text-content\">" .. (uterusHover or "") .. "</div>")
         table.insert(html, "</div>")
 
         table.insert(html, "<div class=\"placeholder-wrapper\">")
@@ -492,6 +482,52 @@ local getImagePromptToProcessImage = async(function(triggerId, data)
     local OMNSFW = getGlobalVar(triggerId, "toggle_OMNSFW") or "0"
     local OMCOMPATIBILITY = getGlobalVar(triggerId, "toggle_OMCOMPATIBILITY") or "0"
 
+    
+    if getState(triggerId, "GREETING") == nil then
+        setState(triggerId, "GREETING", "looking at viewer, {{half-closed eyes, {{waving}}, smile}}")
+    end
+    if getState(triggerId, "ANGRY") == nil then
+        setState(triggerId, "ANGRY", "looking at viewer, {{angry}}, anger vein, wavy mouth, open mouth, {{hands on own hips}}, leaning forward")
+    end
+    if getState(triggerId, "CRYING") == nil then
+        setState(triggerId, "CRYING", "looking at viewer, {{crying, tears}}, wavy mouth, {{parted lips, hand on own chest}}")
+    end
+    if getState(triggerId, "SHOCKED") == nil then
+        setState(triggerId, "SHOCKED", "looking at viewer, furrowed brow, {{surprised, wide-eyed, confused, {{constricted pupils, hands up}}, open mouth, wavy mouth, shaded face")
+    end
+    if getState(triggerId, "HAPPY") == nil then
+        setState(triggerId, "HAPPY", "looking at viewer, {{happy}}, smile, arms at sides")
+    end
+    if getState(triggerId, "CONFUSED") == nil then
+        setState(triggerId, "CONFUSED", "looking at viewer, confused, !?, parted lips, {{furrowed brow, raised eyebrow, hand on own chest}}, sweat")
+    end
+    if getState(triggerId, "SHY") == nil then
+        setState(triggerId, "SHY", "looking down, {{full-face blush}}, parted lips, wavy mouth, embarrassed, sweat, @_@, flying sweatdrops, {{{{{{hands on own face, covering face}}}}}}")
+    end
+    if getState(triggerId, "SATISFIED") == nil then
+        setState(triggerId, "SATISFIED", "looking at viewer, Satisfied, half-closed eyes, parted lips, grin, arms behind back")
+    end
+    if getState(triggerId, "AROUSED") == nil then
+        setState(triggerId, "AROUSED", "looking at viewer, {{{{aroused}}}}, heavy breathing, {{{{blush}}}}, half-closed eyes, parted lips, moaning, {{{{furrowed brow}}}}, v arms")
+    end
+    if getState(triggerId, "SEX_BLOWJOB") == nil then
+        setState(triggerId, "SEX_BLOWJOB", "{{{NSFW, UNCENSORED}}}, sit, down on knees, grabbing penis, blowjob, penis in mouth, from above")
+    end
+    if getState(triggerId, "SEX_DEEPTHROAT") == nil then
+        setState(triggerId, "SEX_DEEPTHROAT", "{{{NSFW, UNCENSORED}}}, blowjob, penis in mouth, from side, Swallow the root of penis, 1.3::deepthroat x-ray, deepthroat cross-section::, cum in mouth, cum on breasts, tears, lovejuice")
+    end
+    if getState(triggerId, "SEX_MISSIONARY") == nil then
+        setState(triggerId, "SEX_MISSIONARY", "{{{NSFW, UNCENSORED}}}, lying, spread legs, leg up, missionary, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from above")
+    end
+    if getState(triggerId, "SEX_COWGIRL") == nil then
+        setState(triggerId, "SEX_COWGIRL", "{{{NSFW, UNCENSORED}}}, squatting, spread legs, leg up, cowgirl position, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from below")
+    end
+    if getState(triggerId, "SEX_DOGGY") == nil then
+        setState(triggerId, "SEX_DOGGY", "{{{NSFW, UNCENSORED}}}, lie down, doggystyle, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from behind")
+    end
+    if getState(triggerId, "SEX_MASTURBATE_DILDO") == nil then
+        setState(triggerId, "SEX_MASTURBATE_DILDO", "{{{NSFW, UNCENSORED}}}, sit, insert dildo into pussy, panties aside, spread legs, legs up, 0.7::aroused, blush, love-juice::, from below")
+    end
 
     -- 테이블을 만들어 각 대화 캡처를 저장
     local captures = {}
@@ -651,6 +687,16 @@ local getImagePromptToProcessImage = async(function(triggerId, data)
 ## Missing Emotion Keys
 - For each missing emotion key below, provide the behavior content in the format:
     - KEY_KEYWORD[behavior content description]
+    - Example:
+        - KEY_GREETING[looking at viewer, {{half-closed eyes, {{waving}}, smile}}]
+        - KEY_ANGRY[looking at viewer, {{angry}}, anger vein, wavy mouth, open mouth, {{hands on own hips}}, leaning forward]
+        - KEY_CRYING[looking at viewer, {{crying, tears}}, wavy mouth, {{parted lips, hand on own chest}}]
+        - KEY_SHOCKED[looking at viewer, furrowed brow, {{surprised, wide-eyed, confused, {{constricted pupils, hands up}}, open mouth, wavy mouth, shaded face]
+        - KEY_HAPPY[looking at viewer, {{happy}}, smile, arms at sides]
+        - KEY_CONFUSED[looking at viewer, confused, !?, parted lips, {{furrowed brow, raised eyebrow, hand on own chest}}, sweat]
+        - KEY_SHY[looking down, {{full-face blush}}, parted lips, wavy mouth, embarrassed, sweat, @_@, flying sweatdrops, {{{{{{hands on own face, covering face}}}}}}]
+        - KEY_SATISFIED[looking at viewer, Satisfied, half-closed eyes, parted lips, grin, arms behind back]
+        - KEY_AROUSED[looking at viewer, {{{{aroused}}}}, heavy breathing, {{{{blush}}}}, half-closed eyes, parted lips, moaning, {{{{furrowed brow}}}}, v arms]
 
 - Please provide content for these missing emotions:
 ]]
