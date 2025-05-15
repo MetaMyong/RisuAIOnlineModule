@@ -497,9 +497,12 @@ local getImagePromptToProcessImage = async(function(triggerId, data)
     -- 새로 캡처해온 이름으로 이미지 프롬프트 작성
     print("ONLINEMODULE: getImagePromptToProcessImage: Creating new image prompt")
     local newImagePrompt = [[
-Now, you have to make a prompt for generating an image.
-- Make a prompt for each character with their specific emotion.
-- Refer to the character's appearance, body, and clothing information.
+# Image Prompt
+- This prompt must describe situations, settings, and actions related to the Character in vivid and detailed language.
+
+- Now, you have to make a prompt for generating an image.
+    - Make a prompt for each character with their specific emotion.
+    - Refer to the character's appearance, body, and clothing information.
 ]]
 
     -- 캡처된 각 이름에 대해 외형 정보 확인
@@ -521,9 +524,9 @@ Now, you have to make a prompt for generating an image.
            characterAppearanceNegPrompt and characterAppearanceNegPrompt ~= "" then
             print("ONLINEMODULE: Found existing appearance information for character: " .. capture.name)
             newImagePrompt = newImagePrompt .. [[
-- Character: ]] .. capture.name .. [[ with appearance:
-  - Appearance: ]] .. characterAppearancePrompt .. [[
-  - Negative: ]] .. characterAppearanceNegPrompt .. [[
+    - Character: ]] .. capture.name .. [[ with appearance:
+        - Appearance: ]] .. characterAppearancePrompt .. [[
+        - Negative: ]] .. characterAppearanceNegPrompt .. [[
 ]]
         else
             print("ONLINEMODULE: No appearance information found for character: " .. capture.name)
@@ -534,16 +537,16 @@ Now, you have to make a prompt for generating an image.
     -- 외형 정보가 없는 캐릭터가 있다면 정보 요청
     if #missingCharacters > 0 then
         newImagePrompt = newImagePrompt .. [[
-## Missing Character Information
-For the following characters, provide appearance information in this format:
-- No blank space allowed in the name.
-- IMG_NPCNAME[solo, 1girl/1boy, age, {{hair details}}, {{{body details}}}, {{clothing}}, other features]
-- NEG_NPCNAME[features to avoid]
-    - Example:
-        - IMG_Moyamo[solo, 1girl, 18, {{long hair, brown hair}}, {{{slim body}}}, {{school uniform}}, other features]
-        - NEG_Moyamo[no glasses, no hat]
+    ## Missing Character Information
+    - For the following characters, provide appearance information in this format:
+        - No blank space allowed in the name.
+        - IMG_NPCNAME[solo, 1girl/1boy, age, {{hair details}}, {{{body details}}}, {{clothing}}, other features]
+        - NEG_NPCNAME[features to avoid]
+            - Example:
+                - IMG_Moyamo[solo, 1girl, 18, {{long hair, brown hair}}, {{{slim body}}}, {{school uniform}}, other features]
+                - NEG_Moyamo[no glasses, no hat]
 
-Please provide appearance information for these characters:
+    - Please provide appearance information for these characters:
 ]]
         for _, name in ipairs(missingCharacters) do
             newImagePrompt = newImagePrompt .. "- " .. "IMG_" .. name .. "[...]\n"
@@ -552,7 +555,7 @@ Please provide appearance information for these characters:
     end
 
     newImagePrompt = newImagePrompt .. [[
-- Create prompts for the following character-emotion pairs:
+    - Create prompts for the following character-emotion pairs:
 ]]
     
     -- 감정키가 없는 것들을 저장할 테이블
@@ -575,7 +578,7 @@ Please provide appearance information for these characters:
             -- 만약 감정 키가 없으면 테이블에 추가
             table.insert(missingEmotionKeys, emotionKey)
             newImagePrompt = newImagePrompt .. [[
-- Character: ]] .. capture.name .. [[ with emotion: ]] .. emotionKey .. [[ currently not exists.
+        - Character: ]] .. capture.name .. [[ with emotion: ]] .. emotionKey .. [[ currently not exists.
 ]]
         else
             print("ONLINEMODULE: getImagePromptToProcessImage: Found existing emotion prompt for " .. emotionKey)
@@ -583,7 +586,7 @@ Please provide appearance information for these characters:
         
         print("ONLINEMODULE: getImagePromptToProcessImage: Image prompt will make a Character for " .. capture.name .. " with emotion " .. emotionKey)
         newImagePrompt = newImagePrompt .. [[
-- Character: ]] .. capture.name .. [[ with emotion: ]] .. emotionKey .. [[ currently exists.
+        - Character: ]] .. capture.name .. [[ with emotion: ]] .. emotionKey .. [[ currently exists.
 ]]
         
         newImagePrompt = newImagePrompt .. "\n\n"
@@ -593,8 +596,8 @@ Please provide appearance information for these characters:
     if #missingEmotionKeys > 0 then
         newImagePrompt = newImagePrompt .. [[
 ## Missing Emotion Keys
-For each missing emotion key below, provide the behavior content in the format:
-- KEY_KEYWORD[behavior content description]
+- For each missing emotion key below, provide the behavior content in the format:
+    - KEY_KEYWORD[behavior content description]
     - Example: 
         - KEY_GREETING[looking at viewer, {{half-closed eyes, {{waving}}, smile}}]
         - KEY_ANGRY[looking at viewer, {{angry}}, anger vein, wavy mouth, open mouth, {{hands on own hips}}, leaning forward]
@@ -606,13 +609,12 @@ For each missing emotion key below, provide the behavior content in the format:
         - KEY_SATISFIED[looking at viewer, Satisfied, half-closed eyes, parted lips, grin, arms behind back]
         - KEY_AROUSED[looking at viewer, {{{{aroused}}}}, heavy breathing, {{{{blush}}}}, half-closed eyes, parted lips, moaning, {{{{furrowed brow}}}}, v arms]
         - KEY_SEX_BLOWJOB[{{{NSFW, UNCENSORED}}}, sit, down on knees, grabbing penis, blowjob, penis in mouth, from above]
-        - KEY_SEX_DEEPTHROAT[{{{NSFW, UNCENSORED}}}, blowjob, penis in mouth, from side, Swallow the root of penis, 1.3::deepthroat x-ray, deepthroat cross-section::, cum in mouth, cum on breasts, tears, lovejuice]
         - KEY_SEX_MIISSIONARY[{{{NSFW, UNCENSORED}}}, lying, spread legs, leg up, missionary, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from above]
         - KEY_SEX_COWGIRL[{{{NSFW, UNCENSORED}}}, squatting, spread legs, leg up, cowgirl position, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from below]
         - KEY_SEX_DOGGY[{{{NSFW, UNCENSORED}}}, lie down, doggystyle, sex, penis in pussy, 0.7::aroused, blush, love-juice, trembling::, from behind]
         - KEY_MASTURBATE_DILDO[{{{NSFW, UNCENSORED}}}, sit, insert dildo into pussy, panties aside, spread legs, legs up, 0.7::aroused, blush, love-juice::, from below]
 
-Please provide content for these missing emotions:
+- Please provide content for these missing emotions:
 ]]
         
         for _, emotion in ipairs(missingEmotionKeys) do
@@ -623,36 +625,57 @@ Please provide content for these missing emotions:
     end
 
     newImagePrompt = newImagePrompt .. [[
-# Image Prompt
+
+## Image Prompt: Extraction
 - From the narrative, extract details to construct a comprehensive Prompt.
-- Use the previously stored character appearance and emotion information.
 
-## Image Prompt Format
-- Generate image prompts using this structure:
-    - IMG_CharacterName[prompt details only with appearance and clothing]
-    - NEG_CharacterName[negative prompt details only with appearance and clothing]
-
-## Image Generation Process
-- For each character-emotion pair, the system will:
-    1. Retrieve character appearance info from IMG_CharacterName state
-    2. Retrieve character negative info from NEG_CharacterName state
-    3. Retrieve emotion behavior from KEY_EMOTION state
-
-## Important Considerations
-- Do not describe the same thing in both IMAGE PROMPT and NEGATIVE PROMPT
-- Focus on the character only, not scene or background
-- If the situation is under NSFW, include the following in the IMAGE PROMPT:
-    - {{{NSFW, UNCENSORED}}}
-- If the situation is not under NSFW, include the following in the IMAGE PROMPT:
-    - {{{CENSORED}}}
+## Image Prompt: Placeholder
+- Focus on the situation the Character is in.
+- The Image Prompt must be written in English and be detailed and descriptive.
+- REPLACE the PLACEHOLDER in the PROMPT:
+	- PLACEHOLDER:
+		- (SITUATION):
+			- Normal situation: {{{CENSORED}}}
+			- NSFW SITUATION:
+				- Bodypart not exposed: Print do not print anything.
+				- Breasts or nipples exposed: Print '{{{NSFW, breasts, nipples}}}'
+				- Pussy exposed: Print '{{{NSFW,UNCENSORED, pussy}}}'
+		- (LABEL):
+			- ONLY 1 Character.
+			- Example:
+				- If Character is a male: 
+					- PROMPT: "solo, 1boy"
+					- NEGATIVE PROMPT: "1girl, female"
+				- If Character is a female:
+					- PROMPT: "solo, 1girl"
+					- NEGATIVE PROMPT: "1boy, male"
+		- (EXPRESSIONS): Describe Character's facial expressions and emotions.
+		- (ACTIONS): Detail Character's behaviors and movements.
+		- (AGE): Describe Character's age in 10s. (e.g., '20s years old')
+		- (APPEARANCE): Describe Character's observable features with {{ and }}. (e.g., '{{pink short hair, high twin-tail}}')
+		- (BODY): Describe Character's physique, output with {{{ and }}}. (e.g., '{{Slender, AA-Cup small breasts, small nipples}}')
+			- BODY shape: slender, petite, loli, glamour, ... etc.
+			- Breast size: A-Cup small breasts, H-Cup large Breasts, ... etc.
+			- If Character is under NSFW situation:
+				- Breasts exposed:
+					- Areola size: small areola, ... etc.
+					- Nipple size: small nipples, ... etc.
+				- Pussy exposed
+					- Shape of pussy: innie pussy, ... etc.
+					- Pussy hair: Baldie, heart-shaped pubic hair, ... 
+		- (DRESSES): 
+			- Outline Character's outfit (type, materials, textures, colors, accessories).
+			- Do not describe under the thighs.
 
 ## Examples of Output
-- IMG_Eun-young[solo, 1girl, 20s years old, {{long twin-tail, pink hair}}, {{{slender, AA-Cup small breasts}}}, {{white dress}}, {{cowboy shot, white background, simple background}}]
-- NEG_Eun-young[1boy, male, short hair, chubby, multiple girls]
-- KEY_GREETING[looking at viewer, {{half-closed eyes, {{waving}}, smile}}]
-- KEY_ANGRY[looking at viewer, {{angry}}, anger vein, wavy mouth, open mouth, {{hands on own hips}}, leaning forward]
-
-- No need to create prompts from scratch - the system will use saved profiles
+- IMG_NAME[(LABEL),(AGE),(APPEARANCE),(BODY),(DRESSES)]
+- NEG_NAME[(LABEL),(APPEARANCE),(BODY),(DRESSES)]
+- KEY_KEYWORD[(SITUATION),(EXPRESSIONS),(ACTIONS)]
+- Final Prompt:
+    - IMG_Eun-young[solo, 1girl, 20s years old, {{long twin-tail, pink hair}}, {{{slender, AA-Cup small breasts}}}, {{white dress}}]
+    - NEG_Eun-young[1boy, male, short hair, chubby, multiple girls, short twin-tail, red hair, {{black dress}}]
+    - KEY_GREETING[{{{CENSORED}}}, {{{looking at viewer, {{half-closed eyes, {{waving}}, smile}}}]
+    - KEY_SEX_DEEPTHROAT[{{{NSFW, UNCENSORED, breasts, nipples, pussy}}}, blowjob, penis in mouth, from side, Swallow the root of penis, 1.3::deepthroat x-ray, deepthroat cross-section::, cum in mouth, cum on breasts, tears, lovejuice]
 ]]
 
 
@@ -803,7 +826,7 @@ Now, Generate the KEYWORD, IMAGE PROMPT, and NEGATIVE PROMPT.
     local artistPrompt = nil
     local qualityPrompt = nil
     local negativePrompt = nil
-    local backgroundPrompt = "{{{white background, simple background}}}"
+    local backgroundPrompt = "{{{cowboy shot, white background, simple background}}}"
     local OMPRESETPROMPT = getGlobalVar(triggerId, "toggle_OMPRESETPROMPT") or "0"
 
     if OMPRESETPROMPT == "0" then

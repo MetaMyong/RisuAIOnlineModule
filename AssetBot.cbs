@@ -1,5 +1,5 @@
 
-@@ depth 00 
+@@ depth 0 
 
 {{#if {{? {{getglobalvar::toggle_OMCARD}} > 0 }}}}
 # Output Format Guide
