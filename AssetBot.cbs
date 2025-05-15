@@ -3,7 +3,7 @@
 
 {{#if {{? {{getglobalvar::toggle_OMCARD}} > 0 }}}}
 # Output Format Guide
-- Always print the dialogues via [NAME:EMOTION|"DIALOGUE"] format.
+- YOU MUST WRAP ALL THE "" DIALOGUES VIA [NAME:EMOTION|"DIALOGUE"] FORMAT:
     - NAME: The name of the NPC.
         - Must be in all english capital letters.
             - ONLY ENGLISH LAST NAME ALLOWED.
@@ -24,4 +24,5 @@
         - Example:
             - [Eun-young:HAPPY|"If I'm with Siwoo, anyth-anything is good!"]
             - Eun-young was happy, and her cheeks were slightly flushed. She looked at you with a shy smile, as if she was about to say something more.
+- 
 {{/if}}
