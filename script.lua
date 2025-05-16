@@ -296,7 +296,7 @@ local function updateEroStatus(triggerId, data)
             - Please print out the total count from birth to now.
             - If character has no experience, state that character has no experience.
 - Final Output Example:
-    - ERO[NAME:Eun-Young|MOUTH:MOUTH_0|I just took a sip of tea. Only the fragrance of the tea remains for now.|Oral sex experience: 0 times↔Swallowed cum amount: 0 ml|NIPPLES:NIPPLES_0|I'm properly wearing underwear beneath my dress. I don't feel anything in particular.|Nipple climax experience: 0 times↔Breast milk discharge amount: 0 ml|UTERUS:UTERUS_0|Inside my body... there's still no change. Of course!|Menst: Ovulating↔Injected cum amount: 1920 ml↔Pregnancy probability: 78%|VAGINAL:VAGINAL_2|Ah, Brother {{user}}!|State: Non-virgin↔Masturbation count: 1234 times↔Vaginal intercourse count: 9182 times↔Total vaginal ejaculation amount: 3492 ml↔Vaginal ejaculation count: 512 times|ANAL:ANAL_0|It's, it's dirty! Even thinking about it is blasphemous!|State: Undeveloped↔Anal intercourse count: 0 times↔Total anal ejaculation amount: 0 ml↔Anal ejaculation count: 0 times]
+    - ERO[NAME:Eun-Young|MOUTH:MOUTH_0|방금 차를 마셔서 그런지 상쾌해.|펠라 경험: 0 회↔삼킨 정액량: 0 ml|NIPPLES:NIPPLES_0|제대로 속옷을 입고 있어. 아무렇지도 않아.|유두 절정 경험: 0 회↔모유 분출량: 0 ml|UTERUS:UTERUS_0|내 몸 안은.. 아무렇지도 않아. 당연하잖아?!|생리주기: 황체기↔주입된 정액량: 1920 ml↔임신 확률: 78%|VAGINAL:VAGINAL_2|아, {{user}} 오빠!|상태: 비처녀↔자위 횟수: 1234 회↔질내 왕복 횟수: 9182 회↔총 질내 사정량: 3492 ml↔질내 사정 횟수: 512 회|ANAL:ANAL_0|더, 더러워! 왜 이런 곳을 묻는 거야?!|상태: 미개발↔애널 왕복 횟수: 0 회↔총 애널 사정량: 0 ml↔애널 사정 횟수: 0 회]
     - ERO[NAME:Akari|MOUTH:....]
 ]]
 
